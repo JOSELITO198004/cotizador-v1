@@ -2,82 +2,926 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi App PWA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0055A4">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230055A4'/><text x='50' y='55' font-family='Arial' font-size='40' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>EN</text></svg>">
+    <title>Cotizador App V1</title>
     
-    <!-- Conexión con el Manifest para Android -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#3b82f6">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Se eliminó html2pdf.js ya que usaremos el motor de impresión nativo -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        const manifestData = {
+            "name": "Cotizador de Ventas V1",
+            "short_name": "Cotizador V1",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#F1F5F9",
+            "theme_color": "#0055A4",
+            "icons": [{
+                "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230055A4' rx='20'/><text x='50' y='55' font-family='Arial' font-size='40' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>EN</text></svg>",
+                "sizes": "192x192",
+                "type": "image/svg+xml",
+                "purpose": "any maskable"
+            }]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        document.write(`<link rel="manifest" href="${manifestUrl}">`);
+    </script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: { DEFAULT: '#0055A4', dark: '#003366', light: '#E6F0FA' },
+                        danger: '#E3000F',
+                        warning: '#FFC107',
+                        success: '#28A745',
+                        lightbg: '#F1F5F9',
+                        darktext: '#1E293B'
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
         body { 
-            font-family: system-ui, -apple-system, sans-serif; 
-            text-align: center; 
-            padding: 20px; 
-            background-color: #f3f4f6;
+            font-family: 'Inter', sans-serif; 
+            background-color: #F1F5F9; 
+            color: #1E293B; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+            overflow-y: auto;
         }
-        .contenedor {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            max-width: 400px;
-            margin: 0 auto;
+        
+        ::-webkit-scrollbar { display: none; }
+        
+        .nav-item.active { color: #0055A4; font-weight: 800; }
+        .nav-item.active svg { stroke-width: 2.5; }
+
+        #main-content { padding-bottom: 150px !important; }
+        
+        .android-safe-nav {
+            padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
+            min-height: 80px !important;
         }
-        button { 
-            padding: 12px 24px; 
-            font-size: 16px; 
-            margin: 10px; 
-            cursor: pointer;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
+
+        /* Estilos específicos para la impresión nativa */
+        @media print {
+            @page { margin: 10mm; }
+            body { background-color: white !important; }
+            /* Ocultar interfaz al imprimir */
+            header, nav, main, #alert-box, .print-hidden { display: none !important; }
+            /* Mostrar SOLO el área de impresión */
+            #print-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
         }
-        .btn-imprimir { background-color: #3b82f6; }
-        .btn-guardar { background-color: #10b981; }
     </style>
 </head>
-<body>
+<body> 
 
-    <div class="contenedor">
-        <h1>Mi App PWA</h1>
-        <p>Prueba las funciones nativas a continuación:</p>
+<!-- App Bar Superior -->
+<header class="bg-primary text-white shadow-md sticky top-0 z-40 print-hidden">
+    <div class="px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-white text-primary rounded-xl flex items-center justify-center font-black text-xs shadow-inner">EN</div>
+            <div>
+                <h1 class="text-base font-black uppercase leading-none">Cotizador V1</h1>
+                <p class="text-[9px] font-medium uppercase opacity-80 mt-0.5" id="header-status">Esperando Base de Datos...</p>
+            </div>
+        </div>
+        <button onclick="clearCacheAndReload()" class="p-2 hover:bg-primary-dark rounded-full transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        </button>
+    </div>
+</header>
 
-        <!-- Botón para Imprimir -->
-        <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir Pantalla</button>
-
-        <!-- Botón para Guardar/Descargar -->
-        <button class="btn-guardar" onclick="descargarArchivo()">💾 Guardar Archivo</button>
+<main id="main-content" class="p-4 relative print-hidden">
+    
+    <!-- Alertas -->
+    <div id="alert-box" class="hidden fixed top-20 left-4 right-4 z-[60] bg-white border-l-4 border-danger shadow-xl p-3 rounded-lg">
+        <div class="flex items-center gap-3">
+            <div class="bg-red-100 text-danger p-1 rounded-full font-bold w-6 h-6 flex items-center justify-center text-xs">!</div>
+            <p id="alert-msg" class="text-[11px] font-bold text-gray-800 uppercase break-words"></p>
+        </div>
     </div>
 
-    <script>
-        // Función para simular la descarga de un archivo
-        function descargarArchivo() {
-            // Creamos un texto de prueba
-            const contenido = "Este es un documento guardado desde tu App en Android.";
-            // Lo convertimos en un archivo Blob
-            const blob = new Blob([contenido], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
+    <!-- PASO 1: CARGA DE ARCHIVO -->
+    <div id="step-1" class="w-full bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col items-center text-center mt-4">
+        <input type="file" id="dataFile" accept=".xlsx, .xls" class="hidden">
+        
+        <div id="loader-spinner" class="hidden mb-6 flex flex-col items-center py-10">
+            <div class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-3"></div>
+            <span class="text-xs font-bold text-primary uppercase tracking-widest animate-pulse" id="loader-text">Procesando Base de Datos...</span>
+        </div>
+        
+        <div id="upload-content" class="w-full">
+            <div class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+            </div>
+            <h2 class="text-lg font-black text-darktext mb-1 uppercase">Base de Datos Maestra</h2>
+            <p class="text-gray-500 mb-6 text-xs">Sube tu archivo <span class="font-bold text-primary">.XLSX</span>.</p>
             
-            // Forzamos la descarga nativa
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'mi-documento.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
+            <div class="flex flex-col gap-3 w-full">
+                <button type="button" onclick="loadFromCloud()" class="w-full bg-primary text-white py-3.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-md">
+                    Descargar de la Nube
+                </button>
+                <button type="button" id="btnSelectFile" class="w-full bg-white text-primary border-2 border-primary py-3.5 rounded-xl text-xs font-black uppercase tracking-widest">
+                    Seleccionar Local
+                </button>
+            </div>
+        </div>
+    </div>
 
-        // --- REGISTRO DEL SERVICE WORKER (Obligatorio para PWA) ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                .then(() => console.log('Service Worker Registrado'))
-                .catch(err => console.error('Error en Service Worker', err));
+    <!-- PASO 2: PANEL DE CONTROL -->
+    <div id="step-main-menu" class="w-full hidden mt-2">
+        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Panel Principal</h2>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div onclick="switchTab('clientes')" class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform">
+                <div class="w-12 h-12 bg-blue-50 text-primary rounded-full flex items-center justify-center mb-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                </div>
+                <h3 class="text-xs font-black text-darktext uppercase">Cartera</h3>
+            </div>
+
+            <div onclick="openQuickQuote()" class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform">
+                <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mb-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <h3 class="text-xs font-black text-darktext uppercase">Mostrador</h3>
+            </div>
+
+            <div onclick="openNewClientModal()" class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform">
+                <div class="w-12 h-12 bg-green-50 text-success rounded-full flex items-center justify-center mb-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                </div>
+                <h3 class="text-xs font-black text-darktext uppercase">Nuevo Cliente</h3>
+            </div>
+
+            <div onclick="switchTab('informes')" class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform">
+                <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mb-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                </div>
+                <h3 class="text-xs font-black text-darktext uppercase">Informes</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- PASO 3: LISTA DE CLIENTES -->
+    <div id="step-clientes" class="w-full hidden">
+        <div class="relative mb-4">
+            <input type="text" id="clientSearch" placeholder="Buscar cliente..." class="w-full p-3 pl-10 bg-white border border-gray-300 rounded-xl focus:border-primary outline-none font-semibold text-darktext text-sm shadow-sm" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <div id="client-list" class="flex flex-col gap-3 pb-4"></div>
+    </div>
+
+    <!-- PASO 4: COTIZADOR -->
+    <div id="step-cotizador" class="w-full hidden">
+        
+        <div class="bg-primary text-white rounded-2xl shadow-lg p-4 mb-4 relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 opacity-10">
+                <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.64-2.25 1.64-1.74 0-2.1-.96-2.15-1.92H8.03c.06 1.62 1.06 2.84 2.87 3.24V19h2.34v-1.73c1.55-.31 2.82-1.3 2.82-2.92 0-2.07-1.67-2.82-3.75-3.35z"></path></svg>
+            </div>
+            <p class="text-[9px] font-bold uppercase tracking-widest opacity-80 mb-1">Cotizando a:</p>
+            <h2 id="cot-client-name" class="text-lg font-black uppercase leading-tight line-clamp-1 mb-2"></h2>
+            
+            <div class="bg-black/20 rounded-xl p-3 mt-2 backdrop-blur-sm border border-white/10">
+                <div class="flex justify-between items-center text-[10px] font-bold uppercase opacity-80 mb-1">
+                    <span>Subtotal:</span><span id="cot-subtotal">$0.00</span>
+                </div>
+                <div class="flex justify-between items-center text-[10px] font-bold uppercase opacity-80 mb-1">
+                    <span>IVA (16%):</span><span id="cot-iva">$0.00</span>
+                </div>
+                <div class="flex justify-between items-center text-xs font-black uppercase mt-1 pt-1 border-t border-white/20">
+                    <span>Total Final:</span><span id="cot-grand-total" class="text-xl">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="relative w-full z-30 mb-4">
+            <input type="text" id="prod-search-input" placeholder="Buscar producto..." class="w-full p-3 bg-white border border-gray-300 rounded-xl focus:border-primary outline-none font-semibold text-darktext text-sm shadow-sm" oninput="handleProductSearch()" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+            <div id="prod-search-results" class="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto hidden shadow-2xl mt-1 z-50 divide-y divide-gray-100"></div>
+        </div>
+
+        <div id="cart-list-container" class="flex flex-col gap-3 mb-6">
+            <div class="bg-white p-6 rounded-xl border border-gray-200 text-center text-gray-400 font-bold text-xs uppercase shadow-sm">
+                El carrito está vacío
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-2 mt-4 mb-4">
+            <button onclick="clearCart()" class="bg-red-50 text-danger border border-danger/30 py-3 rounded-xl text-[10px] font-black uppercase shadow-sm">Vaciar</button>
+            <button onclick="exportExcel()" class="bg-white text-primary border border-primary py-3 rounded-xl text-[10px] font-black uppercase shadow-sm">Excel</button>
+            <button onclick="generatePrint()" class="col-span-2 bg-primary text-white py-3.5 rounded-xl text-xs font-black uppercase shadow-md flex justify-center items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                Imprimir Remisión (PDF)
+            </button>
+        </div>
+    </div>
+
+    <!-- PASO 5: INFORMES -->
+    <div id="step-informes" class="w-full hidden">
+        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Reporte de Sesión</h2>
+        
+        <div class="bg-primary text-white rounded-2xl p-5 shadow-md flex flex-col justify-center items-center text-center mb-4 relative overflow-hidden">
+            <p class="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Total Pagado Hoy</p>
+            <p id="rep-total-money" class="text-3xl font-black">$0.00</p>
+            <p id="rep-total-count" class="text-xs font-medium mt-1 bg-white/20 px-3 py-1 rounded-full">0 Ventas Cerradas</p>
+        </div>
+
+        <div class="flex justify-between items-center mb-3 px-1">
+            <h3 class="text-xs font-black uppercase text-gray-500">Historial de Remisiones</h3>
+        </div>
+
+        <div id="rep-list-container" class="flex flex-col gap-3">
+             <!-- Historial renderizado aqui -->
+        </div>
+    </div>
+
+    <!-- MODAL NUEVO CLIENTE -->
+    <div id="modal-new-client" class="hidden fixed inset-0 z-[70] bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full overflow-hidden border border-gray-100 mt-[-10%]">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="text-base font-black text-darktext uppercase">Alta Manual</h2>
+                <button onclick="closeNewClientModal()" class="text-gray-400 p-1 hover:text-danger hover:bg-gray-100 rounded">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-4 flex flex-col gap-3">
+                <input type="text" id="nc-id" placeholder="ID Cliente *" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+                <input type="text" id="nc-name" placeholder="Razón Social *" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+                <input type="text" id="nc-rfc" placeholder="RFC (Opcional)" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+                <input type="text" id="nc-city" placeholder="Ciudad (Opcional)" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+            </div>
+            <div class="p-4 border-t border-gray-100 flex gap-2">
+                <button onclick="closeNewClientModal()" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold uppercase hover:bg-gray-200">Cancelar</button>
+                <button onclick="saveNewClient()" class="flex-1 py-3 bg-primary text-white rounded-xl text-xs font-black uppercase shadow-sm">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL COBRO -->
+    <div id="modal-payment" class="hidden fixed inset-0 z-[80] bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-100 mt-[-10%]">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <div>
+                    <h2 class="text-base font-black text-darktext uppercase">Cerrar Venta</h2>
+                    <p id="pay-folio-text" class="text-[10px] text-gray-500 font-bold uppercase"></p>
+                </div>
+                <button onclick="closePaymentModal()" class="text-gray-400 p-1 hover:text-danger hover:bg-gray-200 rounded">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-5 flex flex-col gap-4 text-center">
+                <p class="text-xs font-bold text-gray-600 uppercase">Selecciona el método de pago</p>
+                <select id="payment-method" class="w-full p-3 bg-white border-2 border-gray-200 rounded-xl text-sm font-bold text-darktext outline-none focus:border-primary">
+                    <option value="">-- Seleccionar --</option>
+                    <option value="EFECTIVO">Efectivo</option>
+                    <option value="TARJETA DÉBITO">Tarjeta Débito</option>
+                    <option value="TARJETA CRÉDITO">Tarjeta Crédito</option>
+                    <option value="TRANSFERENCIA">Transferencia SPEI</option>
+                </select>
+            </div>
+            <div class="p-4 border-t border-gray-100 flex gap-2">
+                <button onclick="closePaymentModal()" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold uppercase hover:bg-gray-200">Cancelar</button>
+                <button onclick="confirmPayment()" class="flex-1 py-3 bg-success text-white rounded-xl text-xs font-black uppercase shadow-sm flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Confirmar Pago
+                </button>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<nav id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white border-t border-gray-200 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] z-40 android-safe-nav print-hidden">
+    <div class="flex justify-around items-center h-16 pt-2">
+        <button onclick="switchTab('inicio')" id="tab-inicio" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition-colors">
+            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <span class="text-[9px] font-bold">Inicio</span>
+        </button>
+        <button onclick="switchTab('clientes')" id="tab-clientes" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition-colors">
+            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            <span class="text-[9px] font-bold">Clientes</span>
+        </button>
+        <button onclick="switchTab('cotizador')" id="tab-cotizador" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition-colors">
+            <div class="relative">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <span id="cart-badge" class="absolute -top-1 -right-2 bg-danger text-white text-[8px] font-black px-1.5 py-0.5 rounded-full hidden shadow-sm">0</span>
+            </div>
+            <span class="text-[9px] font-bold">Carrito</span>
+        </button>
+        <button onclick="switchTab('informes')" id="tab-informes" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition-colors">
+            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span class="text-[9px] font-bold">Informes</span>
+        </button>
+    </div>
+</nav>
+
+<!-- ÁREA DE IMPRESIÓN (Totalmente oculta excepto al invocar window.print) -->
+<div id="print-area" class="hidden"></div>
+
+<script>
+    // --- VARIABLES GLOBALES Y LOCAL STORAGE ---
+    let globalProducts = new Map();
+    let globalClients = new Map();
+    let selectedClient = null;
+    let cartItems = new Map(); 
+    let saleToPay = null; 
+    
+    // Recuperar datos permanentes o iniciar de 0
+    let sessionSales = JSON.parse(localStorage.getItem('apymsa_sales')) || [];
+    let folioGlobalCounter = parseInt(localStorage.getItem('apymsa_folio')) || 1;
+    
+    function saveSalesToLocal() {
+        localStorage.setItem('apymsa_sales', JSON.stringify(sessionSales));
+        localStorage.setItem('apymsa_folio', folioGlobalCounter);
+    }
+    
+    const fileInput = document.getElementById('dataFile');
+    const step1 = document.getElementById('step-1');
+    const stepMainMenu = document.getElementById('step-main-menu');
+    const stepClientes = document.getElementById('step-clientes');
+    const stepCotizador = document.getElementById('step-cotizador');
+    const stepInformes = document.getElementById('step-informes');
+    const bottomNav = document.getElementById('bottom-nav');
+    const clientList = document.getElementById('client-list');
+    const clientSearch = document.getElementById('clientSearch');
+    
+    const moneyFmt = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+
+    function showAlert(msg, timeout = 3500) {
+        const box = document.getElementById('alert-box');
+        document.getElementById('alert-msg').innerText = msg;
+        box.classList.remove('hidden');
+        setTimeout(() => box.classList.add('hidden'), timeout);
+    }
+
+    function clearCacheAndReload() { location.reload(); }
+    function normalizeKey(key) { return String(key || "").toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9_]/g, ""); }
+    function parseMoney(value) { let num = parseFloat(String(value).replace(/[^\d.-]/g, '').trim()); return isNaN(num) ? 0 : num; }
+
+    function hideAllSteps() {
+        step1.classList.add('hidden');
+        stepMainMenu.classList.add('hidden');
+        stepClientes.classList.add('hidden');
+        stepCotizador.classList.add('hidden');
+        stepInformes.classList.add('hidden');
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    }
+
+    function switchTab(tab) {
+        if(globalProducts.size === 0) return; 
+        hideAllSteps();
+        bottomNav.classList.remove('hidden');
+
+        document.getElementById(`tab-${tab}`).classList.add('active');
+
+        if(tab === 'inicio') {
+            stepMainMenu.classList.remove('hidden');
+        } else if (tab === 'clientes') {
+            stepClientes.classList.remove('hidden');
+            renderClientList();
+        } else if (tab === 'cotizador') {
+            if(!selectedClient) openQuickQuote(); 
+            stepCotizador.classList.remove('hidden');
+            renderCartMobile();
+        } else if (tab === 'informes') {
+            stepInformes.classList.remove('hidden');
+            renderReportsUI();
+        }
+    }
+
+    document.getElementById('btnSelectFile').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+    async function loadFromCloud() {
+        const CLOUD_URL = "https://dl.dropboxusercontent.com/scl/fi/fr8a1xae9l6ckevxk0xla/apymsa-inteligencia-comercial-v15.1.xlsx?rlkey=8iawdpe0are3x9myx2xt6ttw5&st=7p8zu5ss&dl=1"; 
+        document.getElementById('upload-content').classList.add('hidden');
+        document.getElementById('loader-spinner').classList.remove('hidden');
+
+        try {
+            let response;
+            try { response = await fetch(CLOUD_URL); if (!response.ok) throw new Error("Error proxy"); } 
+            catch (err) { response = await fetch("https://corsproxy.io/?" + encodeURIComponent(CLOUD_URL)); }
+            const blob = await response.blob();
+            handleFile(new File([blob], "bd_nube.xlsx", { type: blob.type }));
+        } catch (error) {
+            showAlert("FALLO EN LA NUBE. CARGA MANUALMENTE.");
+            document.getElementById('upload-content').classList.remove('hidden');
+            document.getElementById('loader-spinner').classList.add('hidden');
+        }
+    }
+
+    function handleFile(file) {
+        document.getElementById('upload-content').classList.add('hidden');
+        document.getElementById('loader-spinner').classList.remove('hidden');
+
+        setTimeout(() => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const workbook = XLSX.read(e.target.result, { type: 'array' });
+                    const dataProducts = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    const dataClients = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[1]]);
+                    processData(dataProducts, dataClients);
+                } catch (err) { showAlert("ERROR AL LEER EL EXCEL."); }
+            };
+            reader.readAsArrayBuffer(file);
+        }, 300);
+    }
+
+    function processData(dataProducts, dataClients) {
+        globalProducts.clear(); globalClients.clear();
+
+        dataProducts.forEach(row => {
+            let item = {}; for (let k in row) item[normalizeKey(k)] = row[k];
+            const sku = String(item.codigo || item.producto || "").trim();
+            if(sku) {
+                globalProducts.set(sku, {
+                    codigo: sku, descripcion: String(item.descripcion || "SIN DESCRIPCIÓN").trim(),
+                    marca: String(item.marca || "SIN MARCA").trim(),
+                    imgProducto: String(item.urlimagenproducto || "").trim(),
+                    precioLista: parseMoney(item.preciolista || item.precio || 0)
+                });
+            }
+        });
+
+        dataClients.forEach(row => {
+            let item = {}; for (let k in row) item[normalizeKey(k)] = row[k];
+            const id = String(item.clienteid || item.codigo || "").trim();
+            if(id) {
+                globalClients.set(id, {
+                    id: id, razonSocial: String(item.razonsocial || item.nombre || "SIN NOMBRE").trim(),
+                    direccion: String(item.direccion || "NO REGISTRA").trim(),
+                    celular: String(item.celular || "NO REGISTRA").trim(),
+                    ciudad: String(item.ciudad || "NO REGISTRA").trim(), rfc: String(item.rfc || "XAXX010101000").trim()
+                });
+            }
+        });
+
+        document.getElementById('header-status').innerText = `${globalClients.size} Clientes | ${globalProducts.size} Art.`;
+        clientSearch.addEventListener('input', renderClientList);
+        switchTab('inicio'); 
+    }
+
+    function openNewClientModal() { document.getElementById('modal-new-client').classList.remove('hidden'); }
+    function closeNewClientModal() { document.getElementById('modal-new-client').classList.add('hidden'); }
+    function saveNewClient() {
+        const id = document.getElementById('nc-id').value.trim();
+        const name = document.getElementById('nc-name').value.trim();
+        if (!id || !name) { showAlert("ID y Razón Social son obligatorios."); return; }
+        
+        globalClients.set(id, {
+            id: id, razonSocial: name.toUpperCase(), direccion: 'NO REGISTRA',
+            celular: 'N/A', ciudad: document.getElementById('nc-city').value.toUpperCase() || 'NO REGISTRA',
+            rfc: document.getElementById('nc-rfc').value.toUpperCase() || 'XAXX010101000'
+        });
+        closeNewClientModal(); showAlert("Cliente registrado exitosamente.");
+    }
+
+    function openQuickQuote() {
+        selectedClient = { id: 'MOSTRADOR', razonSocial: 'PÚBLICO EN GENERAL', rfc: 'XAXX010101000', ciudad: 'LOCAL', direccion: 'CONOCIDO', celular: 'S/N' };
+        cartItems.clear(); document.getElementById('prod-search-input').value = '';
+        setupCotizadorHeader(); switchTab('cotizador');
+    }
+
+    function renderClientList() {
+        clientList.innerHTML = ''; const search = clientSearch.value.toLowerCase().trim();
+        let count = 0;
+        for (let [id, client] of globalClients.entries()) {
+            if(id.toLowerCase().includes(search) || client.razonSocial.toLowerCase().includes(search)) {
+                const div = document.createElement('div');
+                div.className = "bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col active:bg-gray-50 transition-colors";
+                div.onclick = () => { selectedClient = client; cartItems.clear(); setupCotizadorHeader(); switchTab('cotizador'); };
+                div.innerHTML = `
+                    <div class="text-[10px] text-primary font-black mb-1">ID: ${client.id}</div>
+                    <div class="text-sm font-black text-darktext uppercase mb-1 leading-tight">${client.razonSocial}</div>
+                    <div class="text-[10px] text-gray-500 font-semibold uppercase">RFC: ${client.rfc} • ${client.ciudad}</div>
+                `;
+                clientList.appendChild(div); count++;
+                if(count > 50 && search === "") break; 
+            }
+        }
+    }
+
+    function setupCotizadorHeader() {
+        document.getElementById('cot-client-name').innerText = selectedClient.razonSocial;
+    }
+
+    function handleProductSearch() {
+        const query = document.getElementById('prod-search-input').value.toLowerCase().trim();
+        const resBox = document.getElementById('prod-search-results'); resBox.innerHTML = '';
+        if (query.length < 2) { resBox.classList.add('hidden'); return; }
+        
+        let count = 0;
+        for (let [sku, prod] of globalProducts.entries()) {
+            if (sku.toLowerCase().includes(query) || prod.descripcion.toLowerCase().includes(query)) {
+                if(!cartItems.has(sku)) {
+                    const img = prod.imgProducto ? `<img src="${prod.imgProducto}" class="w-10 h-10 object-contain rounded border border-gray-100 bg-white">` : `<div class="w-10 h-10 bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-[8px] text-gray-400">S/I</div>`;
+                    const div = document.createElement('div');
+                    div.className = "p-3 flex items-center gap-3 active:bg-gray-50 border-b border-gray-50";
+                    div.innerHTML = `
+                        ${img}
+                        <div class="flex-grow min-w-0">
+                            <div class="text-xs font-black text-primary">${sku}</div>
+                            <div class="text-[10px] text-gray-600 uppercase font-semibold line-clamp-1">${prod.descripcion}</div>
+                        </div>
+                        <button onclick="addProduct('${sku}')" class="bg-primary text-white p-2 rounded-lg flex items-center justify-center shadow-sm">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        </button>
+                    `;
+                    resBox.appendChild(div); count++; if (count > 15) break;
+                }
+            }
+        }
+        resBox.classList.toggle('hidden', count === 0);
+    }
+
+    function addProduct(sku) {
+        const prod = globalProducts.get(sku); if(!prod) return;
+        cartItems.set(sku, { productRef: prod, qty: 1, listPrice: prod.precioLista, discount: 0 });
+        document.getElementById('prod-search-input').value = '';
+        document.getElementById('prod-search-results').classList.add('hidden');
+        renderCartMobile(); updateCartBadge();
+    }
+
+    function updateCartItem(sku, field, value) {
+        if(!cartItems.has(sku)) return;
+        let val = parseFloat(value); if(isNaN(val) || val < 0) val = 0;
+        let item = cartItems.get(sku);
+        if(field === 'qty') item.qty = val === 0 ? 1 : val;
+        else if(field === 'price') item.listPrice = val;
+        else if(field === 'discount') item.discount = val > 100 ? 100 : val;
+        renderCartMobile();
+    }
+
+    function removeCartItem(sku) { cartItems.delete(sku); renderCartMobile(); updateCartBadge(); }
+    function clearCart() { if(confirm("¿Vaciar el carrito?")) { cartItems.clear(); renderCartMobile(); updateCartBadge(); } }
+    function updateCartBadge() {
+        const b = document.getElementById('cart-badge');
+        b.innerText = cartItems.size;
+        b.classList.toggle('hidden', cartItems.size === 0);
+    }
+
+    function renderCartMobile() {
+        const cont = document.getElementById('cart-list-container'); cont.innerHTML = '';
+        let subtotal = 0;
+        
+        if(cartItems.size === 0) {
+            cont.innerHTML = `<div class="bg-white p-6 rounded-xl border border-gray-200 text-center text-gray-400 font-bold text-xs uppercase shadow-sm">El carrito está vacío</div>`;
+        } else {
+            Array.from(cartItems.entries()).reverse().forEach(([sku, item]) => {
+                const prod = item.productRef;
+                const img = prod.imgProducto ? `<img src="${prod.imgProducto}" class="w-12 h-12 object-contain rounded-lg border border-gray-100 bg-white">` : `<div class="w-12 h-12 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center text-[9px] text-gray-400 font-bold">S/I</div>`;
+                const totalRow = item.qty * item.listPrice * (1 - (item.discount / 100));
+                subtotal += totalRow;
+
+                const div = document.createElement('div');
+                div.className = "bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-2 relative";
+                div.innerHTML = `
+                    <button onclick="removeCartItem('${sku}')" class="absolute top-2 right-2 text-gray-300 hover:text-danger p-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                    <div class="flex items-center gap-3 pr-8 border-b border-gray-100 pb-2">
+                        ${img}
+                        <div class="min-w-0">
+                            <div class="text-xs font-black text-primary leading-none mb-1">${sku}</div>
+                            <div class="text-[9px] text-gray-600 uppercase font-semibold line-clamp-2 leading-tight">${prod.descripcion}</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <span class="block text-[8px] text-gray-400 font-bold uppercase mb-0.5">Cant.</span>
+                            <input type="number" min="1" value="${item.qty}" onchange="updateCartItem('${sku}', 'qty', this.value)" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})" class="w-full bg-gray-50 border border-gray-200 rounded p-1.5 text-center text-xs font-bold outline-none shadow-inner">
+                        </div>
+                        <div>
+                            <span class="block text-[8px] text-gray-400 font-bold uppercase mb-0.5">Precio</span>
+                            <input type="number" min="0" step="0.01" value="${item.listPrice}" onchange="updateCartItem('${sku}', 'price', this.value)" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})" class="w-full bg-gray-50 border border-gray-200 rounded p-1.5 text-center text-xs font-bold outline-none shadow-inner">
+                        </div>
+                        <div>
+                            <span class="block text-[8px] text-gray-400 font-bold uppercase mb-0.5">Desc %</span>
+                            <input type="number" min="0" max="100" value="${item.discount}" onchange="updateCartItem('${sku}', 'discount', this.value)" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})" class="w-full bg-red-50 border border-red-200 text-danger rounded p-1.5 text-center text-xs font-bold outline-none shadow-inner">
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-end mt-1 pt-2 border-t border-gray-50">
+                        <span class="text-[9px] font-bold text-gray-400 uppercase">Importe</span>
+                        <span class="text-sm font-black text-darktext">${moneyFmt.format(totalRow)}</span>
+                    </div>
+                `;
+                cont.appendChild(div);
             });
         }
-    </script>
+
+        const iva = subtotal * 0.16; const totalFinal = subtotal + iva;
+        document.getElementById('cot-subtotal').innerText = moneyFmt.format(subtotal);
+        document.getElementById('cot-iva').innerText = moneyFmt.format(iva);
+        document.getElementById('cot-grand-total').innerText = moneyFmt.format(totalFinal);
+    }
+
+    // --- GENERACIÓN DE FOLIOS INTELIGENTES ---
+    function getInitials(name) {
+        let ignoredWords = ['de', 'la', 'el', 'los', 'las', 'y', 'en', 'sa', 'cv'];
+        let words = name.trim().split(/\s+/).filter(w => !ignoredWords.includes(w.toLowerCase()));
+        let initials = words.slice(0,4).map(w => w[0].toUpperCase()).join('');
+        return initials || "X";
+    }
+
+    function getDateStr() {
+        let d = new Date();
+        let day = ("0" + d.getDate()).slice(-2);
+        let month = ("0" + (d.getMonth() + 1)).slice(-2);
+        return `${day}${month}${d.getFullYear()}`;
+    }
+
+    // --- COBRANZA Y REPORTES (AHORA CON MEMORIA PERMANENTE) ---
+    function openPaymentModal(folio) {
+        saleToPay = folio;
+        document.getElementById('pay-folio-text').innerText = `Folio: ${folio}`;
+        document.getElementById('payment-method').value = '';
+        document.getElementById('modal-payment').classList.remove('hidden');
+    }
+
+    function closePaymentModal() {
+        saleToPay = null;
+        document.getElementById('modal-payment').classList.add('hidden');
+    }
+
+    function confirmPayment() {
+        const method = document.getElementById('payment-method').value;
+        if(!method) { showAlert("Selecciona un método de pago."); return; }
+        
+        let sale = sessionSales.find(s => s.folio === saleToPay);
+        if(sale) {
+            sale.status = 'PAGADA';
+            sale.paymentMethod = method;
+        }
+        
+        saveSalesToLocal(); // <-- Guardar en memoria
+        closePaymentModal();
+        showAlert(`Remisión ${saleToPay} cobrada exitosamente.`, 2000);
+        renderReportsUI();
+    }
+
+    function renderReportsUI() {
+        const cont = document.getElementById('rep-list-container'); cont.innerHTML = '';
+        let sumTotalPagado = 0;
+        let numVentasCerradas = 0;
+        
+        if(sessionSales.length === 0) {
+            cont.innerHTML = `<div class="bg-white p-6 rounded-xl border border-gray-200 text-center text-gray-400 font-bold text-xs uppercase shadow-sm">Aún no has generado remisiones.</div>`;
+        } else {
+            [...sessionSales].reverse().forEach(sale => {
+                
+                let badgeHtml = '';
+                let actionHtml = '';
+
+                if(sale.status === 'PENDIENTE') {
+                    badgeHtml = `<span class="bg-orange-100 text-orange-600 px-2 py-0.5 rounded text-[8px] font-black tracking-widest border border-orange-200">PENDIENTE</span>`;
+                    actionHtml = `
+                        <button onclick="openPaymentModal('${sale.folio}')" class="bg-success text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-sm flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Cobrar
+                        </button>
+                    `;
+                } else {
+                    sumTotalPagado += sale.total;
+                    numVentasCerradas++;
+                    badgeHtml = `<span class="bg-green-100 text-success px-2 py-0.5 rounded text-[8px] font-black tracking-widest border border-green-200">PAGADA</span>`;
+                    actionHtml = `<div class="text-[9px] font-bold text-gray-400 uppercase text-right leading-tight">Pagado con<br><span class="text-success">${sale.paymentMethod}</span></div>`;
+                }
+
+                // Botón de re-imprimir PDF siempre disponible
+                const btnPdf = `
+                    <button onclick="reprintSale('${sale.folio}')" class="bg-gray-100 text-primary px-3 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-sm flex items-center gap-1 border border-gray-200 mt-2">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Imprimir PDF
+                    </button>
+                `;
+
+                const div = document.createElement('div');
+                div.className = "bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-2";
+                div.innerHTML = `
+                    <div class="flex justify-between items-start border-b border-gray-100 pb-2">
+                        <div>
+                            <div class="text-[10px] font-black text-primary mb-0.5 tracking-wider">${sale.folio}</div>
+                            <div class="text-[9px] font-bold text-gray-400">${sale.date} ${sale.time}</div>
+                        </div>
+                        ${badgeHtml}
+                    </div>
+                    <div class="flex justify-between items-center mt-1">
+                        <div class="min-w-0 pr-2">
+                            <div class="text-xs font-black text-darktext uppercase line-clamp-1">${sale.clientName}</div>
+                            <div class="text-[9px] font-bold text-gray-500 mt-0.5">${sale.itemsCount} Artículos</div>
+                        </div>
+                        <div class="text-right flex flex-col items-end">
+                            <div class="text-sm font-black text-darktext mb-1">${moneyFmt.format(sale.total)}</div>
+                            ${actionHtml}
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-50 mt-1 pt-1 flex justify-end">
+                        ${btnPdf}
+                    </div>
+                `;
+                cont.appendChild(div);
+            });
+        }
+        document.getElementById('rep-total-money').innerText = moneyFmt.format(sumTotalPagado);
+        document.getElementById('rep-total-count').innerText = `${numVentasCerradas} Ventas Cerradas`;
+    }
+
+    // --- NUEVO SISTEMA DE IMPRESIÓN NATIVA (SOPORTADO EN ANDROID WEBVIEWS) ---
+    function generatePrint() {
+        if(cartItems.size === 0) { showAlert("El carrito está vacío."); return; }
+        
+        showAlert("Preparando Impresión...", 1500);
+        
+        const d = new Date(); 
+        const timeStr = d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
+        const dateStr = d.toLocaleDateString('es-MX');
+        
+        // Generar Folio
+        const initials = getInitials(selectedClient.razonSocial);
+        const dateIdStr = getDateStr();
+        const folio = `${initials}${dateIdStr}${folioGlobalCounter}`;
+        folioGlobalCounter++;
+        
+        let subtotal = 0; let totalItems = 0;
+        let itemsSnapshot = []; // Guardamos copia de los items para memoria
+
+        Array.from(cartItems.entries()).reverse().forEach(([sku, item]) => {
+            const prod = item.productRef;
+            const rowT = item.qty * item.listPrice * (1 - (item.discount / 100));
+            subtotal += rowT; totalItems += item.qty;
+            
+            itemsSnapshot.push({
+                sku: sku,
+                descripcion: prod.descripcion,
+                qty: item.qty,
+                listPrice: item.listPrice,
+                discount: item.discount,
+                imgProducto: prod.imgProducto
+            });
+        });
+        
+        const iva = subtotal * 0.16; 
+        const totalF = subtotal + iva;
+        
+        // Guardar Venta en el LocalStorage
+        let newSale = { 
+            folio: folio,
+            date: dateStr,
+            time: timeStr, 
+            clientName: selectedClient.razonSocial,
+            clientId: selectedClient.id,
+            clientRfc: selectedClient.rfc,
+            clientDir: selectedClient.direccion,
+            clientCity: selectedClient.ciudad,
+            itemsCount: totalItems, 
+            subtotal: subtotal,
+            iva: iva,
+            total: totalF,
+            status: 'PENDIENTE',
+            paymentMethod: null,
+            items: itemsSnapshot
+        };
+        
+        sessionSales.push(newSale);
+        saveSalesToLocal();
+
+        // Vaciar Carrito y refrescar UI
+        cartItems.clear(); 
+        renderCartMobile();
+        updateCartBadge();
+        renderReportsUI();
+        
+        // Disparar la impresión nativa
+        triggerPrint(newSale);
+    }
+
+    function reprintSale(folio) {
+        const sale = sessionSales.find(s => s.folio === folio);
+        if(sale) {
+            triggerPrint(sale);
+        } else {
+            showAlert("No se encontró el documento.");
+        }
+    }
+
+    // Inyecta el recibo en un contenedor especial oculto y ejecuta el diálogo nativo de imprimir del sistema operativo
+    function triggerPrint(sale) {
+        let tbodyHtml = '';
+        
+        sale.items.forEach(item => {
+            const img = item.imgProducto ? `<img src="${item.imgProducto}" style="width:40px;height:40px;object-fit:contain;">` : `<div style="font-size:10px;color:#999;border:1px solid #ddd;width:40px;height:40px;line-height:40px;text-align:center;">S/I</div>`;
+            const rowT = item.qty * item.listPrice * (1 - (item.discount / 100));
+            
+            tbodyHtml += `
+                <tr>
+                    <td style="text-align:center;padding:8px;border-bottom:1px solid #E2E8F0;">${img}</td>
+                    <td style="font-weight:bold;padding:8px;border-bottom:1px solid #E2E8F0;">${item.sku}</td>
+                    <td style="font-size:10px;padding:8px;border-bottom:1px solid #E2E8F0;text-transform:uppercase;">${item.descripcion}</td>
+                    <td style="text-align:center;padding:8px;border-bottom:1px solid #E2E8F0;">${item.qty}</td>
+                    <td style="text-align:right;padding:8px;border-bottom:1px solid #E2E8F0;">${moneyFmt.format(item.listPrice)}</td>
+                    <td style="text-align:center;padding:8px;border-bottom:1px solid #E2E8F0;">${item.discount > 0 ? item.discount+'%' : '-'}</td>
+                    <td style="text-align:right;font-weight:bold;padding:8px;border-bottom:1px solid #E2E8F0;">${moneyFmt.format(rowT)}</td>
+                </tr>`;
+        });
+
+        const printHtml = `
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: sans-serif; color: black; background: white;">
+                <div style="border-bottom: 2px solid #0055A4; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <div style="font-size: 24px; font-weight: 900; color: #0055A4; margin-bottom: 5px;">REMISIÓN DE VENTA</div>
+                        <div style="font-size:14px; font-weight:bold; text-transform:uppercase;">${sale.clientName}</div>
+                        <div style="margin-top:5px; color:#475569; font-size:12px;">
+                            ID: <b>${sale.clientId}</b> | RFC: <b>${sale.clientRfc}</b><br>
+                            Dir: ${sale.clientDir} <br>
+                            Ciu: ${sale.clientCity}
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:18px; font-weight:900; color:#0055A4; margin-bottom:5px;">EMPRESA NUEVA</div>
+                        <div style="color:#64748B; font-size:12px; margin-bottom: 3px;">Folio: <b style="color:#1E293B;">${sale.folio}</b></div>
+                        <div style="color:#64748B; font-size:12px;">Fecha: <b>${sale.date} ${sale.time}</b></div>
+                    </div>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size:12px;">
+                    <thead>
+                        <tr>
+                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: center;">Img</th>
+                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: left;">Código</th>
+                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: left;">Descripción</th>
+                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: center;">Cant</th>
+                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: right;">Precio</th>
+                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: center;">Desc %</th>
+                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: right;">Importe</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tbodyHtml}</tbody>
+                </table>
+                <div style="width: 300px; margin-left: auto; border-top: 2px solid #1E293B; padding-top: 10px; font-size:14px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>SUBTOTAL:</span><span>${moneyFmt.format(sale.subtotal)}</span></div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>IVA (16%):</span><span>${moneyFmt.format(sale.iva)}</span></div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px; border-top: 1px solid #E2E8F0; padding-top: 5px; font-size: 18px; font-weight: 800; color: #0055A4;">
+                        <span>TOTAL FINAL:</span><span>${moneyFmt.format(sale.total)}</span>
+                    </div>
+                </div>
+                <div style="text-align:center; font-size:10px; color:#94A3B8; margin-top:30px; font-weight:bold;">ESTE DOCUMENTO ES UNA REMISIÓN DE VENTA.</div>
+            </div>
+        `;
+
+        // Colocar HTML en la capa de impresión nativa y mandar llamar imprimir
+        const printArea = document.getElementById('print-area');
+        printArea.innerHTML = printHtml;
+        
+        setTimeout(() => {
+            window.print();
+        }, 500); // 500ms de gracia para que el dispositivo renderize la capa en blanco antes de capturar
+    }
+
+    function exportExcel() {
+        if(cartItems.size === 0) { showAlert("El carrito está vacío."); return; }
+        
+        const initials = getInitials(selectedClient.razonSocial);
+        const dateStr = getDateStr();
+        const folio = `${initials}${dateStr}${folioGlobalCounter}`; 
+        
+        let exData = []; let sub = 0;
+        Array.from(cartItems.entries()).reverse().forEach(([sku, item]) => {
+            const tr = item.qty * item.listPrice * (1 - (item.discount / 100)); sub += tr;
+            exData.push({"Código": sku, "Descripción": item.productRef.descripcion.toUpperCase(), "Cantidad": item.qty, "Precio": parseFloat(item.listPrice.toFixed(2)), "Desc %": parseFloat(item.discount.toFixed(2)), "Importe": parseFloat(tr.toFixed(2))});
+        });
+        const iva = sub * 0.16; const tot = sub + iva;
+        exData.push({}); exData.push({"Descripción": "SUBTOTAL:", "Importe": parseFloat(sub.toFixed(2))}); exData.push({"Descripción": "IVA (16%):", "Importe": parseFloat(iva.toFixed(2))}); exData.push({"Descripción": "TOTAL FINAL:", "Importe": parseFloat(tot.toFixed(2))});
+        const ws = XLSX.utils.json_to_sheet(exData); ws['!cols'] = [{wch: 15}, {wch: 50}, {wch: 10}, {wch: 15}, {wch: 15}, {wch: 15}];
+        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Remisión");
+        XLSX.writeFile(wb, `Cotizacion_${folio}.xlsx`);
+    }
+
+    // --- REGISTRO DEL SERVICE WORKER (Obligatorio para PWA) ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            // Verificamos que estamos en un entorno http o https para evitar el error de protocolo en la vista previa
+            if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+                navigator.serviceWorker.register('./sw.js')
+                .then(() => console.log('Service Worker Registrado correctamente.'))
+                .catch(err => console.error('Error al registrar Service Worker:', err));
+            } else {
+                console.log('Vista previa detectada: Registro de Service Worker omitido para evitar errores de protocolo.');
+            }
+        });
+    }
+</script>
 </body>
 </html>
