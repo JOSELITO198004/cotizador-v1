@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi App PWA</title>
+    
+    <!-- Conexión con el Manifest para Android -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+
+    <style>
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            text-align: center; 
+            padding: 20px; 
+            background-color: #f3f4f6;
+        }
+        .contenedor {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        button { 
+            padding: 12px 24px; 
+            font-size: 16px; 
+            margin: 10px; 
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-imprimir { background-color: #3b82f6; }
+        .btn-guardar { background-color: #10b981; }
+    </style>
+</head>
+<body>
+
+    <div class="contenedor">
+        <h1>Mi App PWA</h1>
+        <p>Prueba las funciones nativas a continuación:</p>
+
+        <!-- Botón para Imprimir -->
+        <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir Pantalla</button>
+
+        <!-- Botón para Guardar/Descargar -->
+        <button class="btn-guardar" onclick="descargarArchivo()">💾 Guardar Archivo</button>
+    </div>
+
+    <script>
+        // Función para simular la descarga de un archivo
+        function descargarArchivo() {
+            // Creamos un texto de prueba
+            const contenido = "Este es un documento guardado desde tu App en Android.";
+            // Lo convertimos en un archivo Blob
+            const blob = new Blob([contenido], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            // Forzamos la descarga nativa
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mi-documento.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // --- REGISTRO DEL SERVICE WORKER (Obligatorio para PWA) ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(() => console.log('Service Worker Registrado'))
+                .catch(err => console.error('Error en Service Worker', err));
+            });
+        }
+    </script>
+</body>
+</html>
