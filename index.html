@@ -6,7 +6,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0A192F">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230A192F'/><text x='50' y='55' font-family='Arial' font-size='40' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>AEZ</text></svg>">
-    <title>Cotizador App V2</title>
+    <title>Cotizador App V1</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -104,7 +104,7 @@
         <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-white text-primary rounded-xl flex items-center justify-center font-black text-xs shadow-soft">AEZ</div>
             <div>
-                <h1 class="text-base font-black uppercase leading-none tracking-wide">Zendejas</h1>
+                <h1 class="text-base font-black uppercase leading-none tracking-wide">auto electrica Zendejas</h1>
                 <p class="text-[9px] font-medium uppercase opacity-80 mt-0.5 text-successlight" id="header-status">Sistema de Campo</p>
             </div>
         </div>
@@ -152,10 +152,15 @@
 
     <div id="step-main-menu" class="w-full hidden mt-2">
         
-        <h2 class="text-lg font-black text-primary tracking-tight uppercase mb-3 flex items-center gap-2">
-            <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-            Métricas de Venta
-        </h2>
+        <div class="flex justify-between items-center mb-3 px-1">
+            <h2 class="text-lg font-black text-primary tracking-tight uppercase flex items-center gap-2">
+                <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                Métricas
+            </h2>
+            <div id="dash-current-month-badge" class="bg-primary/10 text-primary-accent px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-inner border border-primary/5">
+                <!-- Se llena dinamicamente con JS -->
+            </div>
+        </div>
         
         <!-- Tarjeta de Venta del Día y Mes (Gráfico Circular) -->
         <div class="bg-cardbg rounded-3xl p-5 shadow-soft border border-gray-100 mb-4 flex items-center justify-between">
@@ -163,7 +168,7 @@
                 <p class="text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-1">Venta del Día</p>
                 <p id="dash-day" class="text-2xl font-black text-primary leading-none mb-3">$0</p>
                 
-                <p class="text-[9px] font-bold uppercase text-gray-400 tracking-widest mb-0.5 mt-2 border-t border-gray-100 pt-2">Acumulado del Mes</p>
+                <p id="dash-month-title" class="text-[9px] font-bold uppercase text-gray-400 tracking-widest mb-0.5 mt-2 border-t border-gray-50 pt-2">Acumulado</p>
                 <p id="dash-month" class="text-sm font-black text-success">$0</p>
             </div>
             
@@ -185,7 +190,7 @@
         <!-- Tarjeta de Gráfico de Barras (Últimos 3 Días) -->
         <div class="bg-gradient-to-br from-primary to-primary-accent rounded-3xl p-5 shadow-lg text-white mb-6 relative overflow-hidden">
             <div class="absolute -right-4 -bottom-4 opacity-10"><svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"></path></svg></div>
-            <p class="text-[10px] font-bold uppercase tracking-widest text-successlight opacity-90 mb-4">Días Anteriores (Sin Dom)</p>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-successlight opacity-90 mb-4">Días Anteriores</p>
             
             <!-- Contenedor del Gráfico de Barras CSS -->
             <div class="flex items-end h-32 gap-3 pb-6 border-b border-white/20 relative z-10" id="bar-chart-container">
@@ -242,7 +247,7 @@
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-black text-primary tracking-tight uppercase">Inventario a Bordo</h2>
             <input type="file" id="invFile" accept=".xlsx, .xls" class="hidden">
-            <button onclick="document.getElementById('invFile').click()" class="bg-success text-white px-3 py-2 rounded-xl text-[10px] font-black uppercase flex items-center gap-1 shadow-md shadow-success/30">
+            <button onclick="document.getElementById('invFile').click()" class="bg-success text-white px-3 py-2 rounded-xl text-[10px] font-black uppercase flex items-center gap-1 shadow-md shadow-success/30 active:scale-95 transition-transform">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                 Cargar Excel
             </button>
@@ -303,19 +308,41 @@
     </div>
 
     <div id="step-informes" class="w-full hidden">
-        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Reporte Diario</h2>
+        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Reportes de Venta</h2>
         
         <div class="bg-gradient-to-br from-primary to-primary-accent text-white rounded-3xl p-6 shadow-lg flex flex-col justify-center items-center text-center mb-5 relative overflow-hidden">
-            <p class="text-[11px] font-bold uppercase tracking-widest text-successlight mb-1">Total Pagado Hoy</p>
+            <p class="text-[11px] font-bold uppercase tracking-widest text-successlight mb-1">Total Cobrado Hoy</p>
             <p id="rep-total-money" class="text-4xl font-black mb-2">$0.00</p>
-            <p id="rep-total-count" class="text-[10px] font-bold tracking-widest uppercase bg-white/20 px-4 py-1.5 rounded-full backdrop-blur-sm">0 Ventas Cerradas</p>
+            <p id="rep-total-count" class="text-[10px] font-bold tracking-widest uppercase bg-white/20 px-4 py-1.5 rounded-full backdrop-blur-sm">0 Cobros Hoy</p>
+        </div>
+
+        <!-- Panel de Filtros -->
+        <div class="bg-cardbg p-4 rounded-3xl border border-gray-100 shadow-soft mb-5">
+            <h3 class="text-[11px] font-black uppercase text-gray-500 tracking-wider mb-3">Buscar Remisiones</h3>
+            
+            <div class="flex gap-2 mb-3">
+                <button id="btn-filt-all" onclick="setFilterStatus('ALL')" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-primary text-white shadow-md transition-colors">Todas</button>
+                <button id="btn-filt-pend" onclick="setFilterStatus('PENDIENTE')" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-gray-50 text-gray-500 transition-colors border border-gray-200">Pendientes</button>
+                <button id="btn-filt-pag" onclick="setFilterStatus('PAGADA')" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-gray-50 text-gray-500 transition-colors border border-gray-200">Cobradas</button>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <div class="relative">
+                    <input type="text" id="filter-client" placeholder="Buscar Cliente o ID..." class="w-full p-3 pl-10 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary transition-colors text-darktext" oninput="renderReportsUI()">
+                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <div class="flex gap-2">
+                    <input type="date" id="filter-date" class="flex-1 p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary transition-colors text-darktext" onchange="renderReportsUI()">
+                    <button onclick="clearFilters()" class="px-4 py-3 bg-dangerlight text-danger rounded-xl text-xs font-black uppercase shadow-sm active:scale-95">Limpiar</button>
+                </div>
+            </div>
         </div>
 
         <div class="flex justify-between items-center mb-3 px-1">
-            <h3 class="text-[11px] font-black uppercase text-gray-500 tracking-wider">Historial de Remisiones</h3>
+            <h3 class="text-[11px] font-black uppercase text-gray-500 tracking-wider" id="rep-list-title">Historial de Remisiones</h3>
         </div>
 
-        <div id="rep-list-container" class="flex flex-col gap-3">
+        <div id="rep-list-container" class="flex flex-col gap-3 pb-6">
              <!-- Historial renderizado aqui -->
         </div>
     </div>
@@ -455,6 +482,9 @@
     let saleToPay = null; 
     let mockSaleForPreview = null;
     
+    // Filtros de reportes
+    let currentFilterStatus = 'ALL';
+    
     // Memoria Permanente
     let sessionSales = JSON.parse(localStorage.getItem('apymsa_sales')) || [];
     let folioGlobalCounter = parseInt(localStorage.getItem('apymsa_folio')) || 1;
@@ -547,6 +577,14 @@
         const today = new Date();
         const strHoy = formatLocalDt(today);
         
+        // Configuración de Mes Actual para los Títulos
+        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const currentMonthName = monthNames[today.getMonth()];
+        const badgeMes = document.getElementById('dash-current-month-badge');
+        if(badgeMes) badgeMes.innerText = `${currentMonthName} ${today.getFullYear()}`;
+        const titleMes = document.getElementById('dash-month-title');
+        if(titleMes) titleMes.innerText = `Acumulado de ${currentMonthName}`;
+        
         // Algoritmo para obtener los 3 días laborables anteriores (saltando el Domingo)
         let prevDays = [];
         let d = new Date(today);
@@ -587,9 +625,12 @@
         const pct2 = (ventaDia2 / maxBar) * 100;
         const pct3 = (ventaDia3 / maxBar) * 100;
         
-        const getName = (dateObj) => {
+        // Función para obtener Nombre Corto y Número de Día (ej. LUN 15)
+        const getLabel = (dateObj) => {
             const days = ['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
-            return days[dateObj.getDay()];
+            const dayName = days[dateObj.getDay()];
+            const dayNum = dateObj.getDate();
+            return `${dayName} ${dayNum}`;
         }
 
         const barContainer = document.getElementById('bar-chart-container');
@@ -610,9 +651,9 @@
         
         const labelsContainer = document.getElementById('bar-chart-labels');
         labelsContainer.innerHTML = `
-            <span class="w-1/3 text-center">${getName(prevDays[0])}</span>
-            <span class="w-1/3 text-center">${getName(prevDays[1])}</span>
-            <span class="w-1/3 text-center text-successlight">${getName(prevDays[2])}</span>
+            <span class="w-1/3 text-center">${getLabel(prevDays[0])}</span>
+            <span class="w-1/3 text-center">${getLabel(prevDays[1])}</span>
+            <span class="w-1/3 text-center text-successlight">${getLabel(prevDays[2])}</span>
         `;
     }
 
@@ -620,7 +661,6 @@
     fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
     async function loadFromCloud() {
-        // Tu repositorio original apuntando a la rama main (siempre actualizado)
         const CLOUD_URL = "https://raw.githubusercontent.com/JOSELITO198004/cotizador-v1/refs/heads/main/nuevo%20proyecto.xlsx"; 
         document.getElementById('upload-content').classList.add('hidden');
         document.getElementById('loader-spinner').classList.remove('hidden');
@@ -1157,15 +1197,62 @@
         updateDashboard(); 
     }
 
+    // Funciones de Filtros
+    function setFilterStatus(status) {
+        currentFilterStatus = status;
+        document.getElementById('btn-filt-all').className = `flex-1 py-2 rounded-lg text-[10px] font-black uppercase shadow-sm transition-colors ${status === 'ALL' ? 'bg-primary text-white' : 'bg-gray-50 text-gray-500 border border-gray-200'}`;
+        document.getElementById('btn-filt-pend').className = `flex-1 py-2 rounded-lg text-[10px] font-black uppercase shadow-sm transition-colors ${status === 'PENDIENTE' ? 'bg-warning text-white' : 'bg-gray-50 text-gray-500 border border-gray-200'}`;
+        document.getElementById('btn-filt-pag').className = `flex-1 py-2 rounded-lg text-[10px] font-black uppercase shadow-sm transition-colors ${status === 'PAGADA' ? 'bg-success text-white' : 'bg-gray-50 text-gray-500 border border-gray-200'}`;
+        renderReportsUI();
+    }
+
+    function clearFilters() {
+        document.getElementById('filter-client').value = '';
+        document.getElementById('filter-date').value = '';
+        setFilterStatus('ALL');
+    }
+
+    function convertToDDMMYYYY(yyyyMMdd) {
+        if(!yyyyMMdd) return '';
+        const [y, m, d] = yyyMMdd.split('-');
+        return `${d}/${m}/${y}`;
+    }
+
     function renderReportsUI() {
-        const cont = document.getElementById('rep-list-container'); cont.innerHTML = '';
-        let sumTotalPagado = 0;
-        let numVentasCerradas = 0;
+        // Obtenemos los valores de los filtros
+        const dateFilterVal = document.getElementById('filter-date').value;
+        const clientFilterVal = document.getElementById('filter-client').value.toLowerCase().trim();
+        const dateFilter = convertToDDMMYYYY(dateFilterVal);
+
+        // 1. Calcular el total cobrado HOY estrictamente (Ignora los filtros de la lista)
+        let sumTotalPagadoHoy = 0;
+        let numVentasCerradasHoy = 0;
+        const strHoy = formatLocalDt(new Date());
+
+        sessionSales.forEach(sale => {
+            if(sale.date === strHoy && sale.status === 'PAGADA') {
+                sumTotalPagadoHoy += sale.total;
+                numVentasCerradasHoy++;
+            }
+        });
+        document.getElementById('rep-total-money').innerText = moneyFmtFull.format(sumTotalPagadoHoy);
+        document.getElementById('rep-total-count').innerText = `${numVentasCerradasHoy} Cobros Hoy`;
+
+        // 2. Filtrar y Renderizar la Lista de Historial
+        const cont = document.getElementById('rep-list-container'); 
+        cont.innerHTML = '';
         
-        if(sessionSales.length === 0) {
-            cont.innerHTML = `<div class="bg-cardbg p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase shadow-soft">Aún no has generado remisiones.</div>`;
+        let filteredSales = sessionSales.filter(sale => {
+            let matchDate = dateFilter ? sale.date === dateFilter : true;
+            let matchClient = clientFilterVal ? sale.clientName.toLowerCase().includes(clientFilterVal) || sale.clientId.toLowerCase().includes(clientFilterVal) : true;
+            let matchStatus = currentFilterStatus === 'ALL' ? true : sale.status === currentFilterStatus;
+            return matchDate && matchClient && matchStatus;
+        });
+
+        if(filteredSales.length === 0) {
+            cont.innerHTML = `<div class="bg-cardbg p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase shadow-soft">No hay remisiones para esta búsqueda.</div>`;
         } else {
-            [...sessionSales].reverse().forEach(sale => {
+            [...filteredSales].reverse().forEach(sale => {
                 
                 let badgeHtml = '';
                 let actionHtml = '';
@@ -1179,8 +1266,6 @@
                         </button>
                     `;
                 } else {
-                    sumTotalPagado += sale.total;
-                    numVentasCerradas++;
                     badgeHtml = `<span class="bg-successlight text-success px-3 py-1 rounded-xl text-[9px] font-black tracking-widest border border-success/20">PAGADA</span>`;
                     actionHtml = `<div class="text-[9px] font-bold text-gray-400 uppercase text-right leading-tight bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100">Pagado con<br><span class="text-success font-black">${sale.paymentMethod}</span></div>`;
                 }
@@ -1220,8 +1305,6 @@
                 cont.appendChild(div);
             });
         }
-        document.getElementById('rep-total-money').innerText = moneyFmtFull.format(sumTotalPagado);
-        document.getElementById('rep-total-count').innerText = `${numVentasCerradas} Ventas Cerradas`;
     }
 
     function exportExcel() {
