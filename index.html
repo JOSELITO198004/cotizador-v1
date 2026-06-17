@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#0055A4">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230055A4'/><text x='50' y='55' font-family='Arial' font-size='40' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>EN</text></svg>">
-    <title>Cotizador App V1</title>
+    <meta name="theme-color" content="#0A192F">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230A192F'/><text x='50' y='55' font-family='Arial' font-size='40' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>AEZ</text></svg>">
+    <title>Cotizador App V2</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -14,14 +14,14 @@
 
     <script>
         const manifestData = {
-            "name": "Cotizador de Ventas V1",
-            "short_name": "Cotizador V1",
+            "name": "Auto Eléctrica Zendejas",
+            "short_name": "AE Zendejas",
             "start_url": ".",
             "display": "standalone",
-            "background_color": "#F1F5F9",
-            "theme_color": "#0055A4",
+            "background_color": "#F8FAFC",
+            "theme_color": "#0A192F",
             "icons": [{
-                "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230055A4' rx='20'/><text x='50' y='55' font-family='Arial' font-size='40' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>EN</text></svg>",
+                "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230A192F' rx='20'/><text x='50' y='55' font-family='Arial' font-size='40' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>AEZ</text></svg>",
                 "sizes": "192x192",
                 "type": "image/svg+xml",
                 "purpose": "any maskable"
@@ -38,12 +38,19 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        primary: { DEFAULT: '#0055A4', dark: '#003366', light: '#E6F0FA' },
-                        danger: '#E3000F',
-                        warning: '#FFC107',
-                        success: '#28A745',
-                        lightbg: '#F1F5F9',
-                        darktext: '#1E293B'
+                        primary: { DEFAULT: '#0A192F', dark: '#020C1B', light: '#112240', accent: '#1E3A8A' },
+                        danger: '#EF4444', 
+                        dangerlight: '#FEE2E2',
+                        warning: '#F59E0B',
+                        success: '#10B981',
+                        successlight: '#D1FAE5',
+                        lightbg: '#F8FAFC',
+                        darktext: '#0F172A',
+                        cardbg: '#FFFFFF'
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 15px rgba(16, 185, 129, 0.3)',
                     }
                 }
             }
@@ -53,8 +60,8 @@
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background-color: #F1F5F9; 
-            color: #1E293B; 
+            background-color: #F8FAFC; 
+            color: #0F172A; 
             margin: 0; 
             padding: 0; 
             -webkit-tap-highlight-color: transparent;
@@ -64,8 +71,8 @@
         
         ::-webkit-scrollbar { display: none; }
         
-        .nav-item.active { color: #0055A4; font-weight: 800; }
-        .nav-item.active svg { stroke-width: 2.5; }
+        .nav-item.active { color: #10B981; font-weight: 800; }
+        .nav-item.active svg { stroke-width: 2.5; filter: drop-shadow(0px 2px 4px rgba(16, 185, 129, 0.4)); }
 
         #main-content { padding-bottom: 150px !important; }
         
@@ -74,187 +81,176 @@
             min-height: 80px !important;
         }
 
-        /* Estilos específicos para la impresión nativa */
+        /* Circulo de progreso SVG mediante CSS */
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.8s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        /* Ocultar elementos al imprimir */
         @media print {
-            @page { margin: 10mm; }
+            @page { margin: 5mm; }
             body { background-color: white !important; }
-            /* Ocultar interfaz al imprimir */
-            header, nav, main, #alert-box, .print-hidden { display: none !important; }
-            /* Mostrar SOLO el área de impresión */
+            header, nav, main, #alert-box, .print-hidden, #modal-preview { display: none !important; }
             #print-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
         }
     </style>
 </head>
 <body> 
 
-<!-- App Bar Superior -->
-<header class="bg-primary text-white shadow-md sticky top-0 z-40 print-hidden">
+<header class="bg-gradient-to-r from-primary to-primary-accent text-white shadow-lg sticky top-0 z-40 print-hidden">
     <div class="px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-white text-primary rounded-xl flex items-center justify-center font-black text-xs shadow-inner">EN</div>
+            <div class="w-9 h-9 bg-white text-primary rounded-xl flex items-center justify-center font-black text-xs shadow-soft">AEZ</div>
             <div>
-                <h1 class="text-base font-black uppercase leading-none">Cotizador V1</h1>
-                <p class="text-[9px] font-medium uppercase opacity-80 mt-0.5" id="header-status">Esperando Base de Datos...</p>
+                <h1 class="text-base font-black uppercase leading-none tracking-wide">Zendejas</h1>
+                <p class="text-[9px] font-medium uppercase opacity-80 mt-0.5 text-successlight" id="header-status">Sistema de Campo</p>
             </div>
         </div>
-        <button onclick="clearCacheAndReload()" class="p-2 hover:bg-primary-dark rounded-full transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <button onclick="clearCacheAndReload()" class="p-2 hover:bg-white/10 rounded-full transition-colors backdrop-blur-sm bg-white/5">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </button>
     </div>
 </header>
 
 <main id="main-content" class="p-4 relative print-hidden">
     
-    <!-- Alertas -->
-    <div id="alert-box" class="hidden fixed top-20 left-4 right-4 z-[60] bg-white border-l-4 border-danger shadow-xl p-3 rounded-lg">
+    <!-- Alertas Generales -->
+    <div id="alert-box" class="hidden fixed top-20 left-4 right-4 z-[60] bg-white border-l-4 border-primary-accent shadow-2xl p-3 rounded-xl transition-all duration-300">
         <div class="flex items-center gap-3">
-            <div class="bg-red-100 text-danger p-1 rounded-full font-bold w-6 h-6 flex items-center justify-center text-xs">!</div>
-            <p id="alert-msg" class="text-[11px] font-bold text-gray-800 uppercase break-words"></p>
+            <div class="bg-primary/10 text-primary-accent p-1 rounded-full font-bold w-6 h-6 flex items-center justify-center text-xs">!</div>
+            <p id="alert-msg" class="text-[11px] font-bold text-darktext uppercase break-words"></p>
         </div>
     </div>
 
-    <!-- PASO 1: CARGA DE ARCHIVO -->
-    <div id="step-1" class="w-full bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col items-center text-center mt-4">
+    <div id="step-1" class="w-full bg-cardbg rounded-3xl shadow-soft border border-gray-100 p-6 flex flex-col items-center text-center mt-2">
         <input type="file" id="dataFile" accept=".xlsx, .xls" class="hidden">
         
         <div id="loader-spinner" class="hidden mb-6 flex flex-col items-center py-10">
-            <div class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-3"></div>
-            <span class="text-xs font-bold text-primary uppercase tracking-widest animate-pulse" id="loader-text">Procesando Base de Datos...</span>
+            <div class="w-12 h-12 border-4 border-success/30 border-t-success rounded-full animate-spin mb-4 shadow-glow"></div>
+            <span class="text-xs font-black text-primary uppercase tracking-widest animate-pulse" id="loader-text">Procesando BD...</span>
         </div>
         
         <div id="upload-content" class="w-full">
-            <div class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+            <div class="bg-gradient-to-br from-primary-light to-primary w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-5 text-white shadow-lg rotate-3">
+                <svg class="w-10 h-10 -rotate-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
             </div>
-            <h2 class="text-lg font-black text-darktext mb-1 uppercase">Base de Datos Maestra</h2>
-            <p class="text-gray-500 mb-6 text-xs">Sube tu archivo <span class="font-bold text-primary">.XLSX</span>.</p>
+            <h2 class="text-xl font-black text-darktext mb-2 uppercase tracking-tight">Sincronización</h2>
+            <p class="text-gray-500 mb-6 text-[11px] font-medium">Actualiza tu catálogo y cartera</p>
             
             <div class="flex flex-col gap-3 w-full">
-                <button type="button" onclick="loadFromCloud()" class="w-full bg-primary text-white py-3.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-md">
-                    Descargar de la Nube
+                <button type="button" onclick="loadFromCloud()" class="w-full bg-gradient-to-r from-success to-emerald-400 text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-success/30 active:scale-95 transition-all">
+                    Descargar Nube
                 </button>
-                <button type="button" id="btnSelectFile" class="w-full bg-white text-primary border-2 border-primary py-3.5 rounded-xl text-xs font-black uppercase tracking-widest">
-                    Seleccionar Local
+                <button type="button" id="btnSelectFile" class="w-full bg-white text-primary border-2 border-primary/20 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:border-primary transition-colors active:scale-95">
+                    Archivo Local
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- PASO 2: PANEL DE CONTROL -->
     <div id="step-main-menu" class="w-full hidden mt-2">
-        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Panel Principal</h2>
-
-        <div class="grid grid-cols-2 gap-4">
-            <div onclick="switchTab('clientes')" class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform">
-                <div class="w-12 h-12 bg-blue-50 text-primary rounded-full flex items-center justify-center mb-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+        
+        <h2 class="text-lg font-black text-primary tracking-tight uppercase mb-3 flex items-center gap-2">
+            <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+            Métricas de Venta
+        </h2>
+        
+        <!-- Tarjeta de Venta del Día y Mes (Gráfico Circular) -->
+        <div class="bg-cardbg rounded-3xl p-5 shadow-soft border border-gray-100 mb-4 flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-1">Venta del Día</p>
+                <p id="dash-day" class="text-2xl font-black text-primary leading-none mb-3">$0</p>
+                
+                <p class="text-[9px] font-bold uppercase text-gray-400 tracking-widest mb-0.5 mt-2 border-t border-gray-100 pt-2">Acumulado del Mes</p>
+                <p id="dash-month" class="text-sm font-black text-success">$0</p>
+            </div>
+            
+            <!-- Gráfico Circular SVG -->
+            <div class="relative w-24 h-24 flex items-center justify-center">
+                <svg class="w-full h-full" viewBox="0 0 100 100">
+                    <!-- Fondo del anillo -->
+                    <circle class="text-gray-100 stroke-current" stroke-width="8" cx="50" cy="50" r="40" fill="transparent"></circle>
+                    <!-- Progreso (Verde) -->
+                    <circle id="dash-month-ring" class="text-success stroke-current progress-ring__circle" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="40" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+                </svg>
+                <div class="absolute flex flex-col items-center justify-center">
+                    <span id="dash-month-pct" class="text-sm font-black text-primary">0%</span>
+                    <span class="text-[6px] uppercase font-bold text-gray-400">Meta Mensual</span>
                 </div>
-                <h3 class="text-xs font-black text-darktext uppercase">Cartera</h3>
+            </div>
+        </div>
+
+        <!-- Tarjeta de Gráfico de Barras (Últimos 3 Días) -->
+        <div class="bg-gradient-to-br from-primary to-primary-accent rounded-3xl p-5 shadow-lg text-white mb-6 relative overflow-hidden">
+            <div class="absolute -right-4 -bottom-4 opacity-10"><svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"></path></svg></div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-successlight opacity-90 mb-4">Días Anteriores (Sin Dom)</p>
+            
+            <!-- Contenedor del Gráfico de Barras CSS -->
+            <div class="flex items-end h-32 gap-3 pb-6 border-b border-white/20 relative z-10" id="bar-chart-container">
+                <!-- Barras generadas por JS -->
+            </div>
+            <!-- Etiquetas del eje X -->
+            <div class="flex justify-between text-[9px] font-bold uppercase mt-2 opacity-80" id="bar-chart-labels">
+                <!-- Etiquetas generadas por JS -->
+            </div>
+        </div>
+
+        <h2 class="text-lg font-black text-primary tracking-tight uppercase mb-3">Accesos Directos</h2>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div onclick="switchTab('clientes')" class="bg-cardbg border border-gray-100 rounded-3xl p-5 shadow-soft flex flex-col items-center text-center active:scale-95 transition-transform">
+                <div class="w-14 h-14 bg-primary/5 text-primary rounded-2xl flex items-center justify-center mb-3">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                </div>
+                <h3 class="text-xs font-black text-darktext uppercase tracking-wide">Cartera</h3>
             </div>
 
-            <!-- Nuevo botón de Inventario en lugar del de Mostrador -->
-            <div onclick="switchTab('inventario')" class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform">
-                <div class="w-12 h-12 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mb-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            <div onclick="switchTab('inventario')" class="bg-cardbg border border-gray-100 rounded-3xl p-5 shadow-soft flex flex-col items-center text-center active:scale-95 transition-transform">
+                <div class="w-14 h-14 bg-success/10 text-success rounded-2xl flex items-center justify-center mb-3">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                 </div>
-                <h3 class="text-xs font-black text-darktext uppercase">Inventario</h3>
+                <h3 class="text-xs font-black text-darktext uppercase tracking-wide">Inventario</h3>
             </div>
 
-            <div onclick="openNewClientModal()" class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform">
-                <div class="w-12 h-12 bg-green-50 text-success rounded-full flex items-center justify-center mb-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+            <div onclick="openNewClientModal()" class="bg-cardbg border border-gray-100 rounded-3xl p-5 shadow-soft flex flex-col items-center text-center active:scale-95 transition-transform">
+                <div class="w-14 h-14 bg-primary-accent/10 text-primary-accent rounded-2xl flex items-center justify-center mb-3">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
                 </div>
-                <h3 class="text-xs font-black text-darktext uppercase">Nuevo Cliente</h3>
+                <h3 class="text-xs font-black text-darktext uppercase tracking-wide">Alta Cliente</h3>
             </div>
 
-            <div onclick="switchTab('informes')" class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform">
-                <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mb-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <div onclick="switchTab('informes')" class="bg-cardbg border border-gray-100 rounded-3xl p-5 shadow-soft flex flex-col items-center text-center active:scale-95 transition-transform">
+                <div class="w-14 h-14 bg-danger/10 text-danger rounded-2xl flex items-center justify-center mb-3">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 </div>
-                <h3 class="text-xs font-black text-darktext uppercase">Informes</h3>
+                <h3 class="text-xs font-black text-darktext uppercase tracking-wide">Informes</h3>
             </div>
         </div>
     </div>
 
-    <!-- PASO 3: LISTA DE CLIENTES -->
     <div id="step-clientes" class="w-full hidden">
         <div class="relative mb-4">
-            <input type="text" id="clientSearch" placeholder="Buscar cliente..." class="w-full p-3 pl-10 bg-white border border-gray-300 rounded-xl focus:border-primary outline-none font-semibold text-darktext text-sm shadow-sm" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <input type="text" id="clientSearch" placeholder="Buscar cliente..." class="w-full p-4 pl-12 bg-cardbg border-2 border-gray-100 rounded-2xl focus:border-success outline-none font-semibold text-darktext text-sm shadow-soft transition-colors" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+            <svg class="w-6 h-6 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </div>
         <div id="client-list" class="flex flex-col gap-3 pb-4"></div>
     </div>
 
-    <!-- PASO 4: COTIZADOR -->
-    <div id="step-cotizador" class="w-full hidden">
-        
-        <div class="bg-primary text-white rounded-2xl shadow-lg p-4 mb-4 relative overflow-hidden">
-            <div class="absolute -right-10 -top-10 opacity-10">
-                <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.64-2.25 1.64-1.74 0-2.1-.96-2.15-1.92H8.03c.06 1.62 1.06 2.84 2.87 3.24V19h2.34v-1.73c1.55-.31 2.82-1.3 2.82-2.92 0-2.07-1.67-2.82-3.75-3.35z"></path></svg>
-            </div>
-            <p class="text-[9px] font-bold uppercase tracking-widest opacity-80 mb-1">Cotizando a:</p>
-            <h2 id="cot-client-name" class="text-lg font-black uppercase leading-tight line-clamp-1 mb-2"></h2>
-            
-            <div class="bg-black/20 rounded-xl p-3 mt-2 backdrop-blur-sm border border-white/10">
-                <div class="flex justify-between items-center text-[10px] font-bold uppercase opacity-80 mb-1">
-                    <span>Subtotal:</span><span id="cot-subtotal">$0.00</span>
-                </div>
-                <div class="flex justify-between items-center text-[10px] font-bold uppercase opacity-80 mb-1">
-                    <span>IVA (16%):</span><span id="cot-iva">$0.00</span>
-                </div>
-                <div class="flex justify-between items-center text-xs font-black uppercase mt-1 pt-1 border-t border-white/20">
-                    <span>Total Final:</span><span id="cot-grand-total" class="text-xl">$0.00</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="relative w-full z-30 mb-4">
-            <input type="text" id="prod-search-input" placeholder="Buscar producto..." class="w-full p-3 bg-white border border-gray-300 rounded-xl focus:border-primary outline-none font-semibold text-darktext text-sm shadow-sm" oninput="handleProductSearch()" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-            <div id="prod-search-results" class="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-xl max-h-60 overflow-y-auto hidden shadow-2xl mt-1 z-50 divide-y divide-gray-100"></div>
-        </div>
-
-        <div id="cart-list-container" class="flex flex-col gap-3 mb-6">
-            <div class="bg-white p-6 rounded-xl border border-gray-200 text-center text-gray-400 font-bold text-xs uppercase shadow-sm">
-                El carrito está vacío
-            </div>
-        </div>
-        
-        <div class="grid grid-cols-2 gap-2 mt-4 mb-4">
-            <button onclick="clearCart()" class="bg-red-50 text-danger border border-danger/30 py-3 rounded-xl text-[10px] font-black uppercase shadow-sm">Vaciar</button>
-            <button onclick="exportExcel()" class="bg-white text-primary border border-primary py-3 rounded-xl text-[10px] font-black uppercase shadow-sm">Excel</button>
-            <button onclick="generatePrint()" class="col-span-2 bg-primary text-white py-3.5 rounded-xl text-xs font-black uppercase shadow-md flex justify-center items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                Imprimir Remisión (PDF)
+    <div id="step-inventario" class="w-full hidden mt-2">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-black text-primary tracking-tight uppercase">Inventario a Bordo</h2>
+            <input type="file" id="invFile" accept=".xlsx, .xls" class="hidden">
+            <button onclick="document.getElementById('invFile').click()" class="bg-success text-white px-3 py-2 rounded-xl text-[10px] font-black uppercase flex items-center gap-1 shadow-md shadow-success/30">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                Cargar Excel
             </button>
         </div>
-    </div>
-
-    <!-- PASO 5: INFORMES -->
-    <div id="step-informes" class="w-full hidden">
-        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Reporte de Sesión</h2>
-        
-        <div class="bg-primary text-white rounded-2xl p-5 shadow-md flex flex-col justify-center items-center text-center mb-4 relative overflow-hidden">
-            <p class="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Total Pagado Hoy</p>
-            <p id="rep-total-money" class="text-3xl font-black">$0.00</p>
-            <p id="rep-total-count" class="text-xs font-medium mt-1 bg-white/20 px-3 py-1 rounded-full">0 Ventas Cerradas</p>
-        </div>
-
-        <div class="flex justify-between items-center mb-3 px-1">
-            <h3 class="text-xs font-black uppercase text-gray-500">Historial de Remisiones</h3>
-        </div>
-
-        <div id="rep-list-container" class="flex flex-col gap-3">
-             <!-- Historial renderizado aqui -->
-        </div>
-    </div>
-
-    <!-- PASO 6: INVENTARIO -->
-    <div id="step-inventario" class="w-full hidden mt-2">
-        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Inventario a Bordo</h2>
         
         <div class="relative mb-4">
-            <input type="text" id="inv-search-input" placeholder="Buscar para cargar stock a bordo..." class="w-full p-3 pl-10 bg-white border border-gray-300 rounded-xl focus:border-primary outline-none font-semibold text-darktext text-sm shadow-sm" oninput="handleInvSearch()" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <input type="text" id="inv-search-input" placeholder="Buscar para cargar stock manual..." class="w-full p-4 pl-12 bg-cardbg border-2 border-gray-100 rounded-2xl focus:border-success outline-none font-semibold text-darktext text-sm shadow-soft transition-colors" oninput="handleInvSearch()" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+            <svg class="w-6 h-6 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </div>
 
         <div id="inv-list-container" class="flex flex-col gap-3 pb-4">
@@ -262,103 +258,207 @@
         </div>
     </div>
 
-    <!-- MODAL NUEVO CLIENTE -->
-    <div id="modal-new-client" class="hidden fixed inset-0 z-[70] bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full overflow-hidden border border-gray-100 mt-[-10%]">
-            <div class="p-4 border-b border-gray-100 flex justify-between items-center">
-                <h2 class="text-base font-black text-darktext uppercase">Alta Manual</h2>
-                <button onclick="closeNewClientModal()" class="text-gray-400 p-1 hover:text-danger hover:bg-gray-100 rounded">
+    <div id="step-cotizador" class="w-full hidden">
+        
+        <div class="bg-gradient-to-r from-primary to-primary-accent text-white rounded-3xl shadow-lg p-5 mb-5 relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 opacity-10">
+                <svg class="w-40 h-40" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path></svg>
+            </div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-successlight mb-1">Cotizando a:</p>
+            <h2 id="cot-client-name" class="text-xl font-black uppercase leading-tight line-clamp-1 mb-3"></h2>
+            
+            <div class="bg-white/10 rounded-2xl p-4 backdrop-blur-md border border-white/20 shadow-inner">
+                <div class="flex justify-between items-center text-[11px] font-bold uppercase opacity-90 mb-1">
+                    <span>Subtotal:</span><span id="cot-subtotal">$0.00</span>
+                </div>
+                <div class="flex justify-between items-center text-[11px] font-bold uppercase opacity-90 mb-2">
+                    <span>IVA (16%):</span><span id="cot-iva">$0.00</span>
+                </div>
+                <div class="flex justify-between items-center text-sm font-black uppercase mt-2 pt-2 border-t border-white/20">
+                    <span class="text-successlight">Total Final:</span><span id="cot-grand-total" class="text-2xl">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="relative w-full z-30 mb-5">
+            <input type="text" id="prod-search-input" placeholder="Buscar refacción..." class="w-full p-4 bg-cardbg border-2 border-gray-100 rounded-2xl focus:border-success outline-none font-semibold text-darktext text-sm shadow-soft transition-colors" oninput="handleProductSearch()" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+            <div id="prod-search-results" class="absolute top-full left-0 w-full bg-cardbg border border-gray-100 rounded-2xl max-h-60 overflow-y-auto hidden shadow-2xl mt-2 z-50 divide-y divide-gray-50"></div>
+        </div>
+
+        <div id="cart-list-container" class="flex flex-col gap-3 mb-6">
+            <div class="bg-cardbg p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase shadow-soft">
+                El carrito está vacío
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3 mt-4 mb-4">
+            <button onclick="openConfirmCartModal()" class="bg-dangerlight text-danger border border-danger/20 py-4 rounded-2xl text-[11px] font-black uppercase shadow-soft active:scale-95 transition-transform">Vaciar</button>
+            <button onclick="exportExcel()" class="bg-cardbg text-primary border border-gray-200 py-4 rounded-2xl text-[11px] font-black uppercase shadow-soft active:scale-95 transition-transform">Excel</button>
+            
+            <button onclick="openPreviewModal()" class="col-span-2 bg-gradient-to-r from-primary to-primary-accent text-white py-4 rounded-2xl text-sm font-black uppercase shadow-lg shadow-primary/30 flex justify-center items-center gap-2 active:scale-95 transition-transform">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                Visualizar Pedido
+            </button>
+        </div>
+    </div>
+
+    <div id="step-informes" class="w-full hidden">
+        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Reporte Diario</h2>
+        
+        <div class="bg-gradient-to-br from-primary to-primary-accent text-white rounded-3xl p-6 shadow-lg flex flex-col justify-center items-center text-center mb-5 relative overflow-hidden">
+            <p class="text-[11px] font-bold uppercase tracking-widest text-successlight mb-1">Total Pagado Hoy</p>
+            <p id="rep-total-money" class="text-4xl font-black mb-2">$0.00</p>
+            <p id="rep-total-count" class="text-[10px] font-bold tracking-widest uppercase bg-white/20 px-4 py-1.5 rounded-full backdrop-blur-sm">0 Ventas Cerradas</p>
+        </div>
+
+        <div class="flex justify-between items-center mb-3 px-1">
+            <h3 class="text-[11px] font-black uppercase text-gray-500 tracking-wider">Historial de Remisiones</h3>
+        </div>
+
+        <div id="rep-list-container" class="flex flex-col gap-3">
+             <!-- Historial renderizado aqui -->
+        </div>
+    </div>
+
+    <div id="modal-new-client" class="hidden fixed inset-0 z-[70] bg-primary/40 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-cardbg rounded-3xl shadow-2xl w-full overflow-hidden border border-gray-100 mt-[-10%]">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white">
+                <h2 class="text-base font-black text-primary uppercase tracking-tight">Alta Manual</h2>
+                <button onclick="closeNewClientModal()" class="text-gray-400 p-1.5 hover:text-danger hover:bg-dangerlight rounded-xl transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div class="p-4 flex flex-col gap-3">
-                <input type="text" id="nc-id" readonly placeholder="ID Autogenerado" class="w-full p-3 bg-gray-100 border border-gray-200 rounded-xl text-sm outline-none text-gray-500 font-bold cursor-not-allowed">
-                <input type="text" id="nc-name" placeholder="Razón Social *" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-                <input type="text" id="nc-address" placeholder="Domicilio *" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-                <input type="tel" id="nc-phone" placeholder="Teléfono *" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-                <input type="text" id="nc-rfc" placeholder="RFC (Opcional)" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-                <input type="text" id="nc-city" placeholder="Ciudad (Opcional)" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+            <div class="p-5 flex flex-col gap-3">
+                <label class="text-[10px] font-bold text-gray-400 uppercase -mb-2 ml-1">ID Cliente (Automático)</label>
+                <input type="text" id="nc-id" readonly class="w-full p-4 bg-gray-100 border border-transparent rounded-2xl text-sm font-bold text-gray-500 outline-none cursor-not-allowed">
+                
+                <input type="text" id="nc-name" placeholder="Razón Social *" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm outline-none focus:border-success transition-colors" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+                <input type="text" id="nc-address" placeholder="Domicilio Completo *" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm outline-none focus:border-success transition-colors" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+                <input type="tel" id="nc-phone" placeholder="Teléfono / WhatsApp *" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm outline-none focus:border-success transition-colors" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+                <input type="text" id="nc-rfc" placeholder="RFC (Opcional)" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm outline-none focus:border-success transition-colors" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+                <input type="text" id="nc-city" placeholder="Ciudad (Opcional)" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm outline-none focus:border-success transition-colors" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
             </div>
-            <div class="p-4 border-t border-gray-100 flex gap-2">
-                <button onclick="closeNewClientModal()" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold uppercase hover:bg-gray-200">Cancelar</button>
-                <button onclick="saveNewClient()" class="flex-1 py-3 bg-primary text-white rounded-xl text-xs font-black uppercase shadow-sm">Guardar</button>
+            <div class="p-4 border-t border-gray-100 flex gap-3 bg-gray-50">
+                <button onclick="closeNewClientModal()" class="flex-1 py-4 bg-white border border-gray-200 text-gray-500 rounded-2xl text-xs font-bold uppercase shadow-soft hover:bg-gray-50 transition-colors">Cancelar</button>
+                <button onclick="saveNewClient()" class="flex-1 py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-primary/30 active:scale-95 transition-transform">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL COBRO -->
-    <div id="modal-payment" class="hidden fixed inset-0 z-[80] bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-100 mt-[-10%]">
-            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <div>
-                    <h2 class="text-base font-black text-darktext uppercase">Cerrar Venta</h2>
-                    <p id="pay-folio-text" class="text-[10px] text-gray-500 font-bold uppercase"></p>
-                </div>
-                <button onclick="closePaymentModal()" class="text-gray-400 p-1 hover:text-danger hover:bg-gray-200 rounded">
+    <!-- Modal Previsualización de Venta -->
+    <div id="modal-preview" class="hidden fixed inset-0 z-[85] bg-primary/80 backdrop-blur-md flex items-center justify-center p-2">
+        <div class="bg-gray-100 rounded-3xl shadow-2xl w-full h-[95vh] max-w-md flex flex-col overflow-hidden">
+            <div class="p-4 border-b border-gray-200 bg-white flex justify-between items-center z-10 shadow-sm">
+                <h2 class="text-sm font-black text-primary uppercase tracking-tight flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    Vista Previa Ticket
+                </h2>
+                <button onclick="closePreviewModal()" class="text-gray-400 p-1.5 hover:text-danger hover:bg-dangerlight rounded-xl transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div class="p-5 flex flex-col gap-4 text-center">
-                <p class="text-xs font-bold text-gray-600 uppercase">Selecciona el método de pago</p>
-                <select id="payment-method" class="w-full p-3 bg-white border-2 border-gray-200 rounded-xl text-sm font-bold text-darktext outline-none focus:border-primary">
-                    <option value="">-- Seleccionar --</option>
-                    <option value="EFECTIVO">Efectivo</option>
-                    <option value="TARJETA DÉBITO">Tarjeta Débito</option>
-                    <option value="TARJETA CRÉDITO">Tarjeta Crédito</option>
-                    <option value="TRANSFERENCIA">Transferencia SPEI</option>
+            
+            <div class="flex-1 overflow-y-auto p-4 relative" id="preview-container">
+                <div id="preview-content" class="bg-white shadow-md mx-auto" style="transform-origin: top center; transform: scale(0.85); width: 115%;"></div>
+            </div>
+
+            <div class="p-4 border-t border-gray-200 bg-white shadow-[0_-5px_15px_rgba(0,0,0,0.05)] z-10 flex gap-3">
+                <button onclick="closePreviewModal()" class="w-1/3 py-4 bg-gray-50 border border-gray-200 text-gray-500 rounded-2xl text-[11px] font-bold uppercase shadow-soft">Editar</button>
+                <button onclick="commitAndPrintSale()" class="w-2/3 py-4 bg-gradient-to-r from-success to-emerald-500 text-white rounded-2xl text-[11px] font-black uppercase shadow-lg shadow-success/30 flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Confirmar e Imprimir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Otros modales -->
+    <div id="modal-payment" class="hidden fixed inset-0 z-[80] bg-primary/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-cardbg rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-100 mt-[-10%]">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white">
+                <div>
+                    <h2 class="text-base font-black text-primary uppercase tracking-tight">Cerrar Venta</h2>
+                    <p id="pay-folio-text" class="text-[10px] text-success font-bold uppercase"></p>
+                </div>
+                <button onclick="closePaymentModal()" class="text-gray-400 p-1.5 hover:text-danger hover:bg-dangerlight rounded-xl transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 flex flex-col gap-4 text-center">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Selecciona el método de pago</p>
+                <select id="payment-method" class="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl text-sm font-bold text-darktext outline-none focus:border-success appearance-none">
+                    <option value="">-- Toca para seleccionar --</option>
+                    <option value="EFECTIVO">💵 Efectivo</option>
+                    <option value="TARJETA DÉBITO">💳 Tarjeta Débito</option>
+                    <option value="TARJETA CRÉDITO">💳 Tarjeta Crédito</option>
+                    <option value="TRANSFERENCIA">📱 Transferencia SPEI</option>
                 </select>
             </div>
-            <div class="p-4 border-t border-gray-100 flex gap-2">
-                <button onclick="closePaymentModal()" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold uppercase hover:bg-gray-200">Cancelar</button>
-                <button onclick="confirmPayment()" class="flex-1 py-3 bg-success text-white rounded-xl text-xs font-black uppercase shadow-sm flex items-center justify-center gap-2">
+            <div class="p-4 border-t border-gray-100 flex gap-3 bg-gray-50">
+                <button onclick="closePaymentModal()" class="flex-1 py-4 bg-white border border-gray-200 text-gray-500 rounded-2xl text-xs font-bold uppercase shadow-soft">Cancelar</button>
+                <button onclick="confirmPayment()" class="flex-1 py-4 bg-gradient-to-r from-success to-emerald-500 text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-success/30 flex items-center justify-center gap-2 active:scale-95 transition-transform">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Confirmar Pago
+                    Confirmar
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-confirm-cart" class="hidden fixed inset-0 z-[90] bg-primary/60 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-cardbg rounded-3xl shadow-2xl w-full max-w-xs overflow-hidden border border-gray-100 text-center p-6 mt-[-10%]">
+            <div class="w-16 h-16 bg-dangerlight text-danger rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </div>
+            <h2 class="text-lg font-black text-primary uppercase tracking-tight mb-2">¿Vaciar Carrito?</h2>
+            <p class="text-xs text-gray-500 mb-6 font-medium">Esta acción eliminará todos los artículos agregados.</p>
+            <div class="flex gap-3">
+                <button onclick="closeConfirmCartModal()" class="flex-1 py-3.5 bg-gray-100 text-gray-600 rounded-2xl text-xs font-bold uppercase hover:bg-gray-200 transition-colors">Cancelar</button>
+                <button onclick="confirmClearCart()" class="flex-1 py-3.5 bg-danger text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-danger/30 active:scale-95 transition-transform">Sí, Vaciar</button>
             </div>
         </div>
     </div>
 
 </main>
 
-<nav id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white border-t border-gray-200 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] z-40 android-safe-nav print-hidden">
-    <div class="flex justify-around items-center h-16 pt-2">
+<nav id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white/90 backdrop-blur-md border-t border-gray-100 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-40 android-safe-nav print-hidden">
+    <div class="flex justify-around items-center h-16 pt-2 px-2">
         <button onclick="switchTab('inicio')" id="tab-inicio" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition-colors">
             <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-            <span class="text-[9px] font-bold">Inicio</span>
+            <span class="text-[9px] font-bold tracking-wide">Inicio</span>
         </button>
         <button onclick="switchTab('clientes')" id="tab-clientes" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition-colors">
             <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-            <span class="text-[9px] font-bold">Clientes</span>
+            <span class="text-[9px] font-bold tracking-wide">Clientes</span>
         </button>
         <button onclick="switchTab('cotizador')" id="tab-cotizador" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition-colors">
             <div class="relative">
                 <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                <span id="cart-badge" class="absolute -top-1 -right-2 bg-danger text-white text-[8px] font-black px-1.5 py-0.5 rounded-full hidden shadow-sm">0</span>
+                <span id="cart-badge" class="absolute -top-1 -right-2 bg-danger text-white text-[8px] font-black px-1.5 py-0.5 rounded-full hidden shadow-soft">0</span>
             </div>
-            <span class="text-[9px] font-bold">Carrito</span>
+            <span class="text-[9px] font-bold tracking-wide">Carrito</span>
         </button>
         <button onclick="switchTab('informes')" id="tab-informes" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition-colors">
             <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-            <span class="text-[9px] font-bold">Informes</span>
+            <span class="text-[9px] font-bold tracking-wide">Informes</span>
         </button>
     </div>
 </nav>
 
-<!-- ÁREA DE IMPRESIÓN (Totalmente oculta excepto al invocar window.print) -->
+<!-- ÁREA DE IMPRESIÓN (Oculta excepto en window.print) -->
 <div id="print-area" class="hidden"></div>
 
 <script>
-    // --- VARIABLES GLOBALES Y LOCAL STORAGE ---
     let globalProducts = new Map();
     let globalClients = new Map();
     let selectedClient = null;
     let cartItems = new Map(); 
     let saleToPay = null; 
+    let mockSaleForPreview = null;
     
-    // Recuperar datos permanentes o iniciar de 0
+    // Memoria Permanente
     let sessionSales = JSON.parse(localStorage.getItem('apymsa_sales')) || [];
     let folioGlobalCounter = parseInt(localStorage.getItem('apymsa_folio')) || 1;
-    let localStock = JSON.parse(localStorage.getItem('apymsa_stock')) || {}; // Guarda el inventario local
+    let localStock = JSON.parse(localStorage.getItem('apymsa_stock')) || {}; 
     
     function saveSalesToLocal() {
         localStorage.setItem('apymsa_sales', JSON.stringify(sessionSales));
@@ -370,6 +470,7 @@
     }
     
     const fileInput = document.getElementById('dataFile');
+    const invFileInput = document.getElementById('invFile');
     const step1 = document.getElementById('step-1');
     const stepMainMenu = document.getElementById('step-main-menu');
     const stepClientes = document.getElementById('step-clientes');
@@ -380,18 +481,26 @@
     const clientList = document.getElementById('client-list');
     const clientSearch = document.getElementById('clientSearch');
     
-    const moneyFmt = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+    const moneyFmt = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }); 
+    const moneyFmtFull = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }); 
 
     function showAlert(msg, timeout = 3500) {
         const box = document.getElementById('alert-box');
         document.getElementById('alert-msg').innerText = msg;
         box.classList.remove('hidden');
+        box.classList.add('translate-y-0');
         setTimeout(() => box.classList.add('hidden'), timeout);
     }
 
     function clearCacheAndReload() { location.reload(); }
     function normalizeKey(key) { return String(key || "").toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9_]/g, ""); }
     function parseMoney(value) { let num = parseFloat(String(value).replace(/[^\d.-]/g, '').trim()); return isNaN(num) ? 0 : num; }
+
+    const formatLocalDt = (d) => {
+        let day = ("0" + d.getDate()).slice(-2);
+        let month = ("0" + (d.getMonth() + 1)).slice(-2);
+        return `${day}/${month}/${d.getFullYear()}`;
+    };
 
     function hideAllSteps() {
         step1.classList.add('hidden');
@@ -411,6 +520,7 @@
         document.getElementById(`tab-${tab}`)?.classList.add('active');
 
         if(tab === 'inicio') {
+            updateDashboard();
             stepMainMenu.classList.remove('hidden');
             document.getElementById('tab-inicio').classList.add('active');
         } else if (tab === 'clientes') {
@@ -418,7 +528,7 @@
             renderClientList();
         } else if (tab === 'cotizador') {
             if(!selectedClient) {
-                showAlert("Primero selecciona un cliente de tu Cartera.");
+                showAlert("Selecciona un cliente de tu cartera para iniciar venta.");
                 switchTab('clientes');
                 return;
             } 
@@ -433,12 +543,85 @@
         }
     }
 
+    function updateDashboard() {
+        const today = new Date();
+        const strHoy = formatLocalDt(today);
+        
+        // Algoritmo para obtener los 3 días laborables anteriores (saltando el Domingo)
+        let prevDays = [];
+        let d = new Date(today);
+        while(prevDays.length < 3) {
+            d.setDate(d.getDate() - 1);
+            if(d.getDay() !== 0) { // 0 es Domingo
+                prevDays.unshift(new Date(d)); // Agregamos al inicio para mantener orden [Día-3, Día-2, Día-1]
+            }
+        }
+
+        const strDia1 = formatLocalDt(prevDays[0]);
+        const strDia2 = formatLocalDt(prevDays[1]);
+        const strDia3 = formatLocalDt(prevDays[2]);
+
+        let ventaHoy = 0, ventaDia1 = 0, ventaDia2 = 0, ventaDia3 = 0, ventaMes = 0;
+        
+        const currentMonthStr = ("0" + (today.getMonth() + 1)).slice(-2) + "/" + today.getFullYear();
+
+        sessionSales.forEach(sale => {
+            if(sale.date === strHoy) ventaHoy += sale.total;
+            if(sale.date === strDia1) ventaDia1 += sale.total;
+            if(sale.date === strDia2) ventaDia2 += sale.total;
+            if(sale.date === strDia3) ventaDia3 += sale.total;
+            if(sale.date.includes(currentMonthStr)) ventaMes += sale.total;
+        });
+
+        document.getElementById('dash-day').innerText = moneyFmt.format(ventaHoy);
+        document.getElementById('dash-month').innerText = moneyFmt.format(ventaMes);
+
+        const goal = 100000;
+        let pct = Math.min((ventaMes / goal) * 100, 100);
+        const offset = 251.2 - (pct / 100) * 251.2;
+        document.getElementById('dash-month-ring').style.strokeDashoffset = offset;
+        document.getElementById('dash-month-pct').innerText = `${Math.floor(pct)}%`;
+
+        const maxBar = Math.max(ventaDia1, ventaDia2, ventaDia3, 1000); 
+        const pct1 = (ventaDia1 / maxBar) * 100;
+        const pct2 = (ventaDia2 / maxBar) * 100;
+        const pct3 = (ventaDia3 / maxBar) * 100;
+        
+        const getName = (dateObj) => {
+            const days = ['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
+            return days[dateObj.getDay()];
+        }
+
+        const barContainer = document.getElementById('bar-chart-container');
+        barContainer.innerHTML = `
+            <div class="w-1/3 flex flex-col justify-end items-center group relative h-full">
+                <span class="text-[8px] font-black opacity-0 group-hover:opacity-100 transition-opacity absolute -top-4">${moneyFmt.format(ventaDia1)}</span>
+                <div class="w-full bg-white/20 rounded-t-lg transition-all duration-1000" style="height: ${pct1}%"></div>
+            </div>
+            <div class="w-1/3 flex flex-col justify-end items-center group relative h-full">
+                <span class="text-[8px] font-black opacity-0 group-hover:opacity-100 transition-opacity absolute -top-4">${moneyFmt.format(ventaDia2)}</span>
+                <div class="w-full bg-white/40 rounded-t-lg transition-all duration-1000" style="height: ${pct2}%"></div>
+            </div>
+            <div class="w-1/3 flex flex-col justify-end items-center group relative h-full">
+                <span class="text-[8px] font-black opacity-100 absolute -top-4 text-successlight">${moneyFmt.format(ventaDia3)}</span>
+                <div class="w-full bg-success rounded-t-lg shadow-[0_0_15px_rgba(16,185,129,0.5)] transition-all duration-1000" style="height: ${pct3}%"></div>
+            </div>
+        `;
+        
+        const labelsContainer = document.getElementById('bar-chart-labels');
+        labelsContainer.innerHTML = `
+            <span class="w-1/3 text-center">${getName(prevDays[0])}</span>
+            <span class="w-1/3 text-center">${getName(prevDays[1])}</span>
+            <span class="w-1/3 text-center text-successlight">${getName(prevDays[2])}</span>
+        `;
+    }
+
     document.getElementById('btnSelectFile').addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
     async function loadFromCloud() {
-        // Enlace Raw directo a tu repositorio de GitHub
-        const CLOUD_URL = "https://raw.githubusercontent.com/JOSELITO198004/cotizador-v1/8b8e667fe0aed04e1b7333410e4dd3832387d3d7/nuevo%20proyecto.xlsx"; 
+        // Tu repositorio original apuntando a la rama main (siempre actualizado)
+        const CLOUD_URL = "https://raw.githubusercontent.com/JOSELITO198004/cotizador-v1/refs/heads/main/nuevo%20proyecto.xlsx"; 
         document.getElementById('upload-content').classList.add('hidden');
         document.getElementById('loader-spinner').classList.remove('hidden');
 
@@ -502,16 +685,90 @@
             }
         });
 
-        document.getElementById('header-status').innerText = `${globalClients.size} Clientes | ${globalProducts.size} Art.`;
+        document.getElementById('header-status').innerText = `${globalClients.size} Clientes | ${globalProducts.size} Refacciones`;
         clientSearch.addEventListener('input', renderClientList);
         switchTab('inicio'); 
     }
 
+    invFileInput.addEventListener('change', e => { if (e.target.files[0]) processInvExcel(e.target.files[0]); });
+
+    function processInvExcel(file) {
+        showAlert("Leyendo inventario Excel...", 1500);
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const workbook = XLSX.read(e.target.result, { type: 'array' });
+                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                
+                localStock = {}; // Reiniciamos stock porque es una carga maestra desde Excel
+                
+                data.forEach(row => {
+                    let item = {}; for (let k in row) item[normalizeKey(k)] = row[k];
+                    const code = String(item.codigo || item.sku || item.id || "").trim();
+                    const qty = parseInt(item.cantidad || item.stock || item.qty || 0);
+                    if(code && !isNaN(qty)) {
+                        localStock[code] = qty;
+                    }
+                });
+                
+                saveStockToLocal();
+                showAlert("Stock de la unidad REINICIADO con éxito.");
+                document.getElementById('invFile').value = ""; 
+                handleInvSearch();
+            } catch (err) {
+                showAlert("Error procesando Excel de Inventario");
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function handleInvSearch() {
+        const query = document.getElementById('inv-search-input').value.toLowerCase().trim();
+        const cont = document.getElementById('inv-list-container');
+        cont.innerHTML = '';
+        
+        let count = 0;
+        for (let [sku, prod] of globalProducts.entries()) {
+            const hasStock = (localStock[sku] || 0) > 0;
+            
+            if ((query !== '' && (sku.toLowerCase().includes(query) || prod.descripcion.toLowerCase().includes(query))) || (query === '' && hasStock)) {
+                const currentStock = localStock[sku] || 0;
+                const img = prod.imgProducto ? `<img src="${prod.imgProducto}" class="w-14 h-14 object-contain rounded-xl border border-gray-100 bg-white shadow-sm">` : `<div class="w-14 h-14 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center text-[10px] text-gray-300 font-bold shadow-sm">S/I</div>`;
+                
+                const div = document.createElement('div');
+                div.className = "bg-cardbg p-4 rounded-3xl border border-gray-100 shadow-soft flex items-center gap-4 transition-all hover:shadow-md";
+                div.innerHTML = `
+                    ${img}
+                    <div class="flex-grow min-w-0">
+                        <div class="text-sm font-black text-primary leading-none mb-1.5">${sku}</div>
+                        <div class="text-[10px] text-gray-500 uppercase font-bold line-clamp-2 leading-snug">${prod.descripcion}</div>
+                    </div>
+                    <div class="flex flex-col items-center bg-gray-50 p-2 rounded-2xl border border-gray-100 shadow-inner">
+                        <span class="text-[9px] font-black text-primary uppercase tracking-widest mb-1 opacity-60">A Bordo</span>
+                        <input type="number" min="0" value="${currentStock}" onchange="updateStock('${sku}', this.value)" class="w-16 bg-white border border-gray-200 text-success rounded-xl p-2 text-center text-sm font-black outline-none shadow-sm focus:border-success transition-colors" onfocus="this.select()">
+                    </div>
+                `;
+                cont.appendChild(div);
+                count++;
+                if (count > 30) break; 
+            }
+        }
+        
+        if (count === 0) {
+            cont.innerHTML = `<div class="bg-cardbg p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase shadow-soft">No se encontraron productos</div>`;
+        }
+    }
+
+    function updateStock(sku, value) {
+        let val = parseInt(value);
+        if(isNaN(val) || val < 0) val = 0;
+        localStock[sku] = val; // Actualiza manual no resetea
+        saveStockToLocal();
+    }
+
     function openNewClientModal() { 
-        // Autogenerar un ID de cliente con el prefijo CLI- y números aleatorios
         const autoId = 'CLI-' + Math.floor(1000 + Math.random() * 9000);
         document.getElementById('nc-id').value = autoId;
-        // Limpiar los campos para la nueva captura
         document.getElementById('nc-name').value = '';
         document.getElementById('nc-address').value = '';
         document.getElementById('nc-phone').value = '';
@@ -542,65 +799,23 @@
         if(!stepClientes.classList.contains('hidden')) renderClientList();
     }
 
-    // --- MÓDULO DE INVENTARIO LOCAL ---
-    function handleInvSearch() {
-        const query = document.getElementById('inv-search-input').value.toLowerCase().trim();
-        const cont = document.getElementById('inv-list-container');
-        cont.innerHTML = '';
-        
-        let count = 0;
-        for (let [sku, prod] of globalProducts.entries()) {
-            const hasStock = (localStock[sku] || 0) > 0;
-            
-            // Mostrar si coincide con la búsqueda O si la búsqueda está vacía y tiene stock
-            if ((query !== '' && (sku.toLowerCase().includes(query) || prod.descripcion.toLowerCase().includes(query))) || (query === '' && hasStock)) {
-                const currentStock = localStock[sku] || 0;
-                const img = prod.imgProducto ? `<img src="${prod.imgProducto}" class="w-12 h-12 object-contain rounded-lg border border-gray-100 bg-white">` : `<div class="w-12 h-12 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center text-[9px] text-gray-400 font-bold">S/I</div>`;
-                
-                const div = document.createElement('div');
-                div.className = "bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3";
-                div.innerHTML = `
-                    ${img}
-                    <div class="flex-grow min-w-0">
-                        <div class="text-xs font-black text-primary leading-none mb-1">${sku}</div>
-                        <div class="text-[9px] text-gray-600 uppercase font-semibold line-clamp-2 leading-tight">${prod.descripcion}</div>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <span class="text-[8px] font-bold text-gray-400 uppercase mb-0.5">Stock A Bordo</span>
-                        <input type="number" min="0" value="${currentStock}" onchange="updateStock('${sku}', this.value)" class="w-16 bg-blue-50 border border-blue-200 text-primary rounded p-1.5 text-center text-xs font-black outline-none shadow-inner" onfocus="this.select()">
-                    </div>
-                `;
-                cont.appendChild(div);
-                count++;
-                if (count > 30) break; // Límite para no saturar el DOM
-            }
-        }
-        
-        if (count === 0) {
-            cont.innerHTML = `<div class="bg-white p-6 rounded-xl border border-gray-200 text-center text-gray-400 font-bold text-xs uppercase shadow-sm">No se encontraron productos</div>`;
-        }
-    }
-
-    function updateStock(sku, value) {
-        let val = parseInt(value);
-        if(isNaN(val) || val < 0) val = 0;
-        localStock[sku] = val;
-        saveStockToLocal();
-    }
-
-    // --- MÓDULO DE COTIZACIÓN ---
     function renderClientList() {
         clientList.innerHTML = ''; const search = clientSearch.value.toLowerCase().trim();
         let count = 0;
         for (let [id, client] of globalClients.entries()) {
             if(id.toLowerCase().includes(search) || client.razonSocial.toLowerCase().includes(search)) {
                 const div = document.createElement('div');
-                div.className = "bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col active:bg-gray-50 transition-colors";
+                div.className = "bg-cardbg border border-gray-100 rounded-3xl p-5 shadow-soft flex flex-col active:bg-gray-50 transition-colors";
                 div.onclick = () => { selectedClient = client; cartItems.clear(); setupCotizadorHeader(); switchTab('cotizador'); };
                 div.innerHTML = `
-                    <div class="text-[10px] text-primary font-black mb-1">ID: ${client.id}</div>
-                    <div class="text-sm font-black text-darktext uppercase mb-1 leading-tight">${client.razonSocial}</div>
-                    <div class="text-[10px] text-gray-500 font-semibold uppercase">RFC: ${client.rfc} • ${client.ciudad}</div>
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-lg font-black tracking-widest">${client.id}</div>
+                    </div>
+                    <div class="text-base font-black text-darktext uppercase mb-1.5 leading-tight">${client.razonSocial}</div>
+                    <div class="text-[10px] text-gray-500 font-bold uppercase flex flex-col gap-0.5">
+                        <span class="flex items-center gap-1"><svg class="w-3 h-3 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${client.ciudad} - ${client.direccion}</span>
+                        <span class="flex items-center gap-1"><svg class="w-3 h-3 text-primary-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>${client.celular}</span>
+                    </div>
                 `;
                 clientList.appendChild(div); count++;
                 if(count > 50 && search === "") break; 
@@ -621,21 +836,20 @@
         for (let [sku, prod] of globalProducts.entries()) {
             if (sku.toLowerCase().includes(query) || prod.descripcion.toLowerCase().includes(query)) {
                 if(!cartItems.has(sku)) {
-                    // Etiqueta visual de Inventario
                     const currentStock = localStock[sku] || 0;
-                    const stockColor = currentStock > 0 ? 'text-success bg-green-50 border-green-200' : 'text-gray-400 bg-gray-50 border-gray-200';
-                    const stockBadge = `<span class="px-1.5 py-0.5 rounded text-[8px] font-black border ${stockColor}">Stock: ${currentStock}</span>`;
+                    const stockColor = currentStock > 0 ? 'text-success bg-successlight border-success/20' : 'text-gray-400 bg-gray-50 border-gray-200';
+                    const stockBadge = `<span class="px-1.5 py-0.5 rounded-md text-[9px] font-black border tracking-widest ${stockColor}">${currentStock} En Ruta</span>`;
 
-                    const img = prod.imgProducto ? `<img src="${prod.imgProducto}" class="w-10 h-10 object-contain rounded border border-gray-100 bg-white">` : `<div class="w-10 h-10 bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-[8px] text-gray-400">S/I</div>`;
+                    const img = prod.imgProducto ? `<img src="${prod.imgProducto}" class="w-12 h-12 object-contain rounded-xl border border-gray-100 bg-white">` : `<div class="w-12 h-12 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center text-[9px] text-gray-300">S/I</div>`;
                     const div = document.createElement('div');
-                    div.className = "p-3 flex items-center gap-3 active:bg-gray-50 border-b border-gray-50";
+                    div.className = "p-4 flex items-center gap-3 active:bg-gray-50 hover:bg-gray-50 transition-colors";
                     div.innerHTML = `
                         ${img}
                         <div class="flex-grow min-w-0">
-                            <div class="text-xs font-black text-primary flex items-center gap-2">${sku} ${stockBadge}</div>
-                            <div class="text-[10px] text-gray-600 uppercase font-semibold line-clamp-1">${prod.descripcion}</div>
+                            <div class="text-sm font-black text-primary flex items-center gap-2 mb-1">${sku} ${stockBadge}</div>
+                            <div class="text-[10px] text-gray-500 uppercase font-bold line-clamp-1">${prod.descripcion}</div>
                         </div>
-                        <button onclick="addProduct('${sku}')" class="bg-primary text-white p-2 rounded-lg flex items-center justify-center shadow-sm">
+                        <button onclick="addProduct('${sku}')" class="bg-gradient-to-r from-success to-emerald-500 text-white p-2.5 rounded-xl flex items-center justify-center shadow-lg shadow-success/30 active:scale-95">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         </button>
                     `;
@@ -665,7 +879,21 @@
     }
 
     function removeCartItem(sku) { cartItems.delete(sku); renderCartMobile(); updateCartBadge(); }
-    function clearCart() { if(confirm("¿Vaciar el carrito?")) { cartItems.clear(); renderCartMobile(); updateCartBadge(); } }
+    
+    function openConfirmCartModal() {
+        if(cartItems.size === 0) return;
+        document.getElementById('modal-confirm-cart').classList.remove('hidden');
+    }
+    function closeConfirmCartModal() {
+        document.getElementById('modal-confirm-cart').classList.add('hidden');
+    }
+    function confirmClearCart() { 
+        cartItems.clear(); 
+        renderCartMobile(); 
+        updateCartBadge(); 
+        closeConfirmCartModal();
+    }
+
     function updateCartBadge() {
         const b = document.getElementById('cart-badge');
         b.innerText = cartItems.size;
@@ -677,44 +905,44 @@
         let subtotal = 0;
         
         if(cartItems.size === 0) {
-            cont.innerHTML = `<div class="bg-white p-6 rounded-xl border border-gray-200 text-center text-gray-400 font-bold text-xs uppercase shadow-sm">El carrito está vacío</div>`;
+            cont.innerHTML = `<div class="bg-cardbg p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase shadow-soft">El carrito está vacío</div>`;
         } else {
             Array.from(cartItems.entries()).reverse().forEach(([sku, item]) => {
                 const prod = item.productRef;
-                const img = prod.imgProducto ? `<img src="${prod.imgProducto}" class="w-12 h-12 object-contain rounded-lg border border-gray-100 bg-white">` : `<div class="w-12 h-12 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center text-[9px] text-gray-400 font-bold">S/I</div>`;
+                const img = prod.imgProducto ? `<img src="${prod.imgProducto}" class="w-14 h-14 object-contain rounded-2xl border border-gray-100 bg-white">` : `<div class="w-14 h-14 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center text-[10px] text-gray-300 font-bold">S/I</div>`;
                 const totalRow = item.qty * item.listPrice * (1 - (item.discount / 100));
                 subtotal += totalRow;
 
                 const div = document.createElement('div');
-                div.className = "bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-2 relative";
+                div.className = "bg-cardbg p-4 rounded-3xl border border-gray-100 shadow-soft flex flex-col gap-3 relative";
                 div.innerHTML = `
-                    <button onclick="removeCartItem('${sku}')" class="absolute top-2 right-2 text-gray-300 hover:text-danger p-1">
+                    <button onclick="removeCartItem('${sku}')" class="absolute top-3 right-3 text-gray-300 hover:text-danger p-1 bg-white rounded-full">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
-                    <div class="flex items-center gap-3 pr-8 border-b border-gray-100 pb-2">
+                    <div class="flex items-center gap-4 pr-8 border-b border-gray-50 pb-3">
                         ${img}
                         <div class="min-w-0">
-                            <div class="text-xs font-black text-primary leading-none mb-1">${sku}</div>
-                            <div class="text-[9px] text-gray-600 uppercase font-semibold line-clamp-2 leading-tight">${prod.descripcion}</div>
+                            <div class="text-sm font-black text-primary leading-none mb-1.5">${sku}</div>
+                            <div class="text-[10px] text-gray-500 uppercase font-bold line-clamp-2 leading-snug">${prod.descripcion}</div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-3 gap-3">
                         <div>
-                            <span class="block text-[8px] text-gray-400 font-bold uppercase mb-0.5">Cant.</span>
-                            <input type="number" min="1" value="${item.qty}" onchange="updateCartItem('${sku}', 'qty', this.value)" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})" class="w-full bg-gray-50 border border-gray-200 rounded p-1.5 text-center text-xs font-bold outline-none shadow-inner">
+                            <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1 pl-1">Cant</span>
+                            <input type="number" min="1" value="${item.qty}" onchange="updateCartItem('${sku}', 'qty', this.value)" class="w-full bg-gray-50 border border-gray-100 rounded-xl p-2 text-center text-sm font-black outline-none focus:border-primary transition-colors text-primary">
                         </div>
                         <div>
-                            <span class="block text-[8px] text-gray-400 font-bold uppercase mb-0.5">Precio</span>
-                            <input type="number" min="0" step="0.01" value="${item.listPrice}" onchange="updateCartItem('${sku}', 'price', this.value)" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})" class="w-full bg-gray-50 border border-gray-200 rounded p-1.5 text-center text-xs font-bold outline-none shadow-inner">
+                            <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1 pl-1">Precio</span>
+                            <input type="number" min="0" step="0.01" value="${item.listPrice}" onchange="updateCartItem('${sku}', 'price', this.value)" class="w-full bg-gray-50 border border-gray-100 rounded-xl p-2 text-center text-sm font-black outline-none focus:border-primary transition-colors text-primary">
                         </div>
                         <div>
-                            <span class="block text-[8px] text-gray-400 font-bold uppercase mb-0.5">Desc %</span>
-                            <input type="number" min="0" max="100" value="${item.discount}" onchange="updateCartItem('${sku}', 'discount', this.value)" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})" class="w-full bg-red-50 border border-red-200 text-danger rounded p-1.5 text-center text-xs font-bold outline-none shadow-inner">
+                            <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1 pl-1">Desc %</span>
+                            <input type="number" min="0" max="100" value="${item.discount}" onchange="updateCartItem('${sku}', 'discount', this.value)" class="w-full bg-dangerlight/50 border border-dangerlight text-danger rounded-xl p-2 text-center text-sm font-black outline-none focus:border-danger transition-colors">
                         </div>
                     </div>
-                    <div class="flex justify-between items-end mt-1 pt-2 border-t border-gray-50">
-                        <span class="text-[9px] font-bold text-gray-400 uppercase">Importe</span>
-                        <span class="text-sm font-black text-darktext">${moneyFmt.format(totalRow)}</span>
+                    <div class="flex justify-between items-end mt-1 pt-3 border-t border-gray-50">
+                        <span class="text-[10px] font-black text-success uppercase tracking-widest">Importe</span>
+                        <span class="text-lg font-black text-primary-dark">${moneyFmtFull.format(totalRow)}</span>
                     </div>
                 `;
                 cont.appendChild(div);
@@ -722,12 +950,184 @@
         }
 
         const iva = subtotal * 0.16; const totalFinal = subtotal + iva;
-        document.getElementById('cot-subtotal').innerText = moneyFmt.format(subtotal);
-        document.getElementById('cot-iva').innerText = moneyFmt.format(iva);
-        document.getElementById('cot-grand-total').innerText = moneyFmt.format(totalFinal);
+        document.getElementById('cot-subtotal').innerText = moneyFmtFull.format(subtotal);
+        document.getElementById('cot-iva').innerText = moneyFmtFull.format(iva);
+        document.getElementById('cot-grand-total').innerText = moneyFmtFull.format(totalFinal);
     }
 
-    // --- COBRANZA Y REPORTES ---
+    function getTempSaleObject() {
+        const d = new Date(); 
+        const timeStr = d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
+        const dateStr = formatLocalDt(d);
+        
+        const folio = `AEZ${String(folioGlobalCounter).padStart(4, '0')}`;
+        
+        let subtotal = 0; let totalItems = 0;
+        let itemsSnapshot = []; 
+
+        Array.from(cartItems.entries()).reverse().forEach(([sku, item]) => {
+            const prod = item.productRef;
+            const rowT = item.qty * item.listPrice * (1 - (item.discount / 100));
+            subtotal += rowT; totalItems += item.qty;
+            
+            itemsSnapshot.push({
+                sku: sku,
+                descripcion: prod.descripcion,
+                qty: item.qty,
+                listPrice: item.listPrice,
+                discount: item.discount,
+                imgProducto: prod.imgProducto
+            });
+        });
+        
+        const iva = subtotal * 0.16; 
+        const totalF = subtotal + iva;
+        
+        return { 
+            folio: folio,
+            date: dateStr,
+            time: timeStr, 
+            clientName: selectedClient.razonSocial,
+            clientId: selectedClient.id,
+            clientRfc: selectedClient.rfc,
+            clientDir: selectedClient.direccion,
+            clientCity: selectedClient.ciudad,
+            clientPhone: selectedClient.celular,
+            itemsCount: totalItems, 
+            subtotal: subtotal,
+            iva: iva,
+            total: totalF,
+            status: 'PENDIENTE',
+            paymentMethod: null,
+            items: itemsSnapshot
+        };
+    }
+
+    function generateHtmlForPrint(sale) {
+        let cardsHtml = '';
+        
+        sale.items.forEach(item => {
+            const rowT = item.qty * item.listPrice * (1 - (item.discount / 100));
+            const desc = item.discount > 0 ? `<span style="color:#EF4444; font-size:10px; font-weight:bold;">(-${item.discount}%)</span>` : '';
+            
+            cardsHtml += `
+                <div style="background: white; border: 1px solid #E2E8F0; padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #10B981; page-break-inside: avoid;">
+                    <div style="flex: 1; padding-right: 10px;">
+                        <div style="font-size: 13px; font-weight: 900; color: #0A192F;">${item.sku}</div>
+                        <div style="font-size: 10px; font-weight: 600; color: #64748B; text-transform: uppercase; margin-top: 2px;">${item.descripcion}</div>
+                    </div>
+                    <div style="text-align: right; border-left: 1px solid #E2E8F0; padding-left: 15px; min-width: 90px;">
+                        <div style="font-size: 10px; color: #94A3B8; font-weight:bold;">CANT: <span style="color:#0A192F; font-size:12px;">${item.qty}</span></div>
+                        <div style="font-size: 10px; color: #94A3B8; margin-top:2px;">${moneyFmtFull.format(item.listPrice)} ${desc}</div>
+                        <div style="font-size: 14px; font-weight: 900; color: #10B981; margin-top: 4px;">${moneyFmtFull.format(rowT)}</div>
+                    </div>
+                </div>`;
+        });
+
+        return `
+            <div style="max-width: 800px; margin: 0 auto; font-family: 'Inter', sans-serif; color: #0F172A; text-align: left; padding: 10px;">
+                <div style="background: linear-gradient(135deg, #0A192F, #1E3A8A); color: white; padding: 25px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); position: relative; overflow: hidden;">
+                    <div style="position: absolute; right: -20px; top: -40px; opacity: 0.1;">
+                        <svg width="200" height="200" viewBox="0 0 24 24" fill="currentColor"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    </div>
+                    <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: 1px;">AUTO ELÉCTRICA ZENDEJAS</h1>
+                    <p style="margin: 5px 0 0; color: #94A3B8; font-size: 13px;">Remisión de Venta | Ruta Móvil</p>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px;">
+                        <div style="font-size: 12px; color: #E2E8F0;">Folio: <b style="font-size:18px; color:white;">${sale.folio}</b></div>
+                        <div style="font-size: 12px; color: #E2E8F0; text-align:right;">Fecha: <b>${sale.date}</b><br>Hora: <b>${sale.time}</b></div>
+                    </div>
+                </div>
+
+                <div style="background: white; border: 1px solid #E2E8F0; padding: 20px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                    <div style="font-size: 10px; font-weight: 900; color: #10B981; letter-spacing: 1px; margin-bottom: 5px;">DATOS DEL CLIENTE</div>
+                    <div style="font-size: 18px; font-weight: 900; color: #0A192F; text-transform: uppercase;">${sale.clientName}</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; font-size: 12px; color: #64748B;">
+                        <div>
+                            <b>ID:</b> ${sale.clientId}<br>
+                            <b>RFC:</b> ${sale.clientRfc}
+                        </div>
+                        <div style="text-align:right;">
+                            <b>TEL:</b> ${sale.clientPhone}<br>
+                            <b>DIR:</b> ${sale.clientDir}, ${sale.clientCity}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="font-size: 11px; font-weight: 900; color: #0A192F; letter-spacing: 1px; margin-bottom: 10px;">ARTÍCULOS (${sale.itemsCount})</div>
+                <div style="display: flex; flex-direction: column;">
+                    ${cardsHtml}
+                </div>
+
+                <div style="background: #0A192F; color: white; padding: 20px; border-radius: 16px; margin-top: 25px; margin-left: auto; width: 300px; box-shadow: 0 10px 15px -3px rgba(10, 25, 47, 0.3);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #94A3B8;"><span>SUBTOTAL:</span><span style="color:white;">${moneyFmtFull.format(sale.subtotal)}</span></div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; color: #94A3B8;"><span>IVA (16%):</span><span style="color:white;">${moneyFmtFull.format(sale.iva)}</span></div>
+                    <div style="display: flex; justify-content: space-between; border-top: 1px dashed rgba(255,255,255,0.3); padding-top: 12px; font-size: 20px; font-weight: 900; color: #10B981;">
+                        <span>TOTAL:</span><span style="color: white;">${moneyFmtFull.format(sale.total)}</span>
+                    </div>
+                </div>
+
+                <div style="text-align:center; font-size:10px; color:#94A3B8; margin-top:40px; font-weight:bold;">ESTE DOCUMENTO ES UNA REMISIÓN DE VENTA GENERADA EN RUTA.</div>
+            </div>
+        `;
+    }
+
+    function openPreviewModal() {
+        if(cartItems.size === 0) { showAlert("El carrito está vacío."); return; }
+        
+        mockSaleForPreview = getTempSaleObject();
+        const htmlContent = generateHtmlForPrint(mockSaleForPreview);
+        
+        document.getElementById('preview-content').innerHTML = htmlContent;
+        document.getElementById('modal-preview').classList.remove('hidden');
+    }
+
+    function closePreviewModal() {
+        document.getElementById('modal-preview').classList.add('hidden');
+        mockSaleForPreview = null;
+    }
+
+    function commitAndPrintSale() {
+        if(!mockSaleForPreview) return;
+        
+        // Guardamos la venta generada
+        sessionSales.push(mockSaleForPreview);
+        folioGlobalCounter++;
+        
+        // Descontamos el inventario local
+        mockSaleForPreview.items.forEach(item => {
+            let currentStock = localStock[item.sku] || 0;
+            localStock[item.sku] = Math.max(0, currentStock - item.qty);
+        });
+        
+        saveSalesToLocal();
+        saveStockToLocal();
+
+        cartItems.clear(); 
+        renderCartMobile();
+        updateCartBadge();
+        closePreviewModal();
+        
+        updateDashboard(); 
+        renderReportsUI();
+        
+        showAlert("Generando Archivo PDF...", 1500);
+        const printArea = document.getElementById('print-area');
+        printArea.innerHTML = generateHtmlForPrint(mockSaleForPreview);
+        setTimeout(() => window.print(), 500); 
+    }
+
+    function reprintSale(folio) {
+        const sale = sessionSales.find(s => s.folio === folio);
+        if(sale) {
+            const printArea = document.getElementById('print-area');
+            printArea.innerHTML = generateHtmlForPrint(sale);
+            setTimeout(() => window.print(), 500); 
+        } else {
+            showAlert("Documento no encontrado.");
+        }
+    }
+
     function openPaymentModal(folio) {
         saleToPay = folio;
         document.getElementById('pay-folio-text').innerText = `Folio: ${folio}`;
@@ -754,6 +1154,7 @@
         closePaymentModal();
         showAlert(`Remisión ${saleToPay} cobrada exitosamente.`, 2000);
         renderReportsUI();
+        updateDashboard(); 
     }
 
     function renderReportsUI() {
@@ -762,7 +1163,7 @@
         let numVentasCerradas = 0;
         
         if(sessionSales.length === 0) {
-            cont.innerHTML = `<div class="bg-white p-6 rounded-xl border border-gray-200 text-center text-gray-400 font-bold text-xs uppercase shadow-sm">Aún no has generado remisiones.</div>`;
+            cont.innerHTML = `<div class="bg-cardbg p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase shadow-soft">Aún no has generado remisiones.</div>`;
         } else {
             [...sessionSales].reverse().forEach(sale => {
                 
@@ -770,215 +1171,63 @@
                 let actionHtml = '';
 
                 if(sale.status === 'PENDIENTE') {
-                    badgeHtml = `<span class="bg-orange-100 text-orange-600 px-2 py-0.5 rounded text-[8px] font-black tracking-widest border border-orange-200">PENDIENTE</span>`;
+                    badgeHtml = `<span class="bg-warning/10 text-warning px-3 py-1 rounded-xl text-[9px] font-black tracking-widest border border-warning/20">PENDIENTE</span>`;
                     actionHtml = `
-                        <button onclick="openPaymentModal('${sale.folio}')" class="bg-success text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-sm flex items-center gap-1">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <button onclick="openPaymentModal('${sale.folio}')" class="bg-gradient-to-r from-success to-emerald-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-success/30 flex items-center gap-1.5 active:scale-95">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             Cobrar
                         </button>
                     `;
                 } else {
                     sumTotalPagado += sale.total;
                     numVentasCerradas++;
-                    badgeHtml = `<span class="bg-green-100 text-success px-2 py-0.5 rounded text-[8px] font-black tracking-widest border border-green-200">PAGADA</span>`;
-                    actionHtml = `<div class="text-[9px] font-bold text-gray-400 uppercase text-right leading-tight">Pagado con<br><span class="text-success">${sale.paymentMethod}</span></div>`;
+                    badgeHtml = `<span class="bg-successlight text-success px-3 py-1 rounded-xl text-[9px] font-black tracking-widest border border-success/20">PAGADA</span>`;
+                    actionHtml = `<div class="text-[9px] font-bold text-gray-400 uppercase text-right leading-tight bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100">Pagado con<br><span class="text-success font-black">${sale.paymentMethod}</span></div>`;
                 }
 
-                // Botón de re-imprimir PDF siempre disponible
                 const btnPdf = `
-                    <button onclick="reprintSale('${sale.folio}')" class="bg-gray-100 text-primary px-3 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-sm flex items-center gap-1 border border-gray-200 mt-2">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        Imprimir PDF
+                    <button onclick="reprintSale('${sale.folio}')" class="bg-white border border-gray-200 text-primary px-4 py-2 rounded-xl text-[10px] font-black uppercase shadow-soft flex items-center gap-1.5 mt-3 w-full justify-center active:bg-gray-50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Ver PDF Remisión
                     </button>
                 `;
 
                 const div = document.createElement('div');
-                div.className = "bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-2";
+                div.className = "bg-cardbg p-5 rounded-3xl border border-gray-100 shadow-soft flex flex-col gap-2";
                 div.innerHTML = `
-                    <div class="flex justify-between items-start border-b border-gray-100 pb-2">
+                    <div class="flex justify-between items-start border-b border-gray-50 pb-3 mb-1">
                         <div>
-                            <div class="text-[10px] font-black text-primary mb-0.5 tracking-wider">${sale.folio}</div>
-                            <div class="text-[9px] font-bold text-gray-400">${sale.date} ${sale.time}</div>
+                            <div class="text-[11px] font-black text-primary mb-1 tracking-wider bg-primary/5 inline-block px-2 py-0.5 rounded">${sale.folio}</div>
+                            <div class="text-[10px] font-bold text-gray-400">${sale.date} a las ${sale.time}</div>
                         </div>
                         ${badgeHtml}
                     </div>
-                    <div class="flex justify-between items-center mt-1">
+                    <div class="flex justify-between items-center">
                         <div class="min-w-0 pr-2">
-                            <div class="text-xs font-black text-darktext uppercase line-clamp-1">${sale.clientName}</div>
-                            <div class="text-[9px] font-bold text-gray-500 mt-0.5">${sale.itemsCount} Artículos</div>
+                            <div class="text-sm font-black text-darktext uppercase line-clamp-1">${sale.clientName}</div>
+                            <div class="text-[10px] font-bold text-gray-500 mt-1 flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                                ${sale.itemsCount} Artículos
+                            </div>
                         </div>
-                        <div class="text-right flex flex-col items-end">
-                            <div class="text-sm font-black text-darktext mb-1">${moneyFmt.format(sale.total)}</div>
+                        <div class="text-right flex flex-col items-end gap-2">
+                            <div class="text-lg font-black text-darktext">${moneyFmtFull.format(sale.total)}</div>
                             ${actionHtml}
                         </div>
                     </div>
-                    <div class="border-t border-gray-50 mt-1 pt-1 flex justify-end">
-                        ${btnPdf}
-                    </div>
+                    ${btnPdf}
                 `;
                 cont.appendChild(div);
             });
         }
-        document.getElementById('rep-total-money').innerText = moneyFmt.format(sumTotalPagado);
+        document.getElementById('rep-total-money').innerText = moneyFmtFull.format(sumTotalPagado);
         document.getElementById('rep-total-count').innerText = `${numVentasCerradas} Ventas Cerradas`;
-    }
-
-    // --- NUEVO SISTEMA DE IMPRESIÓN NATIVA ---
-    function generatePrint() {
-        if(cartItems.size === 0) { showAlert("El carrito está vacío."); return; }
-        
-        showAlert("Preparando Impresión...", 1500);
-        
-        const d = new Date(); 
-        const timeStr = d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
-        const dateStr = d.toLocaleDateString('es-MX');
-        
-        // Generar Folio con Prefijo Estático AEZ
-        const folio = `AEZ${String(folioGlobalCounter).padStart(4, '0')}`;
-        folioGlobalCounter++;
-        
-        let subtotal = 0; let totalItems = 0;
-        let itemsSnapshot = []; 
-
-        Array.from(cartItems.entries()).reverse().forEach(([sku, item]) => {
-            const prod = item.productRef;
-            const rowT = item.qty * item.listPrice * (1 - (item.discount / 100));
-            subtotal += rowT; totalItems += item.qty;
-            
-            // DEDUCIR STOCK DEL INVENTARIO A BORDO AUTOMÁTICAMENTE
-            let currentStock = localStock[sku] || 0;
-            localStock[sku] = Math.max(0, currentStock - item.qty);
-
-            itemsSnapshot.push({
-                sku: sku,
-                descripcion: prod.descripcion,
-                qty: item.qty,
-                listPrice: item.listPrice,
-                discount: item.discount,
-                imgProducto: prod.imgProducto
-            });
-        });
-        
-        saveStockToLocal(); // Guardar el inventario descontado
-        
-        const iva = subtotal * 0.16; 
-        const totalF = subtotal + iva;
-        
-        // Guardar Venta en el LocalStorage
-        let newSale = { 
-            folio: folio,
-            date: dateStr,
-            time: timeStr, 
-            clientName: selectedClient.razonSocial,
-            clientId: selectedClient.id,
-            clientRfc: selectedClient.rfc,
-            clientDir: selectedClient.direccion,
-            clientCity: selectedClient.ciudad,
-            itemsCount: totalItems, 
-            subtotal: subtotal,
-            iva: iva,
-            total: totalF,
-            status: 'PENDIENTE',
-            paymentMethod: null,
-            items: itemsSnapshot
-        };
-        
-        sessionSales.push(newSale);
-        saveSalesToLocal();
-
-        // Vaciar Carrito y refrescar UI
-        cartItems.clear(); 
-        renderCartMobile();
-        updateCartBadge();
-        renderReportsUI();
-        
-        // Disparar la impresión nativa
-        triggerPrint(newSale);
-    }
-
-    function reprintSale(folio) {
-        const sale = sessionSales.find(s => s.folio === folio);
-        if(sale) {
-            triggerPrint(sale);
-        } else {
-            showAlert("No se encontró el documento.");
-        }
-    }
-
-    function triggerPrint(sale) {
-        let tbodyHtml = '';
-        
-        sale.items.forEach(item => {
-            const img = item.imgProducto ? `<img src="${item.imgProducto}" style="width:40px;height:40px;object-fit:contain;">` : `<div style="font-size:10px;color:#999;border:1px solid #ddd;width:40px;height:40px;line-height:40px;text-align:center;">S/I</div>`;
-            const rowT = item.qty * item.listPrice * (1 - (item.discount / 100));
-            
-            tbodyHtml += `
-                <tr>
-                    <td style="text-align:center;padding:8px;border-bottom:1px solid #E2E8F0;">${img}</td>
-                    <td style="font-weight:bold;padding:8px;border-bottom:1px solid #E2E8F0;">${item.sku}</td>
-                    <td style="font-size:10px;padding:8px;border-bottom:1px solid #E2E8F0;text-transform:uppercase;">${item.descripcion}</td>
-                    <td style="text-align:center;padding:8px;border-bottom:1px solid #E2E8F0;">${item.qty}</td>
-                    <td style="text-align:right;padding:8px;border-bottom:1px solid #E2E8F0;">${moneyFmt.format(item.listPrice)}</td>
-                    <td style="text-align:center;padding:8px;border-bottom:1px solid #E2E8F0;">${item.discount > 0 ? item.discount+'%' : '-'}</td>
-                    <td style="text-align:right;font-weight:bold;padding:8px;border-bottom:1px solid #E2E8F0;">${moneyFmt.format(rowT)}</td>
-                </tr>`;
-        });
-
-        const printHtml = `
-            <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: sans-serif; color: black; background: white;">
-                <div style="border-bottom: 2px solid #0055A4; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                        <div style="font-size: 24px; font-weight: 900; color: #0055A4; margin-bottom: 5px;">REMISIÓN DE VENTA</div>
-                        <div style="font-size:14px; font-weight:bold; text-transform:uppercase;">${sale.clientName}</div>
-                        <div style="margin-top:5px; color:#475569; font-size:12px;">
-                            ID: <b>${sale.clientId}</b> | RFC: <b>${sale.clientRfc}</b><br>
-                            Dir: ${sale.clientDir} <br>
-                            Ciu: ${sale.clientCity}
-                        </div>
-                    </div>
-                    <div style="text-align:right;">
-                        <div style="font-size:18px; font-weight:900; color:#0055A4; margin-bottom:5px;">AUTO ELECTRICA ZENDEJAS</div>
-                        <div style="color:#64748B; font-size:12px; margin-bottom: 3px;">Folio: <b style="color:#1E293B;">${sale.folio}</b></div>
-                        <div style="color:#64748B; font-size:12px;">Fecha: <b>${sale.date} ${sale.time}</b></div>
-                    </div>
-                </div>
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size:12px;">
-                    <thead>
-                        <tr>
-                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: center;">Img</th>
-                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: left;">Código</th>
-                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: left;">Descripción</th>
-                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: center;">Cant</th>
-                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: right;">Precio</th>
-                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: center;">Desc %</th>
-                            <th style="background-color: #0055A4; color: white; padding: 8px; text-align: right;">Importe</th>
-                        </tr>
-                    </thead>
-                    <tbody>${tbodyHtml}</tbody>
-                </table>
-                <div style="width: 300px; margin-left: auto; border-top: 2px solid #1E293B; padding-top: 10px; font-size:14px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>SUBTOTAL:</span><span>${moneyFmt.format(sale.subtotal)}</span></div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>IVA (16%):</span><span>${moneyFmt.format(sale.iva)}</span></div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 5px; border-top: 1px solid #E2E8F0; padding-top: 5px; font-size: 18px; font-weight: 800; color: #0055A4;">
-                        <span>TOTAL FINAL:</span><span>${moneyFmt.format(sale.total)}</span>
-                    </div>
-                </div>
-                <div style="text-align:center; font-size:10px; color:#94A3B8; margin-top:30px; font-weight:bold;">ESTE DOCUMENTO ES UNA REMISIÓN DE VENTA.</div>
-            </div>
-        `;
-
-        const printArea = document.getElementById('print-area');
-        printArea.innerHTML = printHtml;
-        
-        setTimeout(() => {
-            window.print();
-        }, 500); 
     }
 
     function exportExcel() {
         if(cartItems.size === 0) { showAlert("El carrito está vacío."); return; }
         
-        const folio = `AEZ${String(folioGlobalCounter).padStart(4, '0')}`;
+        const folio = `AEZ${String(folioGlobalCounter)}`; 
         
         let exData = []; let sub = 0;
         Array.from(cartItems.entries()).reverse().forEach(([sku, item]) => {
@@ -992,15 +1241,12 @@
         XLSX.writeFile(wb, `Remision_${folio}.xlsx`);
     }
 
-    // --- REGISTRO DEL SERVICE WORKER ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
                 navigator.serviceWorker.register('./sw.js')
                 .then(() => console.log('Service Worker Registrado correctamente.'))
                 .catch(err => console.error('Error al registrar Service Worker:', err));
-            } else {
-                console.log('Vista previa detectada: Registro de Service Worker omitido para evitar errores de protocolo.');
             }
         });
     }
