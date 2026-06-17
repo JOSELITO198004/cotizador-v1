@@ -272,8 +272,10 @@
                 </button>
             </div>
             <div class="p-4 flex flex-col gap-3">
-                <input type="text" id="nc-id" placeholder="ID Cliente *" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+                <input type="text" id="nc-id" readonly placeholder="ID Autogenerado" class="w-full p-3 bg-gray-100 border border-gray-200 rounded-xl text-sm outline-none text-gray-500 font-bold cursor-not-allowed">
                 <input type="text" id="nc-name" placeholder="Razón Social *" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+                <input type="text" id="nc-address" placeholder="Domicilio *" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+                <input type="tel" id="nc-phone" placeholder="Teléfono *" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
                 <input type="text" id="nc-rfc" placeholder="RFC (Opcional)" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
                 <input type="text" id="nc-city" placeholder="Ciudad (Opcional)" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
             </div>
@@ -505,19 +507,39 @@
         switchTab('inicio'); 
     }
 
-    function openNewClientModal() { document.getElementById('modal-new-client').classList.remove('hidden'); }
+    function openNewClientModal() { 
+        // Autogenerar un ID de cliente con el prefijo CLI- y números aleatorios
+        const autoId = 'CLI-' + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('nc-id').value = autoId;
+        // Limpiar los campos para la nueva captura
+        document.getElementById('nc-name').value = '';
+        document.getElementById('nc-address').value = '';
+        document.getElementById('nc-phone').value = '';
+        document.getElementById('nc-rfc').value = '';
+        document.getElementById('nc-city').value = '';
+        document.getElementById('modal-new-client').classList.remove('hidden'); 
+    }
+    
     function closeNewClientModal() { document.getElementById('modal-new-client').classList.add('hidden'); }
+    
     function saveNewClient() {
         const id = document.getElementById('nc-id').value.trim();
         const name = document.getElementById('nc-name').value.trim();
-        if (!id || !name) { showAlert("ID y Razón Social son obligatorios."); return; }
+        const address = document.getElementById('nc-address').value.trim();
+        const phone = document.getElementById('nc-phone').value.trim();
+        
+        if (!name || !address || !phone) { showAlert("Razón Social, Domicilio y Teléfono son obligatorios."); return; }
         
         globalClients.set(id, {
-            id: id, razonSocial: name.toUpperCase(), direccion: 'NO REGISTRA',
-            celular: 'N/A', ciudad: document.getElementById('nc-city').value.toUpperCase() || 'NO REGISTRA',
+            id: id, razonSocial: name.toUpperCase(), 
+            direccion: address.toUpperCase(),
+            celular: phone.toUpperCase(), 
+            ciudad: document.getElementById('nc-city').value.toUpperCase() || 'NO REGISTRA',
             rfc: document.getElementById('nc-rfc').value.toUpperCase() || 'XAXX010101000'
         });
-        closeNewClientModal(); showAlert("Cliente registrado exitosamente.");
+        closeNewClientModal(); 
+        showAlert("Cliente registrado exitosamente.");
+        if(!stepClientes.classList.contains('hidden')) renderClientList();
     }
 
     // --- MÓDULO DE INVENTARIO LOCAL ---
@@ -915,7 +937,7 @@
                         </div>
                     </div>
                     <div style="text-align:right;">
-                        <div style="font-size:18px; font-weight:900; color:#0055A4; margin-bottom:5px;">EMPRESA NUEVA</div>
+                        <div style="font-size:18px; font-weight:900; color:#0055A4; margin-bottom:5px;">AUTO ELECTRICA ZENDEJAS</div>
                         <div style="color:#64748B; font-size:12px; margin-bottom: 3px;">Folio: <b style="color:#1E293B;">${sale.folio}</b></div>
                         <div style="color:#64748B; font-size:12px;">Fecha: <b>${sale.date} ${sale.time}</b></div>
                     </div>
