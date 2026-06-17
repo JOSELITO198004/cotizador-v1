@@ -10,7 +10,6 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Se eliminó html2pdf.js ya que usaremos el motor de impresión nativo -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <script>
@@ -153,11 +152,12 @@
                 <h3 class="text-xs font-black text-darktext uppercase">Cartera</h3>
             </div>
 
-            <div onclick="openQuickQuote()" class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform">
-                <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mb-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            <!-- Nuevo botón de Inventario en lugar del de Mostrador -->
+            <div onclick="switchTab('inventario')" class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform">
+                <div class="w-12 h-12 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mb-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                 </div>
-                <h3 class="text-xs font-black text-darktext uppercase">Mostrador</h3>
+                <h3 class="text-xs font-black text-darktext uppercase">Inventario</h3>
             </div>
 
             <div onclick="openNewClientModal()" class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform">
@@ -245,6 +245,20 @@
 
         <div id="rep-list-container" class="flex flex-col gap-3">
              <!-- Historial renderizado aqui -->
+        </div>
+    </div>
+
+    <!-- PASO 6: INVENTARIO -->
+    <div id="step-inventario" class="w-full hidden mt-2">
+        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Inventario a Bordo</h2>
+        
+        <div class="relative mb-4">
+            <input type="text" id="inv-search-input" placeholder="Buscar para cargar stock a bordo..." class="w-full p-3 pl-10 bg-white border border-gray-300 rounded-xl focus:border-primary outline-none font-semibold text-darktext text-sm shadow-sm" oninput="handleInvSearch()" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
+            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+
+        <div id="inv-list-container" class="flex flex-col gap-3 pb-4">
+            <!-- Inventario se lista aquí -->
         </div>
     </div>
 
@@ -342,10 +356,15 @@
     // Recuperar datos permanentes o iniciar de 0
     let sessionSales = JSON.parse(localStorage.getItem('apymsa_sales')) || [];
     let folioGlobalCounter = parseInt(localStorage.getItem('apymsa_folio')) || 1;
+    let localStock = JSON.parse(localStorage.getItem('apymsa_stock')) || {}; // Guarda el inventario local
     
     function saveSalesToLocal() {
         localStorage.setItem('apymsa_sales', JSON.stringify(sessionSales));
         localStorage.setItem('apymsa_folio', folioGlobalCounter);
+    }
+
+    function saveStockToLocal() {
+        localStorage.setItem('apymsa_stock', JSON.stringify(localStock));
     }
     
     const fileInput = document.getElementById('dataFile');
@@ -354,6 +373,7 @@
     const stepClientes = document.getElementById('step-clientes');
     const stepCotizador = document.getElementById('step-cotizador');
     const stepInformes = document.getElementById('step-informes');
+    const stepInventario = document.getElementById('step-inventario');
     const bottomNav = document.getElementById('bottom-nav');
     const clientList = document.getElementById('client-list');
     const clientSearch = document.getElementById('clientSearch');
@@ -377,6 +397,7 @@
         stepClientes.classList.add('hidden');
         stepCotizador.classList.add('hidden');
         stepInformes.classList.add('hidden');
+        stepInventario.classList.add('hidden');
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     }
 
@@ -385,20 +406,28 @@
         hideAllSteps();
         bottomNav.classList.remove('hidden');
 
-        document.getElementById(`tab-${tab}`).classList.add('active');
+        document.getElementById(`tab-${tab}`)?.classList.add('active');
 
         if(tab === 'inicio') {
             stepMainMenu.classList.remove('hidden');
+            document.getElementById('tab-inicio').classList.add('active');
         } else if (tab === 'clientes') {
             stepClientes.classList.remove('hidden');
             renderClientList();
         } else if (tab === 'cotizador') {
-            if(!selectedClient) openQuickQuote(); 
+            if(!selectedClient) {
+                showAlert("Primero selecciona un cliente de tu Cartera.");
+                switchTab('clientes');
+                return;
+            } 
             stepCotizador.classList.remove('hidden');
             renderCartMobile();
         } else if (tab === 'informes') {
             stepInformes.classList.remove('hidden');
             renderReportsUI();
+        } else if (tab === 'inventario') {
+            stepInventario.classList.remove('hidden');
+            handleInvSearch(); 
         }
     }
 
@@ -406,7 +435,8 @@
     fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
     async function loadFromCloud() {
-        const CLOUD_URL = "https://dl.dropboxusercontent.com/scl/fi/fr8a1xae9l6ckevxk0xla/apymsa-inteligencia-comercial-v15.1.xlsx?rlkey=8iawdpe0are3x9myx2xt6ttw5&st=7p8zu5ss&dl=1"; 
+        // Enlace Raw directo a tu repositorio de GitHub
+        const CLOUD_URL = "https://raw.githubusercontent.com/JOSELITO198004/cotizador-v1/8b8e667fe0aed04e1b7333410e4dd3832387d3d7/nuevo%20proyecto.xlsx"; 
         document.getElementById('upload-content').classList.add('hidden');
         document.getElementById('loader-spinner').classList.remove('hidden');
 
@@ -490,12 +520,53 @@
         closeNewClientModal(); showAlert("Cliente registrado exitosamente.");
     }
 
-    function openQuickQuote() {
-        selectedClient = { id: 'MOSTRADOR', razonSocial: 'PÚBLICO EN GENERAL', rfc: 'XAXX010101000', ciudad: 'LOCAL', direccion: 'CONOCIDO', celular: 'S/N' };
-        cartItems.clear(); document.getElementById('prod-search-input').value = '';
-        setupCotizadorHeader(); switchTab('cotizador');
+    // --- MÓDULO DE INVENTARIO LOCAL ---
+    function handleInvSearch() {
+        const query = document.getElementById('inv-search-input').value.toLowerCase().trim();
+        const cont = document.getElementById('inv-list-container');
+        cont.innerHTML = '';
+        
+        let count = 0;
+        for (let [sku, prod] of globalProducts.entries()) {
+            const hasStock = (localStock[sku] || 0) > 0;
+            
+            // Mostrar si coincide con la búsqueda O si la búsqueda está vacía y tiene stock
+            if ((query !== '' && (sku.toLowerCase().includes(query) || prod.descripcion.toLowerCase().includes(query))) || (query === '' && hasStock)) {
+                const currentStock = localStock[sku] || 0;
+                const img = prod.imgProducto ? `<img src="${prod.imgProducto}" class="w-12 h-12 object-contain rounded-lg border border-gray-100 bg-white">` : `<div class="w-12 h-12 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center text-[9px] text-gray-400 font-bold">S/I</div>`;
+                
+                const div = document.createElement('div');
+                div.className = "bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3";
+                div.innerHTML = `
+                    ${img}
+                    <div class="flex-grow min-w-0">
+                        <div class="text-xs font-black text-primary leading-none mb-1">${sku}</div>
+                        <div class="text-[9px] text-gray-600 uppercase font-semibold line-clamp-2 leading-tight">${prod.descripcion}</div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-[8px] font-bold text-gray-400 uppercase mb-0.5">Stock A Bordo</span>
+                        <input type="number" min="0" value="${currentStock}" onchange="updateStock('${sku}', this.value)" class="w-16 bg-blue-50 border border-blue-200 text-primary rounded p-1.5 text-center text-xs font-black outline-none shadow-inner" onfocus="this.select()">
+                    </div>
+                `;
+                cont.appendChild(div);
+                count++;
+                if (count > 30) break; // Límite para no saturar el DOM
+            }
+        }
+        
+        if (count === 0) {
+            cont.innerHTML = `<div class="bg-white p-6 rounded-xl border border-gray-200 text-center text-gray-400 font-bold text-xs uppercase shadow-sm">No se encontraron productos</div>`;
+        }
     }
 
+    function updateStock(sku, value) {
+        let val = parseInt(value);
+        if(isNaN(val) || val < 0) val = 0;
+        localStock[sku] = val;
+        saveStockToLocal();
+    }
+
+    // --- MÓDULO DE COTIZACIÓN ---
     function renderClientList() {
         clientList.innerHTML = ''; const search = clientSearch.value.toLowerCase().trim();
         let count = 0;
@@ -528,13 +599,18 @@
         for (let [sku, prod] of globalProducts.entries()) {
             if (sku.toLowerCase().includes(query) || prod.descripcion.toLowerCase().includes(query)) {
                 if(!cartItems.has(sku)) {
+                    // Etiqueta visual de Inventario
+                    const currentStock = localStock[sku] || 0;
+                    const stockColor = currentStock > 0 ? 'text-success bg-green-50 border-green-200' : 'text-gray-400 bg-gray-50 border-gray-200';
+                    const stockBadge = `<span class="px-1.5 py-0.5 rounded text-[8px] font-black border ${stockColor}">Stock: ${currentStock}</span>`;
+
                     const img = prod.imgProducto ? `<img src="${prod.imgProducto}" class="w-10 h-10 object-contain rounded border border-gray-100 bg-white">` : `<div class="w-10 h-10 bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-[8px] text-gray-400">S/I</div>`;
                     const div = document.createElement('div');
                     div.className = "p-3 flex items-center gap-3 active:bg-gray-50 border-b border-gray-50";
                     div.innerHTML = `
                         ${img}
                         <div class="flex-grow min-w-0">
-                            <div class="text-xs font-black text-primary">${sku}</div>
+                            <div class="text-xs font-black text-primary flex items-center gap-2">${sku} ${stockBadge}</div>
                             <div class="text-[10px] text-gray-600 uppercase font-semibold line-clamp-1">${prod.descripcion}</div>
                         </div>
                         <button onclick="addProduct('${sku}')" class="bg-primary text-white p-2 rounded-lg flex items-center justify-center shadow-sm">
@@ -629,22 +705,7 @@
         document.getElementById('cot-grand-total').innerText = moneyFmt.format(totalFinal);
     }
 
-    // --- GENERACIÓN DE FOLIOS INTELIGENTES ---
-    function getInitials(name) {
-        let ignoredWords = ['de', 'la', 'el', 'los', 'las', 'y', 'en', 'sa', 'cv'];
-        let words = name.trim().split(/\s+/).filter(w => !ignoredWords.includes(w.toLowerCase()));
-        let initials = words.slice(0,4).map(w => w[0].toUpperCase()).join('');
-        return initials || "X";
-    }
-
-    function getDateStr() {
-        let d = new Date();
-        let day = ("0" + d.getDate()).slice(-2);
-        let month = ("0" + (d.getMonth() + 1)).slice(-2);
-        return `${day}${month}${d.getFullYear()}`;
-    }
-
-    // --- COBRANZA Y REPORTES (AHORA CON MEMORIA PERMANENTE) ---
+    // --- COBRANZA Y REPORTES ---
     function openPaymentModal(folio) {
         saleToPay = folio;
         document.getElementById('pay-folio-text').innerText = `Folio: ${folio}`;
@@ -667,7 +728,7 @@
             sale.paymentMethod = method;
         }
         
-        saveSalesToLocal(); // <-- Guardar en memoria
+        saveSalesToLocal(); 
         closePaymentModal();
         showAlert(`Remisión ${saleToPay} cobrada exitosamente.`, 2000);
         renderReportsUI();
@@ -740,7 +801,7 @@
         document.getElementById('rep-total-count').innerText = `${numVentasCerradas} Ventas Cerradas`;
     }
 
-    // --- NUEVO SISTEMA DE IMPRESIÓN NATIVA (SOPORTADO EN ANDROID WEBVIEWS) ---
+    // --- NUEVO SISTEMA DE IMPRESIÓN NATIVA ---
     function generatePrint() {
         if(cartItems.size === 0) { showAlert("El carrito está vacío."); return; }
         
@@ -750,20 +811,22 @@
         const timeStr = d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
         const dateStr = d.toLocaleDateString('es-MX');
         
-        // Generar Folio
-        const initials = getInitials(selectedClient.razonSocial);
-        const dateIdStr = getDateStr();
-        const folio = `${initials}${dateIdStr}${folioGlobalCounter}`;
+        // Generar Folio con Prefijo Estático AEZ
+        const folio = `AEZ${String(folioGlobalCounter).padStart(4, '0')}`;
         folioGlobalCounter++;
         
         let subtotal = 0; let totalItems = 0;
-        let itemsSnapshot = []; // Guardamos copia de los items para memoria
+        let itemsSnapshot = []; 
 
         Array.from(cartItems.entries()).reverse().forEach(([sku, item]) => {
             const prod = item.productRef;
             const rowT = item.qty * item.listPrice * (1 - (item.discount / 100));
             subtotal += rowT; totalItems += item.qty;
             
+            // DEDUCIR STOCK DEL INVENTARIO A BORDO AUTOMÁTICAMENTE
+            let currentStock = localStock[sku] || 0;
+            localStock[sku] = Math.max(0, currentStock - item.qty);
+
             itemsSnapshot.push({
                 sku: sku,
                 descripcion: prod.descripcion,
@@ -773,6 +836,8 @@
                 imgProducto: prod.imgProducto
             });
         });
+        
+        saveStockToLocal(); // Guardar el inventario descontado
         
         const iva = subtotal * 0.16; 
         const totalF = subtotal + iva;
@@ -818,7 +883,6 @@
         }
     }
 
-    // Inyecta el recibo en un contenedor especial oculto y ejecuta el diálogo nativo de imprimir del sistema operativo
     function triggerPrint(sale) {
         let tbodyHtml = '';
         
@@ -881,21 +945,18 @@
             </div>
         `;
 
-        // Colocar HTML en la capa de impresión nativa y mandar llamar imprimir
         const printArea = document.getElementById('print-area');
         printArea.innerHTML = printHtml;
         
         setTimeout(() => {
             window.print();
-        }, 500); // 500ms de gracia para que el dispositivo renderize la capa en blanco antes de capturar
+        }, 500); 
     }
 
     function exportExcel() {
         if(cartItems.size === 0) { showAlert("El carrito está vacío."); return; }
         
-        const initials = getInitials(selectedClient.razonSocial);
-        const dateStr = getDateStr();
-        const folio = `${initials}${dateStr}${folioGlobalCounter}`; 
+        const folio = `AEZ${String(folioGlobalCounter).padStart(4, '0')}`;
         
         let exData = []; let sub = 0;
         Array.from(cartItems.entries()).reverse().forEach(([sku, item]) => {
@@ -906,13 +967,12 @@
         exData.push({}); exData.push({"Descripción": "SUBTOTAL:", "Importe": parseFloat(sub.toFixed(2))}); exData.push({"Descripción": "IVA (16%):", "Importe": parseFloat(iva.toFixed(2))}); exData.push({"Descripción": "TOTAL FINAL:", "Importe": parseFloat(tot.toFixed(2))});
         const ws = XLSX.utils.json_to_sheet(exData); ws['!cols'] = [{wch: 15}, {wch: 50}, {wch: 10}, {wch: 15}, {wch: 15}, {wch: 15}];
         const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Remisión");
-        XLSX.writeFile(wb, `Cotizacion_${folio}.xlsx`);
+        XLSX.writeFile(wb, `Remision_${folio}.xlsx`);
     }
 
-    // --- REGISTRO DEL SERVICE WORKER (Obligatorio para PWA) ---
+    // --- REGISTRO DEL SERVICE WORKER ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            // Verificamos que estamos en un entorno http o https para evitar el error de protocolo en la vista previa
             if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
                 navigator.serviceWorker.register('./sw.js')
                 .then(() => console.log('Service Worker Registrado correctamente.'))
