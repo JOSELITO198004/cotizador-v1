@@ -5,30 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0A192F">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230A192F'/><text x='50' y='55' font-family='Arial' font-size='40' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>AEZ</text></svg>">
-    <title>Cotizador App V1</title>
+    <title>AEZ Sistema de Campo</title>
     
+    <!-- Librerías Externas -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+    <!-- MANIFEST PARA APP INSTALABLE (PWA) -->
     <script>
         const manifestData = {
-            "name": "Auto Eléctrica Zendejas",
-            "short_name": "AE Zendejas",
-            "start_url": ".",
-            "display": "standalone",
-            "background_color": "#F8FAFC",
-            "theme_color": "#0A192F",
-            "icons": [{
-                "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230A192F' rx='20'/><text x='50' y='55' font-family='Arial' font-size='40' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>AEZ</text></svg>",
-                "sizes": "192x192",
-                "type": "image/svg+xml",
-                "purpose": "any maskable"
-            }]
+            "name": "Auto Eléctrica Zendejas", "short_name": "AEZ Rutas", "start_url": ".", "display": "standalone",
+            "background_color": "#F8FAFC", "theme_color": "#0A192F",
+            "icons": [{"src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230A192F' rx='20'/><text x='50' y='55' font-family='Arial' font-size='40' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>AEZ</text></svg>", "sizes": "192x192", "type": "image/svg+xml"}]
         };
-        const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
-        const manifestUrl = URL.createObjectURL(manifestBlob);
+        const manifestUrl = URL.createObjectURL(new Blob([JSON.stringify(manifestData)], {type: 'application/json'}));
         document.write(`<link rel="manifest" href="${manifestUrl}">`);
     </script>
 
@@ -37,78 +30,38 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        primary: { DEFAULT: '#0A192F', dark: '#020C1B', light: '#112240', accent: '#1E3A8A' },
-                        danger: '#EF4444', 
-                        dangerlight: '#FEE2E2',
-                        warning: '#F59E0B',
-                        success: '#10B981',
-                        successlight: '#D1FAE5',
-                        lightbg: '#F8FAFC',
-                        darktext: '#0F172A',
-                        cardbg: '#FFFFFF'
-                    },
-                    boxShadow: {
-                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                        'glow': '0 0 15px rgba(16, 185, 129, 0.3)',
-                    }
+                    colors: { primary: { DEFAULT: '#0A192F', light: '#112240' }, danger: '#EF4444', dangerlight: '#FEE2E2', warning: '#F59E0B', success: '#10B981', successlight: '#D1FAE5', darktext: '#0F172A' },
+                    boxShadow: { 'sm': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)' }
                 }
             }
         }
     </script>
 
     <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #F8FAFC; 
-            color: #0F172A; 
-            margin: 0; 
-            padding: 0; 
-            -webkit-tap-highlight-color: transparent;
-            min-height: 100vh;
-            overflow-y: auto;
-        }
-        
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #0F172A; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; min-height: 100vh; overflow-y: auto; }
         ::-webkit-scrollbar { display: none; }
-        
-        .nav-item.active { color: #10B981; font-weight: 800; }
-        .nav-item.active svg { stroke-width: 2.5; filter: drop-shadow(0px 2px 4px rgba(16, 185, 129, 0.4)); }
-
-        #main-content { padding-bottom: 150px !important; }
-        
-        .android-safe-nav {
-            padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
-            min-height: 80px !important;
-        }
-
-        /* Circulo de progreso SVG mediante CSS */
-        .progress-ring__circle {
-            transition: stroke-dashoffset 0.8s ease-in-out;
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-        }
-
-        /* Ocultar elementos al imprimir */
-        @media print {
-            @page { margin: 5mm; }
-            body { background-color: white !important; }
-            header, nav, main, #alert-box, .print-hidden, #modal-preview { display: none !important; }
-            #print-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
-        }
+        .nav-item.active { color: #0A192F; font-weight: 800; }
+        .nav-item.active svg { stroke-width: 2.5; }
+        #main-content { padding-bottom: 120px !important; }
+        .progress-ring__circle { transition: stroke-dashoffset 0.8s ease-in-out; transform: rotate(-90deg); transform-origin: 50% 50%; }
+        .modal-enter { animation: fade-in-up 0.3s ease-out forwards; }
+        @keyframes fade-in-up { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @media print { @page { margin: 5mm; } body { background-color: white !important; } header, nav, main, #alert-box, .print-hidden, [id^="modal-"] { display: none !important; } #print-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; } }
     </style>
 </head>
 <body> 
 
-<header class="bg-gradient-to-r from-primary to-primary-accent text-white shadow-lg sticky top-0 z-40 print-hidden">
+<!-- ENCABEZADO GLOBAL -->
+<header class="bg-primary text-white shadow-sm sticky top-0 z-40 print-hidden">
     <div class="px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-white text-primary rounded-xl flex items-center justify-center font-black text-xs shadow-soft">AEZ</div>
+            <div class="w-9 h-9 bg-white text-primary rounded-xl flex items-center justify-center font-black text-xs shadow-sm">AEZ</div>
             <div>
-                <h1 class="text-base font-black uppercase leading-none tracking-wide">auto electrica Zendejas</h1>
-                <p class="text-[9px] font-medium uppercase opacity-80 mt-0.5 text-successlight" id="header-status">Sistema de Campo</p>
+                <h1 class="text-sm font-black uppercase leading-none tracking-wide">Auto Eléctrica Zendejas</h1>
+                <p class="text-[9px] font-medium uppercase mt-0.5 text-gray-300" id="header-status">Sistema de Campo</p>
             </div>
         </div>
-        <button onclick="clearCacheAndReload()" class="p-2 hover:bg-white/10 rounded-full transition-colors backdrop-blur-sm bg-white/5">
+        <button onclick="clearCacheAndReload()" class="p-2 hover:bg-white/10 rounded-xl transition-colors">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </button>
     </div>
@@ -116,783 +69,590 @@
 
 <main id="main-content" class="p-4 relative print-hidden">
     
-    <!-- Alertas Generales -->
-    <div id="alert-box" class="hidden fixed top-20 left-4 right-4 z-[60] bg-white border-l-4 border-primary-accent shadow-2xl p-3 rounded-xl transition-all duration-300">
-        <div class="flex items-center gap-3">
-            <div class="bg-primary/10 text-primary-accent p-1 rounded-full font-bold w-6 h-6 flex items-center justify-center text-xs">!</div>
-            <p id="alert-msg" class="text-[11px] font-bold text-darktext uppercase break-words"></p>
-        </div>
+    <div id="alert-box" class="hidden fixed top-20 left-4 right-4 z-[60] bg-darktext text-white shadow-lg p-4 rounded-2xl transition-all duration-300 text-center">
+        <p id="alert-msg" class="text-xs font-bold uppercase tracking-wide"></p>
     </div>
 
-    <div id="step-1" class="w-full bg-cardbg rounded-3xl shadow-soft border border-gray-100 p-6 flex flex-col items-center text-center mt-2">
+    <!-- JERARQUÍA 1: SINCRONIZACIÓN -->
+    <div id="step-1" class="w-full bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center mt-2">
         <input type="file" id="dataFile" accept=".xlsx, .xls" class="hidden">
-        
         <div id="loader-spinner" class="hidden mb-6 flex flex-col items-center py-10">
-            <div class="w-12 h-12 border-4 border-success/30 border-t-success rounded-full animate-spin mb-4 shadow-glow"></div>
-            <span class="text-xs font-black text-primary uppercase tracking-widest animate-pulse" id="loader-text">Procesando BD...</span>
+            <div class="w-10 h-10 border-4 border-gray-200 border-t-primary rounded-full animate-spin mb-4"></div>
+            <span class="text-xs font-black text-primary uppercase tracking-widest animate-pulse" id="loader-text">Procesando...</span>
         </div>
-        
         <div id="upload-content" class="w-full">
-            <div class="bg-gradient-to-br from-primary-light to-primary w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-5 text-white shadow-lg rotate-3">
-                <svg class="w-10 h-10 -rotate-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+            <div class="bg-gray-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-5 text-primary shadow-inner">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
             </div>
-            <h2 class="text-xl font-black text-darktext mb-2 uppercase tracking-tight">Sincronización</h2>
-            <p class="text-gray-500 mb-6 text-[11px] font-medium">Actualiza tu catálogo y cartera</p>
-            
+            <h2 class="text-lg font-black text-darktext mb-2 uppercase tracking-tight">Sincronización</h2>
+            <p class="text-gray-500 mb-6 text-[11px] font-medium">Carga catálogo y clientes maestros</p>
             <div class="flex flex-col gap-3 w-full">
-                <button type="button" onclick="loadFromCloud()" class="w-full bg-gradient-to-r from-success to-emerald-400 text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-success/30 active:scale-95 transition-all">
-                    Descargar Nube
-                </button>
-                <button type="button" id="btnSelectFile" class="w-full bg-white text-primary border-2 border-primary/20 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:border-primary transition-colors active:scale-95">
-                    Archivo Local
-                </button>
+                <button onclick="loadFromCloud()" class="w-full bg-primary text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest active:scale-[0.98] transition-all">Descargar Nube (Google Sheets)</button>
+                <button id="btnSelectFile" class="w-full bg-white text-primary border border-gray-200 py-4 rounded-2xl text-xs font-black uppercase tracking-widest active:scale-[0.98] transition-all">Archivo Local (Excel)</button>
             </div>
         </div>
     </div>
 
+    <!-- JERARQUÍA 2: MENÚ PRINCIPAL -->
     <div id="step-main-menu" class="w-full hidden mt-2">
-        
-        <div class="flex justify-between items-center mb-3 px-1">
-            <h2 class="text-lg font-black text-primary tracking-tight uppercase flex items-center gap-2">
-                <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                Métricas
-            </h2>
-            <div id="dash-current-month-badge" class="bg-primary/10 text-primary-accent px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-inner border border-primary/5">
-                <!-- Se llena dinamicamente con JS -->
-            </div>
-        </div>
-        
-        <!-- Tarjeta de Venta del Día y Mes (Gráfico Circular) -->
-        <div class="bg-cardbg rounded-3xl p-5 shadow-soft border border-gray-100 mb-4 flex items-center justify-between">
+        <div class="bg-primary rounded-3xl p-5 shadow-sm text-white mb-6 flex items-center justify-between">
             <div>
-                <p class="text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-1">Venta del Día</p>
-                <p id="dash-day" class="text-2xl font-black text-primary leading-none mb-3">$0</p>
-                
-                <p id="dash-month-title" class="text-[9px] font-bold uppercase text-gray-400 tracking-widest mb-0.5 mt-2 border-t border-gray-50 pt-2">Acumulado</p>
-                <p id="dash-month" class="text-sm font-black text-success">$0</p>
-            </div>
-            
-            <!-- Gráfico Circular SVG -->
-            <div class="relative w-24 h-24 flex items-center justify-center">
-                <svg class="w-full h-full" viewBox="0 0 100 100">
-                    <!-- Fondo del anillo -->
-                    <circle class="text-gray-100 stroke-current" stroke-width="8" cx="50" cy="50" r="40" fill="transparent"></circle>
-                    <!-- Progreso (Verde) -->
-                    <circle id="dash-month-ring" class="text-success stroke-current progress-ring__circle" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="40" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
-                </svg>
-                <div class="absolute flex flex-col items-center justify-center">
-                    <span id="dash-month-pct" class="text-sm font-black text-primary">0%</span>
-                    <span class="text-[6px] uppercase font-bold text-gray-400">Meta Mensual</span>
-                </div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-gray-300 mb-1">Panel de Control</p>
+                <h2 class="text-xl font-black leading-none">AUTO ELÉCTRICA ZENDEJAS</h2>
             </div>
         </div>
-
-        <!-- Tarjeta de Gráfico de Barras (Últimos 3 Días) -->
-        <div class="bg-gradient-to-br from-primary to-primary-accent rounded-3xl p-5 shadow-lg text-white mb-6 relative overflow-hidden">
-            <div class="absolute -right-4 -bottom-4 opacity-10"><svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"></path></svg></div>
-            <p class="text-[10px] font-bold uppercase tracking-widest text-successlight opacity-90 mb-4">Días Anteriores</p>
-            
-            <!-- Contenedor del Gráfico de Barras CSS -->
-            <div class="flex items-end h-32 gap-3 pb-6 border-b border-white/20 relative z-10" id="bar-chart-container">
-                <!-- Barras generadas por JS -->
-            </div>
-            <!-- Etiquetas del eje X -->
-            <div class="flex justify-between text-[9px] font-bold uppercase mt-2 opacity-80" id="bar-chart-labels">
-                <!-- Etiquetas generadas por JS -->
-            </div>
-        </div>
-
-        <h2 class="text-lg font-black text-primary tracking-tight uppercase mb-3">Accesos Directos</h2>
-
+        <h2 class="text-sm font-black text-darktext tracking-tight uppercase mb-3 pl-1 border-l-4 border-primary">Módulos de Operación</h2>
         <div class="grid grid-cols-2 gap-3">
-            <div onclick="switchTab('clientes')" class="bg-cardbg border border-gray-100 rounded-3xl p-5 shadow-soft flex flex-col items-center text-center active:scale-95 transition-transform">
-                <div class="w-14 h-14 bg-primary/5 text-primary rounded-2xl flex items-center justify-center mb-3">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                </div>
-                <h3 class="text-xs font-black text-darktext uppercase tracking-wide">Cartera</h3>
-            </div>
-
-            <div onclick="switchTab('inventario')" class="bg-cardbg border border-gray-100 rounded-3xl p-5 shadow-soft flex flex-col items-center text-center active:scale-95 transition-transform">
-                <div class="w-14 h-14 bg-success/10 text-success rounded-2xl flex items-center justify-center mb-3">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                </div>
-                <h3 class="text-xs font-black text-darktext uppercase tracking-wide">Inventario</h3>
-            </div>
-
-            <div onclick="openNewClientModal()" class="bg-cardbg border border-gray-100 rounded-3xl p-5 shadow-soft flex flex-col items-center text-center active:scale-95 transition-transform">
-                <div class="w-14 h-14 bg-primary-accent/10 text-primary-accent rounded-2xl flex items-center justify-center mb-3">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-                </div>
-                <h3 class="text-xs font-black text-darktext uppercase tracking-wide">Alta Cliente</h3>
-            </div>
-
-            <div onclick="switchTab('informes')" class="bg-cardbg border border-gray-100 rounded-3xl p-5 shadow-soft flex flex-col items-center text-center active:scale-95 transition-transform">
-                <div class="w-14 h-14 bg-danger/10 text-danger rounded-2xl flex items-center justify-center mb-3">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                </div>
-                <h3 class="text-xs font-black text-darktext uppercase tracking-wide">Informes</h3>
-            </div>
+            <button onclick="switchTab('clientes')" class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform"><div class="w-12 h-12 bg-primary text-white rounded-2xl flex items-center justify-center mb-3"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></div><h3 class="text-[11px] font-black text-darktext uppercase tracking-wide">1. Cartera Clientes</h3></button>
+            <button onclick="switchTab('nuevo_cliente')" class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform"><div class="w-12 h-12 bg-success text-white rounded-2xl flex items-center justify-center mb-3"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg></div><h3 class="text-[11px] font-black text-darktext uppercase tracking-wide">2. Nuevo Cliente</h3></button>
+            <button onclick="switchTab('pedidos')" class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform"><div class="w-12 h-12 bg-primary text-white rounded-2xl flex items-center justify-center mb-3"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg></div><h3 class="text-[11px] font-black text-darktext uppercase tracking-wide">3. Mis Pedidos</h3></button>
+            <button onclick="switchTab('cotizaciones')" class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform"><div class="w-12 h-12 bg-warning text-white rounded-2xl flex items-center justify-center mb-3"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div><h3 class="text-[11px] font-black text-darktext uppercase tracking-wide">4. Cotizaciones</h3></button>
+            <button onclick="switchTab('informes')" class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform"><div class="w-12 h-12 bg-danger text-white rounded-2xl flex items-center justify-center mb-3"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg></div><h3 class="text-[11px] font-black text-darktext uppercase tracking-wide">5. Informes</h3></button>
+            <button onclick="switchTab('inventario')" class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform"><div class="w-12 h-12 bg-gray-600 text-white rounded-2xl flex items-center justify-center mb-3"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></div><h3 class="text-[11px] font-black text-darktext uppercase tracking-wide">6. Inventarios</h3></button>
         </div>
     </div>
 
-    <div id="step-clientes" class="w-full hidden">
-        <div class="relative mb-4">
-            <input type="text" id="clientSearch" placeholder="Buscar cliente..." class="w-full p-4 pl-12 bg-cardbg border-2 border-gray-100 rounded-2xl focus:border-success outline-none font-semibold text-darktext text-sm shadow-soft transition-colors" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-            <svg class="w-6 h-6 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+    <!-- JERARQUÍA 3: CARTERA DE CLIENTES -->
+    <div id="step-clientes" class="w-full hidden mt-2">
+        <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 mb-5">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-sm font-black text-primary tracking-tight uppercase">Métricas del Mes</h2>
+                <div id="dash-current-month-badge" class="bg-gray-100 text-primary px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest"></div>
+            </div>
+            <div class="flex items-center justify-between border-b border-gray-50 pb-4 mb-4">
+                <div>
+                    <p class="text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-1">Venta del Día</p>
+                    <p id="dash-day" class="text-2xl font-black text-primary leading-none mb-2">$0</p>
+                    <p class="text-[9px] font-bold uppercase text-gray-400 tracking-widest mb-0.5">Venta en Pesos (Acumulado)</p>
+                    <p id="dash-month" class="text-sm font-black text-success">$0</p>
+                </div>
+                <div class="relative w-20 h-20 flex items-center justify-center">
+                    <svg class="w-full h-full" viewBox="0 0 100 100"><circle class="text-gray-100 stroke-current" stroke-width="8" cx="50" cy="50" r="40" fill="transparent"></circle><circle id="dash-month-ring" class="text-primary stroke-current progress-ring__circle" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="40" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle></svg>
+                    <div class="absolute flex flex-col items-center justify-center"><span id="dash-month-pct" class="text-xs font-black text-primary">0%</span><span class="text-[6px] uppercase font-bold text-gray-400">Cuota</span></div>
+                </div>
+            </div>
+        </div>
+        <h2 class="text-sm font-black text-primary tracking-tight uppercase mb-3 pl-1">Directorio de Clientes</h2>
+        <div class="relative mb-4 shadow-sm rounded-2xl">
+            <input type="text" id="clientSearch" placeholder="Buscar por ID o Razón Social..." class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 pl-11 text-sm outline-none focus:border-primary transition-all text-darktext font-semibold">
+            <svg class="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </div>
         <div id="client-list" class="flex flex-col gap-3 pb-4"></div>
     </div>
 
-    <div id="step-inventario" class="w-full hidden mt-2">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-black text-primary tracking-tight uppercase">Inventario a Bordo</h2>
-            <input type="file" id="invFile" accept=".xlsx, .xls" class="hidden">
-            <button onclick="document.getElementById('invFile').click()" class="bg-success text-white px-3 py-2 rounded-xl text-[10px] font-black uppercase flex items-center gap-1 shadow-md shadow-success/30 active:scale-95 transition-transform">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                Cargar Excel
-            </button>
+    <!-- JERARQUÍA 3: NUEVO CLIENTE -->
+    <div id="step-nuevo-cliente" class="w-full hidden mt-2">
+        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Gestión de Clientes</h2>
+        <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm mb-5">
+            <h3 class="text-xs font-bold text-primary uppercase tracking-wide mb-4 flex items-center gap-2"><svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>Alta de Nuevo Cliente</h3>
+            <div class="flex flex-col gap-3">
+                <input type="text" id="nc-id" readonly class="w-full bg-gray-100 border border-transparent rounded-2xl px-4 py-3 text-sm font-bold text-gray-500 outline-none cursor-not-allowed mb-2">
+                <input type="text" id="nc-name" placeholder="Razón Social *" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none focus:border-primary transition-all text-darktext font-semibold">
+                <input type="text" id="nc-address" placeholder="Domicilio Completo *" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none focus:border-primary transition-all text-darktext font-semibold">
+                <input type="tel" id="nc-phone" placeholder="Teléfono / WhatsApp *" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none focus:border-primary transition-all text-darktext font-semibold">
+                <div class="flex gap-3"><input type="text" id="nc-rfc" placeholder="RFC (Opc.)" class="w-1/2 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none focus:border-primary transition-all text-darktext font-semibold"><input type="text" id="nc-city" placeholder="Ciudad (Opc.)" class="w-1/2 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none focus:border-primary transition-all text-darktext font-semibold"></div>
+                <button onclick="saveNewClient()" class="w-full bg-primary text-white font-bold text-xs uppercase py-3.5 rounded-2xl mt-2 active:scale-[0.98] transition-all">Guardar Cliente Local</button>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mb-5">
+            <button onclick="exportNewClientsToExcel()" class="bg-white border border-gray-200 p-4 rounded-3xl shadow-sm flex flex-col items-center justify-center text-center active:bg-gray-50 transition-all"><svg class="w-6 h-6 text-success mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span class="text-[10px] font-black uppercase text-darktext">Descargar<br>Nuevos</span></button>
+            <button onclick="checkClientTrafficLight()" class="bg-white border border-gray-200 p-4 rounded-3xl shadow-sm flex flex-col items-center justify-center text-center active:bg-gray-50 transition-all"><svg class="w-6 h-6 text-danger mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg><span class="text-[10px] font-black uppercase text-darktext">Semáforo<br>Sin Venta</span></button>
+        </div>
+        <div id="traffic-light-container" class="hidden flex flex-col gap-3 pb-4"></div>
+    </div>
+
+    <!-- JERARQUÍA 3: MIS PEDIDOS (Inmutables) -->
+    <div id="step-pedidos" class="w-full hidden mt-2">
+        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Ventas Cerradas</h2>
+        <div class="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm mb-4">
+            <div class="flex flex-col gap-3">
+                <input type="text" id="search-pedidos" placeholder="Buscar folio..." class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none focus:border-primary transition-all font-semibold" oninput="renderPedidosList()">
+                <input type="date" id="date-pedidos" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none focus:border-primary transition-all font-semibold" onchange="renderPedidosList()">
+            </div>
+        </div>
+        <div id="pedidos-list-container" class="flex flex-col gap-3 pb-4"></div>
+    </div>
+
+    <!-- JERARQUÍA 3: MIS COTIZACIONES (Sin buscador, automáticas) -->
+    <div id="step-cotizaciones" class="w-full hidden mt-2">
+        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-2">Cotizaciones Activas</h2>
+        <p class="text-[10px] font-bold text-gray-500 uppercase mb-4 tracking-wide bg-warning/10 text-warning p-3 rounded-2xl border border-warning/20">Se muestran las de esta semana. Se depuran automáticamente al pasar 7 días.</p>
+        <div id="cotizaciones-list-container" class="flex flex-col gap-3 pb-4"></div>
+    </div>
+
+    <!-- JERARQUÍA 3: INFORMES Y GRÁFICAS -->
+    <div id="step-informes" class="w-full hidden mt-2">
+        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Reportes e Inteligencia</h2>
+        <div class="bg-primary p-5 rounded-3xl shadow-sm text-white mb-5">
+            <h3 class="text-xs font-bold text-gray-300 uppercase tracking-wide mb-3">Exportación Maestra (Excel)</h3>
+            <div class="flex gap-2 mb-3">
+                <div class="w-1/2"><label class="text-[9px] uppercase font-bold text-gray-400 pl-1 block mb-1">Inicial</label><input type="date" id="exp-start-date" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-xs outline-none text-white"></div>
+                <div class="w-1/2"><label class="text-[9px] uppercase font-bold text-gray-400 pl-1 block mb-1">Final</label><input type="date" id="exp-end-date" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-xs outline-none text-white"></div>
+            </div>
+            <button onclick="exportGlobalData()" class="w-full bg-white text-primary font-black text-xs uppercase py-3.5 rounded-xl active:scale-[0.98]">Descargar Operación</button>
         </div>
         
-        <div class="relative mb-4">
-            <input type="text" id="inv-search-input" placeholder="Buscar para cargar stock manual..." class="w-full p-4 pl-12 bg-cardbg border-2 border-gray-100 rounded-2xl focus:border-success outline-none font-semibold text-darktext text-sm shadow-soft transition-colors" oninput="handleInvSearch()" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-            <svg class="w-6 h-6 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        </div>
-
-        <div id="inv-list-container" class="flex flex-col gap-3 pb-4">
-            <!-- Inventario se lista aquí -->
+        <!-- MEJORA: GRÁFICA REAL DE SKU -->
+        <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm mb-5">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-4">Top 5 SKU del Mes</h3>
+            <canvas id="skuChart" height="200"></canvas>
         </div>
     </div>
 
+    <!-- JERARQUÍA 3: INVENTARIOS -->
+    <div id="step-inventario" class="w-full hidden mt-2">
+        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Inventario y Kardex</h2>
+        <div class="flex bg-gray-200 p-1 rounded-xl mb-5 shadow-inner">
+            <button id="btn-tab-stock" onclick="switchInvTab('stock')" class="flex-1 py-2 rounded-lg bg-white shadow-sm text-xs font-bold text-primary transition-all">Stock a Bordo</button>
+            <button id="btn-tab-kardex" onclick="switchInvTab('kardex')" class="flex-1 py-2 rounded-lg text-gray-500 text-xs font-bold transition-all">Registro Kardex</button>
+        </div>
+
+        <div id="inv-view-stock">
+            <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm mb-5">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Ingreso de Mercancía</h3>
+                <div class="flex flex-col gap-3">
+                    <!-- MEJORA: Botón de Escáner -->
+                    <div class="flex gap-2">
+                        <input type="text" id="kardex-sku" placeholder="Código" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none focus:border-primary font-semibold">
+                        <button onclick="openScanner('kardex-sku')" class="bg-gray-100 text-primary border border-gray-200 rounded-2xl px-4 active:scale-95"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H5v3a1 1 0 01-2 0V4zm17 0a1 1 0 00-1-1h-4a1 1 0 100 2h3v3a1 1 0 102 0V4zM4 17a1 1 0 012 0v3h3a1 1 0 110 2H5a1 1 0 01-1-1v-4zm15 0a1 1 0 012 0v4a1 1 0 01-1 1h-4a1 1 0 110-2h3v-3z"></path></svg></button>
+                    </div>
+                    <div class="flex gap-3">
+                        <input type="number" id="kardex-qty" placeholder="Cant." min="1" class="w-1/3 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none text-center font-semibold">
+                        <select id="kardex-motive" class="w-2/3 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none font-semibold">
+                            <option value="">Motivo...</option><option value="TRASPASO">Traspaso</option><option value="DEVOLUCION">Devolución</option><option value="AJUSTE">Ajuste</option>
+                        </select>
+                    </div>
+                    <button onclick="saveManualKardex()" class="w-full bg-primary text-white font-bold text-xs uppercase py-3.5 rounded-2xl active:scale-[0.98]">Guardar</button>
+                </div>
+            </div>
+            <div class="relative mb-4">
+                <input type="text" id="inv-search-input" placeholder="Buscar en stock actual..." class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 pl-10 text-sm outline-none focus:border-primary transition-all font-semibold" oninput="handleInvSearch()">
+                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <div id="inv-list-container" class="flex flex-col gap-3 pb-4"></div>
+        </div>
+
+        <div id="inv-view-kardex" class="hidden"><div id="kardex-list-container" class="flex flex-col gap-3 pb-4"></div></div>
+    </div>
+
+    <!-- COTIZADOR -->
     <div id="step-cotizador" class="w-full hidden">
-        
-        <div class="bg-gradient-to-r from-primary to-primary-accent text-white rounded-3xl shadow-lg p-5 mb-5 relative overflow-hidden">
-            <div class="absolute -right-10 -top-10 opacity-10">
-                <svg class="w-40 h-40" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path></svg>
-            </div>
-            <p class="text-[10px] font-bold uppercase tracking-widest text-successlight mb-1">Cotizando a:</p>
+        <div class="bg-primary text-white rounded-3xl shadow-sm p-5 mb-5 relative overflow-hidden">
+            <button onclick="switchTab('clientes')" class="flex items-center gap-1 text-gray-300 hover:text-white text-[10px] font-bold uppercase tracking-wider mb-4 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>Volver a Cartera
+            </button>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-300 mb-1">Cotizando a:</p>
             <h2 id="cot-client-name" class="text-xl font-black uppercase leading-tight line-clamp-1 mb-3"></h2>
-            
-            <div class="bg-white/10 rounded-2xl p-4 backdrop-blur-md border border-white/20 shadow-inner">
-                <div class="flex justify-between items-center text-[11px] font-bold uppercase opacity-90 mb-1">
-                    <span>Subtotal:</span><span id="cot-subtotal">$0.00</span>
-                </div>
-                <div class="flex justify-between items-center text-[11px] font-bold uppercase opacity-90 mb-2">
-                    <span>IVA (16%):</span><span id="cot-iva">$0.00</span>
-                </div>
-                <div class="flex justify-between items-center text-sm font-black uppercase mt-2 pt-2 border-t border-white/20">
-                    <span class="text-successlight">Total Final:</span><span id="cot-grand-total" class="text-2xl">$0.00</span>
-                </div>
+            <div class="bg-white/10 rounded-2xl p-4 border border-white/20">
+                <div class="flex justify-between items-center text-[11px] font-bold uppercase opacity-90 mb-1"><span>Subtotal:</span><span id="cot-subtotal">$0.00</span></div>
+                <div class="flex justify-between items-center text-[11px] font-bold uppercase opacity-90 mb-2"><span>IVA (16%):</span><span id="cot-iva">$0.00</span></div>
+                <div class="flex justify-between items-center text-sm font-black uppercase mt-2 pt-2 border-t border-white/20"><span class="text-successlight">Total Final:</span><span id="cot-grand-total" class="text-2xl">$0.00</span></div>
             </div>
         </div>
 
-        <div class="relative w-full z-30 mb-5">
-            <input type="text" id="prod-search-input" placeholder="Buscar refacción..." class="w-full p-4 bg-cardbg border-2 border-gray-100 rounded-2xl focus:border-success outline-none font-semibold text-darktext text-sm shadow-soft transition-colors" oninput="handleProductSearch()" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-            <div id="prod-search-results" class="absolute top-full left-0 w-full bg-cardbg border border-gray-100 rounded-2xl max-h-60 overflow-y-auto hidden shadow-2xl mt-2 z-50 divide-y divide-gray-50"></div>
+        <div class="flex gap-2 mb-5 z-30">
+            <input type="text" id="prod-search-input" placeholder="Buscar refacción..." class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 text-sm outline-none focus:border-primary transition-all font-semibold shadow-sm" oninput="handleProductSearch()">
+            <button onclick="openScanner('prod-search-input')" class="bg-white text-primary border border-gray-200 rounded-2xl px-4 active:scale-95 shadow-sm"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H5v3a1 1 0 01-2 0V4zm17 0a1 1 0 00-1-1h-4a1 1 0 100 2h3v3a1 1 0 102 0V4zM4 17a1 1 0 012 0v3h3a1 1 0 110 2H5a1 1 0 01-1-1v-4zm15 0a1 1 0 012 0v4a1 1 0 01-1 1h-4a1 1 0 110-2h3v-3z"></path></svg></button>
         </div>
+        <div id="prod-search-results" class="bg-white border border-gray-100 rounded-2xl max-h-60 overflow-y-auto hidden shadow-lg mt-[-10px] mb-5 divide-y divide-gray-50"></div>
 
-        <div id="cart-list-container" class="flex flex-col gap-3 mb-6">
-            <div class="bg-cardbg p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase shadow-soft">
-                El carrito está vacío
-            </div>
-        </div>
+        <div id="cart-list-container" class="flex flex-col gap-3 mb-6"></div>
         
         <div class="grid grid-cols-2 gap-3 mt-4 mb-4">
-            <button onclick="openConfirmCartModal()" class="bg-dangerlight text-danger border border-danger/20 py-4 rounded-2xl text-[11px] font-black uppercase shadow-soft active:scale-95 transition-transform">Vaciar</button>
-            <button onclick="exportExcel()" class="bg-cardbg text-primary border border-gray-200 py-4 rounded-2xl text-[11px] font-black uppercase shadow-soft active:scale-95 transition-transform">Excel</button>
-            
-            <button onclick="openPreviewModal()" class="col-span-2 bg-gradient-to-r from-primary to-primary-accent text-white py-4 rounded-2xl text-sm font-black uppercase shadow-lg shadow-primary/30 flex justify-center items-center gap-2 active:scale-95 transition-transform">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                Visualizar Pedido
-            </button>
+            <button onclick="confirmClearCart()" class="bg-dangerlight text-danger border border-danger/20 py-4 rounded-2xl text-[11px] font-black uppercase active:scale-95">Vaciar</button>
+            <button onclick="switchTab('clientes')" class="bg-gray-100 text-primary border border-gray-200 py-4 rounded-2xl text-[11px] font-black uppercase active:scale-95">Pausar (Guardar)</button>
+            <button onclick="openPreviewModal()" class="col-span-2 bg-primary text-white py-4 rounded-2xl text-sm font-black uppercase flex justify-center items-center gap-2 active:scale-95">Procesar Venta</button>
         </div>
     </div>
 
-    <div id="step-informes" class="w-full hidden">
-        <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Reportes de Venta</h2>
-        
-        <div class="bg-gradient-to-br from-primary to-primary-accent text-white rounded-3xl p-6 shadow-lg flex flex-col justify-center items-center text-center mb-5 relative overflow-hidden">
-            <p class="text-[11px] font-bold uppercase tracking-widest text-successlight mb-1">Total Cobrado Hoy</p>
-            <p id="rep-total-money" class="text-4xl font-black mb-2">$0.00</p>
-            <p id="rep-total-count" class="text-[10px] font-bold tracking-widest uppercase bg-white/20 px-4 py-1.5 rounded-full backdrop-blur-sm">0 Cobros Hoy</p>
-        </div>
-
-        <!-- Panel de Filtros -->
-        <div class="bg-cardbg p-4 rounded-3xl border border-gray-100 shadow-soft mb-5">
-            <h3 class="text-[11px] font-black uppercase text-gray-500 tracking-wider mb-3">Buscar Remisiones</h3>
-            
-            <div class="flex gap-2 mb-3">
-                <button id="btn-filt-all" onclick="setFilterStatus('ALL')" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-primary text-white shadow-md transition-colors">Todas</button>
-                <button id="btn-filt-pend" onclick="setFilterStatus('PENDIENTE')" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-gray-50 text-gray-500 transition-colors border border-gray-200">Pendientes</button>
-                <button id="btn-filt-pag" onclick="setFilterStatus('PAGADA')" class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase bg-gray-50 text-gray-500 transition-colors border border-gray-200">Cobradas</button>
+    <!-- ESCÁNER MODAL -->
+    <div id="modal-scanner" class="hidden fixed inset-0 z-[110] bg-darktext/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 class="text-sm font-black text-primary uppercase">Escanear Código</h2>
+                <button onclick="closeScanner()" class="text-gray-400 p-1.5 hover:text-danger rounded-xl transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-
-            <div class="flex flex-col gap-3">
-                <div class="relative">
-                    <input type="text" id="filter-client" placeholder="Buscar Cliente o ID..." class="w-full p-3 pl-10 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary transition-colors text-darktext" oninput="renderReportsUI()">
-                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <div class="flex gap-2">
-                    <input type="date" id="filter-date" class="flex-1 p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary transition-colors text-darktext" onchange="renderReportsUI()">
-                    <button onclick="clearFilters()" class="px-4 py-3 bg-dangerlight text-danger rounded-xl text-xs font-black uppercase shadow-sm active:scale-95">Limpiar</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex justify-between items-center mb-3 px-1">
-            <h3 class="text-[11px] font-black uppercase text-gray-500 tracking-wider" id="rep-list-title">Historial de Remisiones</h3>
-        </div>
-
-        <div id="rep-list-container" class="flex flex-col gap-3 pb-6">
-             <!-- Historial renderizado aqui -->
+            <div id="reader" style="width: 100%; min-height: 250px;"></div>
         </div>
     </div>
 
-    <div id="modal-new-client" class="hidden fixed inset-0 z-[70] bg-primary/40 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity">
-        <div class="bg-cardbg rounded-3xl shadow-2xl w-full overflow-hidden border border-gray-100 mt-[-10%]">
-            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white">
-                <h2 class="text-base font-black text-primary uppercase tracking-tight">Alta Manual</h2>
-                <button onclick="closeNewClientModal()" class="text-gray-400 p-1.5 hover:text-danger hover:bg-dangerlight rounded-xl transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div class="p-5 flex flex-col gap-3">
-                <label class="text-[10px] font-bold text-gray-400 uppercase -mb-2 ml-1">ID Cliente (Automático)</label>
-                <input type="text" id="nc-id" readonly class="w-full p-4 bg-gray-100 border border-transparent rounded-2xl text-sm font-bold text-gray-500 outline-none cursor-not-allowed">
-                
-                <input type="text" id="nc-name" placeholder="Razón Social *" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm outline-none focus:border-success transition-colors" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-                <input type="text" id="nc-address" placeholder="Domicilio Completo *" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm outline-none focus:border-success transition-colors" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-                <input type="tel" id="nc-phone" placeholder="Teléfono / WhatsApp *" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm outline-none focus:border-success transition-colors" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-                <input type="text" id="nc-rfc" placeholder="RFC (Opcional)" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm outline-none focus:border-success transition-colors" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-                <input type="text" id="nc-city" placeholder="Ciudad (Opcional)" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm outline-none focus:border-success transition-colors" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'center'})">
-            </div>
-            <div class="p-4 border-t border-gray-100 flex gap-3 bg-gray-50">
-                <button onclick="closeNewClientModal()" class="flex-1 py-4 bg-white border border-gray-200 text-gray-500 rounded-2xl text-xs font-bold uppercase shadow-soft hover:bg-gray-50 transition-colors">Cancelar</button>
-                <button onclick="saveNewClient()" class="flex-1 py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-primary/30 active:scale-95 transition-transform">Guardar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Previsualización de Venta -->
-    <div id="modal-preview" class="hidden fixed inset-0 z-[85] bg-primary/80 backdrop-blur-md flex items-center justify-center p-2">
-        <div class="bg-gray-100 rounded-3xl shadow-2xl w-full h-[95vh] max-w-md flex flex-col overflow-hidden">
+    <!-- VISOR DE TICKET UNIVERSAL -->
+    <div id="modal-preview" class="hidden fixed inset-0 z-[85] bg-darktext/80 backdrop-blur-sm flex items-center justify-center p-2 modal-enter">
+        <div class="bg-gray-100 rounded-3xl shadow-xl w-full h-[95vh] max-w-md flex flex-col overflow-hidden">
             <div class="p-4 border-b border-gray-200 bg-white flex justify-between items-center z-10 shadow-sm">
-                <h2 class="text-sm font-black text-primary uppercase tracking-tight flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                    Vista Previa Ticket
-                </h2>
-                <button onclick="closePreviewModal()" class="text-gray-400 p-1.5 hover:text-danger hover:bg-dangerlight rounded-xl transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                <h2 class="text-sm font-black text-primary uppercase tracking-tight" id="preview-title">Vista Previa</h2>
+                <button onclick="closePreviewModal(true)" class="text-gray-400 p-1.5 hover:text-danger rounded-xl transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
+            <div class="flex-1 overflow-y-auto p-4 relative" id="preview-container"><div id="preview-content" class="bg-white shadow-sm mx-auto border border-gray-200" style="transform-origin: top center; transform: scale(0.85); width: 115%;"></div></div>
             
-            <div class="flex-1 overflow-y-auto p-4 relative" id="preview-container">
-                <div id="preview-content" class="bg-white shadow-md mx-auto" style="transform-origin: top center; transform: scale(0.85); width: 115%;"></div>
+            <div id="preview-actions-presale" class="p-4 border-t border-gray-200 bg-gray-50 flex flex-col gap-2 z-10 hidden">
+                <button onclick="commitSale('COBRO')" class="w-full py-3.5 bg-success text-white rounded-2xl text-[11px] font-black uppercase active:scale-[0.98]">Generar Remisión y Cobrar</button>
+                <div class="flex gap-2">
+                    <button onclick="commitSale('COTIZACION')" class="w-1/2 py-3 bg-white border border-gray-200 text-primary rounded-2xl text-[11px] font-bold uppercase active:bg-gray-100">Solo Cotizar</button>
+                    <button onclick="closePreviewModal(true)" class="w-1/2 py-3 bg-dangerlight text-danger rounded-2xl text-[11px] font-bold uppercase active:bg-red-200">Cancelar / Editar</button>
+                </div>
             </div>
 
-            <div class="p-4 border-t border-gray-200 bg-white shadow-[0_-5px_15px_rgba(0,0,0,0.05)] z-10 flex gap-3">
-                <button onclick="closePreviewModal()" class="w-1/3 py-4 bg-gray-50 border border-gray-200 text-gray-500 rounded-2xl text-[11px] font-bold uppercase shadow-soft">Editar</button>
-                <button onclick="commitAndPrintSale()" class="w-2/3 py-4 bg-gradient-to-r from-success to-emerald-500 text-white rounded-2xl text-[11px] font-black uppercase shadow-lg shadow-success/30 flex items-center justify-center gap-2 active:scale-95 transition-transform">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                    Confirmar e Imprimir
-                </button>
+            <div id="preview-actions-postsale" class="p-4 border-t border-gray-200 bg-gray-50 flex gap-3 z-10 hidden">
+                <button onclick="triggerPrintFromViewer()" class="flex-1 py-3.5 bg-primary text-white rounded-2xl text-[11px] font-black uppercase active:scale-[0.98]">Imprimir</button>
+                <button onclick="sendWhatsAppFromViewer()" class="flex-1 py-3.5 bg-success text-white rounded-2xl text-[11px] font-black uppercase active:scale-[0.98]">WhatsApp</button>
             </div>
         </div>
     </div>
 
-    <!-- Otros modales -->
-    <div id="modal-payment" class="hidden fixed inset-0 z-[80] bg-primary/40 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-cardbg rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-100 mt-[-10%]">
-            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white">
-                <div>
-                    <h2 class="text-base font-black text-primary uppercase tracking-tight">Cerrar Venta</h2>
-                    <p id="pay-folio-text" class="text-[10px] text-success font-bold uppercase"></p>
-                </div>
-                <button onclick="closePaymentModal()" class="text-gray-400 p-1.5 hover:text-danger hover:bg-dangerlight rounded-xl transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+    <!-- MODAL DE PAGOS -->
+    <div id="modal-payment" class="hidden fixed inset-0 z-[80] bg-darktext/80 backdrop-blur-sm flex items-center justify-center p-4 modal-enter">
+        <div class="bg-white rounded-3xl shadow-xl w-full max-w-sm overflow-hidden border border-gray-100 mt-[-10%]">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <div><h2 class="text-base font-black text-primary uppercase tracking-tight">Cerrar Venta</h2><p id="pay-folio-text" class="text-[10px] text-success font-bold uppercase"></p></div>
+                <button onclick="closePaymentModal()" class="text-gray-400 p-1.5 hover:text-danger rounded-xl transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             <div class="p-6 flex flex-col gap-4 text-center">
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Selecciona el método de pago</p>
-                <select id="payment-method" class="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl text-sm font-bold text-darktext outline-none focus:border-success appearance-none">
-                    <option value="">-- Toca para seleccionar --</option>
-                    <option value="EFECTIVO">💵 Efectivo</option>
-                    <option value="TARJETA DÉBITO">💳 Tarjeta Débito</option>
-                    <option value="TARJETA CRÉDITO">💳 Tarjeta Crédito</option>
-                    <option value="TRANSFERENCIA">📱 Transferencia SPEI</option>
+                <select id="payment-method" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl text-sm font-bold text-darktext outline-none focus:border-primary appearance-none">
+                    <option value="">-- Selecciona Pago --</option><option value="EFECTIVO">💵 Efectivo</option><option value="TARJETA DÉBITO">💳 Tarjeta Débito</option><option value="TARJETA CRÉDITO">💳 Tarjeta Crédito</option><option value="TRANSFERENCIA">📱 Transferencia SPEI</option>
                 </select>
             </div>
             <div class="p-4 border-t border-gray-100 flex gap-3 bg-gray-50">
-                <button onclick="closePaymentModal()" class="flex-1 py-4 bg-white border border-gray-200 text-gray-500 rounded-2xl text-xs font-bold uppercase shadow-soft">Cancelar</button>
-                <button onclick="confirmPayment()" class="flex-1 py-4 bg-gradient-to-r from-success to-emerald-500 text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-success/30 flex items-center justify-center gap-2 active:scale-95 transition-transform">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Confirmar
-                </button>
+                <button onclick="confirmPayment()" class="w-full py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase shadow-sm active:scale-[0.98]">Confirmar Pago</button>
             </div>
         </div>
     </div>
-
-    <div id="modal-confirm-cart" class="hidden fixed inset-0 z-[90] bg-primary/60 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-cardbg rounded-3xl shadow-2xl w-full max-w-xs overflow-hidden border border-gray-100 text-center p-6 mt-[-10%]">
-            <div class="w-16 h-16 bg-dangerlight text-danger rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-            </div>
-            <h2 class="text-lg font-black text-primary uppercase tracking-tight mb-2">¿Vaciar Carrito?</h2>
-            <p class="text-xs text-gray-500 mb-6 font-medium">Esta acción eliminará todos los artículos agregados.</p>
-            <div class="flex gap-3">
-                <button onclick="closeConfirmCartModal()" class="flex-1 py-3.5 bg-gray-100 text-gray-600 rounded-2xl text-xs font-bold uppercase hover:bg-gray-200 transition-colors">Cancelar</button>
-                <button onclick="confirmClearCart()" class="flex-1 py-3.5 bg-danger text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-danger/30 active:scale-95 transition-transform">Sí, Vaciar</button>
-            </div>
-        </div>
-    </div>
-
 </main>
 
-<nav id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white/90 backdrop-blur-md border-t border-gray-100 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-40 android-safe-nav print-hidden">
-    <div class="flex justify-around items-center h-16 pt-2 px-2">
+<nav id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white/90 backdrop-blur-md border-t border-gray-200 z-40 pb-5 pt-2 print-hidden">
+    <div class="flex justify-around items-center h-12 px-2">
         <button onclick="switchTab('inicio')" id="tab-inicio" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition-colors">
-            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-            <span class="text-[9px] font-bold tracking-wide">Inicio</span>
-        </button>
-        <button onclick="switchTab('clientes')" id="tab-clientes" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition-colors">
-            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-            <span class="text-[9px] font-bold tracking-wide">Clientes</span>
+            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span class="text-[9px] font-bold tracking-wide">Menú Ppal.</span>
         </button>
         <button onclick="switchTab('cotizador')" id="tab-cotizador" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition-colors">
             <div class="relative">
                 <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                <span id="cart-badge" class="absolute -top-1 -right-2 bg-danger text-white text-[8px] font-black px-1.5 py-0.5 rounded-full hidden shadow-soft">0</span>
+                <span id="cart-badge" class="absolute -top-1 -right-2 bg-danger text-white text-[8px] font-black px-1.5 py-0.5 rounded-full hidden">0</span>
             </div>
             <span class="text-[9px] font-bold tracking-wide">Carrito</span>
-        </button>
-        <button onclick="switchTab('informes')" id="tab-informes" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition-colors">
-            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-            <span class="text-[9px] font-bold tracking-wide">Informes</span>
         </button>
     </div>
 </nav>
 
-<!-- ÁREA DE IMPRESIÓN (Oculta excepto en window.print) -->
 <div id="print-area" class="hidden"></div>
 
 <script>
-    let globalProducts = new Map();
-    let globalClients = new Map();
-    let selectedClient = null;
-    let cartItems = new Map(); 
-    let saleToPay = null; 
-    let mockSaleForPreview = null;
-    
-    // Filtros de reportes
-    let currentFilterStatus = 'ALL';
-    
-    // Memoria Permanente
-    let sessionSales = JSON.parse(localStorage.getItem('apymsa_sales')) || [];
-    let folioGlobalCounter = parseInt(localStorage.getItem('apymsa_folio')) || 1;
-    let localStock = JSON.parse(localStorage.getItem('apymsa_stock')) || {}; 
-    
-    function saveSalesToLocal() {
-        localStorage.setItem('apymsa_sales', JSON.stringify(sessionSales));
-        localStorage.setItem('apymsa_folio', folioGlobalCounter);
-    }
+    const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbxwXsxTIOjAUgzCiB9clZ-Fi6NtZ4-ALCeO0ORzPrhuw8o37-wsy-Rxnr8K-buH6Wd2/exec";
 
-    function saveStockToLocal() {
-        localStorage.setItem('apymsa_stock', JSON.stringify(localStock));
-    }
-    
-    const fileInput = document.getElementById('dataFile');
-    const invFileInput = document.getElementById('invFile');
-    const step1 = document.getElementById('step-1');
-    const stepMainMenu = document.getElementById('step-main-menu');
-    const stepClientes = document.getElementById('step-clientes');
-    const stepCotizador = document.getElementById('step-cotizador');
-    const stepInformes = document.getElementById('step-informes');
-    const stepInventario = document.getElementById('step-inventario');
-    const bottomNav = document.getElementById('bottom-nav');
-    const clientList = document.getElementById('client-list');
-    const clientSearch = document.getElementById('clientSearch');
-    
-    const moneyFmt = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }); 
-    const moneyFmtFull = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }); 
+    let globalProducts = new Map(); let globalClients = new Map(); let selectedClient = null; let cartItems = new Map(); let saleToPay = null; let mockSaleForPreview = null; let ticketViewerSale = null; let html5QrcodeScanner = null; let targetInputForScanner = ''; let skuChartInstance = null;
+    let activeVisitClientId = null; let visitTimerInterval = null; let visitSeconds = 0;
 
-    function showAlert(msg, timeout = 3500) {
-        const box = document.getElementById('alert-box');
-        document.getElementById('alert-msg').innerText = msg;
-        box.classList.remove('hidden');
-        box.classList.add('translate-y-0');
-        setTimeout(() => box.classList.add('hidden'), timeout);
-    }
+    let sessionSales = JSON.parse(localStorage.getItem('empresanueva_sales')) || [];
+    let folioGlobalCounter = parseInt(localStorage.getItem('empresanueva_folio')) || 1;
+    let localStock = JSON.parse(localStorage.getItem('empresanueva_stock')) || {}; 
+    let localNewClients = JSON.parse(localStorage.getItem('empresanueva_new_clients')) || [];
+    let kardexLog = JSON.parse(localStorage.getItem('empresanueva_kardex')) || [];
 
+    function saveSalesToLocal() { localStorage.setItem('empresanueva_sales', JSON.stringify(sessionSales)); localStorage.setItem('empresanueva_folio', folioGlobalCounter); }
+    function saveStockToLocal() { localStorage.setItem('empresanueva_stock', JSON.stringify(localStock)); }
+    function saveNewClientsToLocal() { localStorage.setItem('empresanueva_new_clients', JSON.stringify(localNewClients)); }
+    function saveKardexToLocal() { localStorage.setItem('empresanueva_kardex', JSON.stringify(kardexLog)); }
+    
+    // MEJORA: AUTOGUARDADO DE CARRITO
+    function saveCartToLocal() { localStorage.setItem('empresanueva_cart', JSON.stringify(Array.from(cartItems.entries()))); }
+    function loadCartFromLocal() { const saved = localStorage.getItem('empresanueva_cart'); if(saved) { cartItems = new Map(JSON.parse(saved)); if(cartItems.size > 0) renderCartMobile(); } }
+
+    const moneyFmt = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }); const moneyFmtFull = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }); 
+
+    function showAlert(msg, timeout = 3500) { const box = document.getElementById('alert-box'); document.getElementById('alert-msg').innerText = msg; box.classList.remove('hidden'); setTimeout(() => box.classList.add('hidden'), timeout); }
     function clearCacheAndReload() { location.reload(); }
     function normalizeKey(key) { return String(key || "").toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9_]/g, ""); }
     function parseMoney(value) { let num = parseFloat(String(value).replace(/[^\d.-]/g, '').trim()); return isNaN(num) ? 0 : num; }
+    const formatLocalDt = (d) => { let day = ("0" + d.getDate()).slice(-2); let month = ("0" + (d.getMonth() + 1)).slice(-2); return `${day}/${month}/${d.getFullYear()}`; };
+    function convertToDDMMYYYY(yyyyMMdd) { if(!yyyyMMdd) return ''; const [y, m, d] = yyyMMdd.split('-'); return `${d}/${m}/${y}`; }
 
-    const formatLocalDt = (d) => {
-        let day = ("0" + d.getDate()).slice(-2);
-        let month = ("0" + (d.getMonth() + 1)).slice(-2);
-        return `${day}/${month}/${d.getFullYear()}`;
-    };
+    window.onload = function() { loadCartFromLocal(); }
 
-    function hideAllSteps() {
-        step1.classList.add('hidden');
-        stepMainMenu.classList.add('hidden');
-        stepClientes.classList.add('hidden');
-        stepCotizador.classList.add('hidden');
-        stepInformes.classList.add('hidden');
-        stepInventario.classList.add('hidden');
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    }
+    function hideAllSteps() { ['step-1', 'step-main-menu', 'step-clientes', 'step-nuevo-cliente', 'step-pedidos', 'step-cotizaciones', 'step-informes', 'step-inventario', 'step-cotizador'].forEach(id => { document.getElementById(id).classList.add('hidden'); }); document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); }
 
     function switchTab(tab) {
         if(globalProducts.size === 0) return; 
-        hideAllSteps();
-        bottomNav.classList.remove('hidden');
+        hideAllSteps(); document.getElementById('bottom-nav').classList.remove('hidden'); document.getElementById(`tab-${tab}`)?.classList.add('active');
+        if(tab === 'inicio') { document.getElementById('step-main-menu').classList.remove('hidden'); updateDashboard(); }
+        else if (tab === 'clientes') { document.getElementById('step-clientes').classList.remove('hidden'); renderClientList(); updateDashboard(); }
+        else if (tab === 'nuevo_cliente') { document.getElementById('step-nuevo-cliente').classList.remove('hidden'); generateNewClientId(); }
+        else if (tab === 'pedidos') { document.getElementById('step-pedidos').classList.remove('hidden'); renderPedidosList(); }
+        else if (tab === 'cotizaciones') { cleanOldQuotes(); document.getElementById('step-cotizaciones').classList.remove('hidden'); renderCotizacionesList(); }
+        else if (tab === 'informes') { document.getElementById('step-informes').classList.remove('hidden'); renderSKUChart(); }
+        else if (tab === 'inventario') { document.getElementById('step-inventario').classList.remove('hidden'); switchInvTab('stock'); }
+        else if (tab === 'cotizador') { if(!selectedClient) { showAlert("Por favor, selecciona un cliente en tu Cartera."); switchTab('clientes'); return; } document.getElementById('step-cotizador').classList.remove('hidden'); renderCartMobile(); }
+    }
 
-        document.getElementById(`tab-${tab}`)?.classList.add('active');
-
-        if(tab === 'inicio') {
-            updateDashboard();
-            stepMainMenu.classList.remove('hidden');
-            document.getElementById('tab-inicio').classList.add('active');
-        } else if (tab === 'clientes') {
-            stepClientes.classList.remove('hidden');
-            renderClientList();
-        } else if (tab === 'cotizador') {
-            if(!selectedClient) {
-                showAlert("Selecciona un cliente de tu cartera para iniciar venta.");
-                switchTab('clientes');
-                return;
-            } 
-            stepCotizador.classList.remove('hidden');
-            renderCartMobile();
-        } else if (tab === 'informes') {
-            stepInformes.classList.remove('hidden');
-            renderReportsUI();
-        } else if (tab === 'inventario') {
-            stepInventario.classList.remove('hidden');
-            handleInvSearch(); 
-        }
+    // AUTO DEPURA COTIZACIONES VIEJAS
+    function cleanOldQuotes() {
+        const today = new Date(); today.setHours(0,0,0,0); const now = today.getTime(); const sevenDays = 7 * 24 * 60 * 60 * 1000;
+        let changed = false;
+        sessionSales = sessionSales.filter(s => {
+            if (s.status === 'PAGADA') return true;
+            const p = s.date.split('/'); if(p.length !== 3) return true;
+            const saleTime = new Date(`${p[2]}-${p[1]}-${p[0]}T00:00:00`).getTime();
+            if (now - saleTime > sevenDays) { changed = true; return false; }
+            return true;
+        });
+        if(changed) saveSalesToLocal();
     }
 
     function updateDashboard() {
-        const today = new Date();
-        const strHoy = formatLocalDt(today);
-        
-        // Configuración de Mes Actual para los Títulos
-        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-        const currentMonthName = monthNames[today.getMonth()];
-        const badgeMes = document.getElementById('dash-current-month-badge');
-        if(badgeMes) badgeMes.innerText = `${currentMonthName} ${today.getFullYear()}`;
-        const titleMes = document.getElementById('dash-month-title');
-        if(titleMes) titleMes.innerText = `Acumulado de ${currentMonthName}`;
-        
-        // Algoritmo para obtener los 3 días laborables anteriores (saltando el Domingo)
-        let prevDays = [];
-        let d = new Date(today);
-        while(prevDays.length < 3) {
-            d.setDate(d.getDate() - 1);
-            if(d.getDay() !== 0) { // 0 es Domingo
-                prevDays.unshift(new Date(d)); // Agregamos al inicio para mantener orden [Día-3, Día-2, Día-1]
-            }
-        }
-
-        const strDia1 = formatLocalDt(prevDays[0]);
-        const strDia2 = formatLocalDt(prevDays[1]);
-        const strDia3 = formatLocalDt(prevDays[2]);
-
-        let ventaHoy = 0, ventaDia1 = 0, ventaDia2 = 0, ventaDia3 = 0, ventaMes = 0;
-        
-        const currentMonthStr = ("0" + (today.getMonth() + 1)).slice(-2) + "/" + today.getFullYear();
-
+        const today = new Date(); const strHoy = formatLocalDt(today); const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const badgeMes = document.getElementById('dash-current-month-badge'); if(badgeMes) badgeMes.innerText = `${monthNames[today.getMonth()]} ${today.getFullYear()}`;
+        let prevDays = []; let d = new Date(today); while(prevDays.length < 3) { d.setDate(d.getDate() - 1); if(d.getDay() !== 0) prevDays.unshift(new Date(d)); }
+        let ventaHoy = 0, ventaDia1 = 0, ventaDia2 = 0, ventaDia3 = 0, ventaMes = 0; const currentMonthStr = ("0" + (today.getMonth() + 1)).slice(-2) + "/" + today.getFullYear();
         sessionSales.forEach(sale => {
-            if(sale.date === strHoy) ventaHoy += sale.total;
-            if(sale.date === strDia1) ventaDia1 += sale.total;
-            if(sale.date === strDia2) ventaDia2 += sale.total;
-            if(sale.date === strDia3) ventaDia3 += sale.total;
-            if(sale.date.includes(currentMonthStr)) ventaMes += sale.total;
+            if(sale.status === 'PAGADA') {
+                if(sale.date === strHoy) ventaHoy += sale.total;
+                if(sale.date === formatLocalDt(prevDays[0])) ventaDia1 += sale.total;
+                if(sale.date === formatLocalDt(prevDays[1])) ventaDia2 += sale.total;
+                if(sale.date === formatLocalDt(prevDays[2])) ventaDia3 += sale.total;
+                if(sale.date.includes(currentMonthStr)) ventaMes += sale.total;
+            }
         });
-
-        document.getElementById('dash-day').innerText = moneyFmt.format(ventaHoy);
-        document.getElementById('dash-month').innerText = moneyFmt.format(ventaMes);
-
-        const goal = 100000;
-        let pct = Math.min((ventaMes / goal) * 100, 100);
-        const offset = 251.2 - (pct / 100) * 251.2;
-        document.getElementById('dash-month-ring').style.strokeDashoffset = offset;
-        document.getElementById('dash-month-pct').innerText = `${Math.floor(pct)}%`;
-
-        const maxBar = Math.max(ventaDia1, ventaDia2, ventaDia3, 1000); 
-        const pct1 = (ventaDia1 / maxBar) * 100;
-        const pct2 = (ventaDia2 / maxBar) * 100;
-        const pct3 = (ventaDia3 / maxBar) * 100;
-        
-        // Función para obtener Nombre Corto y Número de Día (ej. LUN 15)
-        const getLabel = (dateObj) => {
-            const days = ['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
-            const dayName = days[dateObj.getDay()];
-            const dayNum = dateObj.getDate();
-            return `${dayName} ${dayNum}`;
-        }
-
+        const dDay = document.getElementById('dash-day'); if(dDay) dDay.innerText = moneyFmt.format(ventaHoy);
+        const dMonth = document.getElementById('dash-month'); if(dMonth) dMonth.innerText = moneyFmt.format(ventaMes);
+        const goal = 100000; let pct = Math.min((ventaMes / goal) * 100, 100); const ring = document.getElementById('dash-month-ring');
+        if(ring) { ring.style.strokeDashoffset = 251.2 - (pct / 100) * 251.2; document.getElementById('dash-month-pct').innerText = `${Math.floor(pct)}%`; }
         const barContainer = document.getElementById('bar-chart-container');
-        barContainer.innerHTML = `
-            <div class="w-1/3 flex flex-col justify-end items-center group relative h-full">
-                <span class="text-[8px] font-black opacity-0 group-hover:opacity-100 transition-opacity absolute -top-4">${moneyFmt.format(ventaDia1)}</span>
-                <div class="w-full bg-white/20 rounded-t-lg transition-all duration-1000" style="height: ${pct1}%"></div>
-            </div>
-            <div class="w-1/3 flex flex-col justify-end items-center group relative h-full">
-                <span class="text-[8px] font-black opacity-0 group-hover:opacity-100 transition-opacity absolute -top-4">${moneyFmt.format(ventaDia2)}</span>
-                <div class="w-full bg-white/40 rounded-t-lg transition-all duration-1000" style="height: ${pct2}%"></div>
-            </div>
-            <div class="w-1/3 flex flex-col justify-end items-center group relative h-full">
-                <span class="text-[8px] font-black opacity-100 absolute -top-4 text-successlight">${moneyFmt.format(ventaDia3)}</span>
-                <div class="w-full bg-success rounded-t-lg shadow-[0_0_15px_rgba(16,185,129,0.5)] transition-all duration-1000" style="height: ${pct3}%"></div>
-            </div>
-        `;
-        
-        const labelsContainer = document.getElementById('bar-chart-labels');
-        labelsContainer.innerHTML = `
-            <span class="w-1/3 text-center">${getLabel(prevDays[0])}</span>
-            <span class="w-1/3 text-center">${getLabel(prevDays[1])}</span>
-            <span class="w-1/3 text-center text-successlight">${getLabel(prevDays[2])}</span>
-        `;
+        if(barContainer) {
+            const maxBar = Math.max(ventaDia1, ventaDia2, ventaDia3, 1000); 
+            barContainer.innerHTML = `<div class="w-1/3 flex flex-col justify-end items-center relative h-full"><span class="text-[8px] font-black absolute -top-4 text-gray-400">${moneyFmt.format(ventaDia1)}</span><div class="w-full bg-gray-200 rounded-t-lg transition-all duration-1000" style="height: ${(ventaDia1/maxBar)*100}%"></div></div><div class="w-1/3 flex flex-col justify-end items-center relative h-full"><span class="text-[8px] font-black absolute -top-4 text-gray-400">${moneyFmt.format(ventaDia2)}</span><div class="w-full bg-gray-300 rounded-t-lg transition-all duration-1000" style="height: ${(ventaDia2/maxBar)*100}%"></div></div><div class="w-1/3 flex flex-col justify-end items-center relative h-full"><span class="text-[8px] font-black absolute -top-4 text-primary">${moneyFmt.format(ventaDia3)}</span><div class="w-full bg-primary rounded-t-lg transition-all duration-1000" style="height: ${(ventaDia3/maxBar)*100}%"></div></div>`;
+            document.getElementById('bar-chart-labels').innerHTML = `<span class="w-1/3 text-center">${prevDays[0].getDate()}</span><span class="w-1/3 text-center">${prevDays[1].getDate()}</span><span class="w-1/3 text-center text-primary">${prevDays[2].getDate()}</span>`;
+        }
     }
 
-    document.getElementById('btnSelectFile').addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+    function renderSKUChart() {
+        const today = new Date(); const currentMonthStr = ("0" + (today.getMonth() + 1)).slice(-2) + "/" + today.getFullYear();
+        let skuCounts = {};
+        sessionSales.forEach(sale => { if(sale.status === 'PAGADA' && sale.date.includes(currentMonthStr)) { (sale.items||[]).forEach(item => { skuCounts[item.sku] = (skuCounts[item.sku] || 0) + item.qty; }); } });
+        const sorted = Object.entries(skuCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+        const labels = sorted.map(i=>i[0]); const data = sorted.map(i=>i[1]);
+        const ctx = document.getElementById('skuChart').getContext('2d');
+        if(skuChartInstance) skuChartInstance.destroy();
+        skuChartInstance = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Unidades Vendidas', data: data, backgroundColor: '#0A192F', borderRadius: 6 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } } });
+    }
+
+    function openScanner(targetInputId) {
+        targetInputForScanner = targetInputId; document.getElementById('modal-scanner').classList.remove('hidden');
+        if(!html5QrcodeScanner) {
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 150}, aspectRatio: 1.0 });
+            html5QrcodeScanner.render((decodedText) => { document.getElementById(targetInputForScanner).value = decodedText; closeScanner(); if(targetInputForScanner === 'prod-search-input') handleProductSearch(); else if(targetInputForScanner === 'kardex-sku') handleInvSearch(); }, (err) => { });
+        }
+    }
+    function closeScanner() { document.getElementById('modal-scanner').classList.add('hidden'); if(html5QrcodeScanner) { html5QrcodeScanner.clear(); html5QrcodeScanner = null; } }
+
+    async function pushToSheets(actionType, payloadObj) { if(!GOOGLE_SHEETS_API_URL || GOOGLE_SHEETS_API_URL.includes("AKI_VA_TU_URL")) return; payloadObj.action = actionType; try { await fetch(GOOGLE_SHEETS_API_URL, { method: 'POST', body: JSON.stringify(payloadObj), headers: { 'Content-Type': 'text/plain;charset=utf-8' }}); } catch(error) { console.error("Error nube", error); } }
 
     async function loadFromCloud() {
-        const CLOUD_URL = "https://raw.githubusercontent.com/JOSELITO198004/cotizador-v1/refs/heads/main/nuevo%20proyecto.xlsx"; 
-        document.getElementById('upload-content').classList.add('hidden');
-        document.getElementById('loader-spinner').classList.remove('hidden');
-
+        if(!GOOGLE_SHEETS_API_URL || GOOGLE_SHEETS_API_URL.includes("AKI_VA_TU_URL")) { showAlert("Configura la URL de Sheets."); return; }
+        document.getElementById('upload-content').classList.add('hidden'); document.getElementById('loader-spinner').classList.remove('hidden'); document.getElementById('loader-text').innerText = "Conectando a la Nube...";
         try {
-            let response;
-            try { response = await fetch(CLOUD_URL); if (!response.ok) throw new Error("Error proxy"); } 
-            catch (err) { response = await fetch("https://corsproxy.io/?" + encodeURIComponent(CLOUD_URL)); }
-            const blob = await response.blob();
-            handleFile(new File([blob], "bd_nube.xlsx", { type: blob.type }));
-        } catch (error) {
-            showAlert("FALLO EN LA NUBE. CARGA MANUALMENTE.");
-            document.getElementById('upload-content').classList.remove('hidden');
-            document.getElementById('loader-spinner').classList.add('hidden');
-        }
+            let response = await fetch(GOOGLE_SHEETS_API_URL, { redirect: "follow" }); let textData = await response.text(); 
+            if(textData.includes("<html") || textData.includes("<HTML")) throw new Error("Google pide iniciar sesión.");
+            let data = JSON.parse(textData); if(data.error) throw new Error(data.error);
+            globalProducts.clear(); globalClients.clear();
+            if(data.productos) data.productos.forEach(item => { const sku = String(item.codigo || item.sku || item.id || "").trim(); if(sku) globalProducts.set(sku, { codigo: sku, descripcion: String(item.descripcion || "S/D").trim(), marca: String(item.marca || "S/M").trim(), precioLista: parseFloat(item.precio || item.preciolista || 0) || 0 }); });
+            if(data.clientes) data.clientes.forEach(item => { const id = String(item.id || item.clienteid || item.codigo || "").trim(); if(id) globalClients.set(id, { id: id, razonSocial: String(item.razonsocial || item.nombre || "S/N").trim(), direccion: String(item.direccion || "").trim(), celular: String(item.celular || item.telefono || "").trim(), ciudad: String(item.ciudad || "").trim(), rfc: String(item.rfc || "").trim() }); });
+            localNewClients.forEach(c => { if(!globalClients.has(c.id)) globalClients.set(c.id, c); });
+            document.getElementById('header-status').innerText = `${globalClients.size} Clientes | ${globalProducts.size} Refacciones`;
+            if(globalProducts.size === 0 && globalClients.size === 0) showAlert("Sheets vacío."); else { showAlert("¡Base de datos descargada!"); switchTab('inicio'); }
+        } catch (error) { showAlert("ERROR: " + error.message, 6000); } finally { document.getElementById('upload-content').classList.remove('hidden'); document.getElementById('loader-spinner').classList.add('hidden'); }
     }
 
-    function handleFile(file) {
-        document.getElementById('upload-content').classList.add('hidden');
-        document.getElementById('loader-spinner').classList.remove('hidden');
+    document.getElementById('btnSelectFile').addEventListener('click', () => document.getElementById('dataFile').click());
+    document.getElementById('dataFile').addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
+    function handleFile(file) {
+        document.getElementById('upload-content').classList.add('hidden'); document.getElementById('loader-spinner').classList.remove('hidden'); document.getElementById('loader-text').innerText = "Analizando Excel...";
         setTimeout(() => {
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const workbook = XLSX.read(e.target.result, { type: 'array' });
-                    const dataProducts = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                    const dataClients = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[1]]);
-                    processData(dataProducts, dataClients);
-                } catch (err) { showAlert("ERROR AL LEER EL EXCEL."); }
-            };
-            reader.readAsArrayBuffer(file);
+                    let idxProd = workbook.SheetNames.findIndex(n => n.toLowerCase().includes('prod')); let idxCli = workbook.SheetNames.findIndex(n => n.toLowerCase().includes('client'));
+                    let nameProd = idxProd !== -1 ? workbook.SheetNames[idxProd] : workbook.SheetNames[0]; let nameCli = idxCli !== -1 ? workbook.SheetNames[idxCli] : workbook.SheetNames[1];
+                    const dataProducts = workbook.Sheets[nameProd] ? XLSX.utils.sheet_to_json(workbook.Sheets[nameProd]) : []; const dataClients = workbook.Sheets[nameCli] ? XLSX.utils.sheet_to_json(workbook.Sheets[nameCli]) : [];
+                    globalProducts.clear(); globalClients.clear();
+                    dataProducts.forEach(row => { let item = {}; for (let k in row) item[normalizeKey(k)] = row[k]; const sku = String(item.codigo || item.sku || item.producto || item.id || "").trim(); if(sku) globalProducts.set(sku, { codigo: sku, descripcion: String(item.descripcion || item.desc || "S/D").trim(), marca: String(item.marca || "S/M").trim(), precioLista: parseMoney(item.preciolista || item.precio || item.costo || 0) }); });
+                    dataClients.forEach(row => { let item = {}; for (let k in row) item[normalizeKey(k)] = row[k]; const id = String(item.id || item.clienteid || item.codigo || item.rfc || "").trim(); if(id) globalClients.set(id, { id: id, razonSocial: String(item.razonsocial || item.nombre || item.cliente || "S/N").trim(), direccion: String(item.direccion || item.domicilio || "").trim(), celular: String(item.celular || item.telefono || item.tel || "").trim(), ciudad: String(item.ciudad || item.municipio || "").trim(), rfc: String(item.rfc || "").trim() }); });
+                    localNewClients.forEach(c => { if(!globalClients.has(c.id)) globalClients.set(c.id, c); });
+                    document.getElementById('header-status').innerText = `${globalClients.size} Clientes | ${globalProducts.size} Refacciones`;
+                    if(globalProducts.size === 0 && globalClients.size === 0) showAlert("Excel vacío o títulos incorrectos."); else { showAlert("Excel cargado."); switchTab('inicio'); }
+                } catch (err) { showAlert("Archivo inválido."); } finally { document.getElementById('upload-content').classList.remove('hidden'); document.getElementById('loader-spinner').classList.add('hidden'); document.getElementById('dataFile').value = ""; }
+            }; reader.readAsArrayBuffer(file);
         }, 300);
     }
 
-    function processData(dataProducts, dataClients) {
-        globalProducts.clear(); globalClients.clear();
-
-        dataProducts.forEach(row => {
-            let item = {}; for (let k in row) item[normalizeKey(k)] = row[k];
-            const sku = String(item.codigo || item.producto || "").trim();
-            if(sku) {
-                globalProducts.set(sku, {
-                    codigo: sku, descripcion: String(item.descripcion || "SIN DESCRIPCIÓN").trim(),
-                    marca: String(item.marca || "SIN MARCA").trim(),
-                    imgProducto: String(item.urlimagenproducto || "").trim(),
-                    precioLista: parseMoney(item.preciolista || item.precio || 0)
-                });
-            }
-        });
-
-        dataClients.forEach(row => {
-            let item = {}; for (let k in row) item[normalizeKey(k)] = row[k];
-            const id = String(item.clienteid || item.codigo || "").trim();
-            if(id) {
-                globalClients.set(id, {
-                    id: id, razonSocial: String(item.razonsocial || item.nombre || "SIN NOMBRE").trim(),
-                    direccion: String(item.direccion || "NO REGISTRA").trim(),
-                    celular: String(item.celular || "NO REGISTRA").trim(),
-                    ciudad: String(item.ciudad || "NO REGISTRA").trim(), rfc: String(item.rfc || "XAXX010101000").trim()
-                });
-            }
-        });
-
-        document.getElementById('header-status').innerText = `${globalClients.size} Clientes | ${globalProducts.size} Refacciones`;
-        clientSearch.addEventListener('input', renderClientList);
-        switchTab('inicio'); 
-    }
-
-    invFileInput.addEventListener('change', e => { if (e.target.files[0]) processInvExcel(e.target.files[0]); });
-
-    function processInvExcel(file) {
-        showAlert("Leyendo inventario Excel...", 1500);
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const workbook = XLSX.read(e.target.result, { type: 'array' });
-                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                
-                localStock = {}; // Reiniciamos stock porque es una carga maestra desde Excel
-                
-                data.forEach(row => {
-                    let item = {}; for (let k in row) item[normalizeKey(k)] = row[k];
-                    const code = String(item.codigo || item.sku || item.id || "").trim();
-                    const qty = parseInt(item.cantidad || item.stock || item.qty || 0);
-                    if(code && !isNaN(qty)) {
-                        localStock[code] = qty;
-                    }
-                });
-                
-                saveStockToLocal();
-                showAlert("Stock de la unidad REINICIADO con éxito.");
-                document.getElementById('invFile').value = ""; 
-                handleInvSearch();
-            } catch (err) {
-                showAlert("Error procesando Excel de Inventario");
-            }
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
-    function handleInvSearch() {
-        const query = document.getElementById('inv-search-input').value.toLowerCase().trim();
-        const cont = document.getElementById('inv-list-container');
-        cont.innerHTML = '';
-        
-        let count = 0;
-        for (let [sku, prod] of globalProducts.entries()) {
-            const hasStock = (localStock[sku] || 0) > 0;
-            
-            if ((query !== '' && (sku.toLowerCase().includes(query) || prod.descripcion.toLowerCase().includes(query))) || (query === '' && hasStock)) {
-                const currentStock = localStock[sku] || 0;
-                const img = prod.imgProducto ? `<img src="${prod.imgProducto}" class="w-14 h-14 object-contain rounded-xl border border-gray-100 bg-white shadow-sm">` : `<div class="w-14 h-14 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center text-[10px] text-gray-300 font-bold shadow-sm">S/I</div>`;
-                
-                const div = document.createElement('div');
-                div.className = "bg-cardbg p-4 rounded-3xl border border-gray-100 shadow-soft flex items-center gap-4 transition-all hover:shadow-md";
-                div.innerHTML = `
-                    ${img}
-                    <div class="flex-grow min-w-0">
-                        <div class="text-sm font-black text-primary leading-none mb-1.5">${sku}</div>
-                        <div class="text-[10px] text-gray-500 uppercase font-bold line-clamp-2 leading-snug">${prod.descripcion}</div>
-                    </div>
-                    <div class="flex flex-col items-center bg-gray-50 p-2 rounded-2xl border border-gray-100 shadow-inner">
-                        <span class="text-[9px] font-black text-primary uppercase tracking-widest mb-1 opacity-60">A Bordo</span>
-                        <input type="number" min="0" value="${currentStock}" onchange="updateStock('${sku}', this.value)" class="w-16 bg-white border border-gray-200 text-success rounded-xl p-2 text-center text-sm font-black outline-none shadow-sm focus:border-success transition-colors" onfocus="this.select()">
-                    </div>
-                `;
-                cont.appendChild(div);
-                count++;
-                if (count > 30) break; 
-            }
-        }
-        
-        if (count === 0) {
-            cont.innerHTML = `<div class="bg-cardbg p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase shadow-soft">No se encontraron productos</div>`;
-        }
-    }
-
-    function updateStock(sku, value) {
-        let val = parseInt(value);
-        if(isNaN(val) || val < 0) val = 0;
-        localStock[sku] = val; // Actualiza manual no resetea
-        saveStockToLocal();
-    }
-
-    function openNewClientModal() { 
-        const autoId = 'CLI-' + Math.floor(1000 + Math.random() * 9000);
-        document.getElementById('nc-id').value = autoId;
-        document.getElementById('nc-name').value = '';
-        document.getElementById('nc-address').value = '';
-        document.getElementById('nc-phone').value = '';
-        document.getElementById('nc-rfc').value = '';
-        document.getElementById('nc-city').value = '';
-        document.getElementById('modal-new-client').classList.remove('hidden'); 
-    }
-    
-    function closeNewClientModal() { document.getElementById('modal-new-client').classList.add('hidden'); }
-    
-    function saveNewClient() {
-        const id = document.getElementById('nc-id').value.trim();
-        const name = document.getElementById('nc-name').value.trim();
-        const address = document.getElementById('nc-address').value.trim();
-        const phone = document.getElementById('nc-phone').value.trim();
-        
-        if (!name || !address || !phone) { showAlert("Razón Social, Domicilio y Teléfono son obligatorios."); return; }
-        
-        globalClients.set(id, {
-            id: id, razonSocial: name.toUpperCase(), 
-            direccion: address.toUpperCase(),
-            celular: phone.toUpperCase(), 
-            ciudad: document.getElementById('nc-city').value.toUpperCase() || 'NO REGISTRA',
-            rfc: document.getElementById('nc-rfc').value.toUpperCase() || 'XAXX010101000'
-        });
-        closeNewClientModal(); 
-        showAlert("Cliente registrado exitosamente.");
-        if(!stepClientes.classList.contains('hidden')) renderClientList();
-    }
-
+    // JERARQUÍA DESPLEGABLE (ACORDEÓN) DE CLIENTES
     function renderClientList() {
-        clientList.innerHTML = ''; const search = clientSearch.value.toLowerCase().trim();
-        let count = 0;
+        const list = document.getElementById('client-list'); list.innerHTML = ''; const search = document.getElementById('clientSearch').value.toLowerCase().trim(); let count = 0;
         for (let [id, client] of globalClients.entries()) {
             if(id.toLowerCase().includes(search) || client.razonSocial.toLowerCase().includes(search)) {
-                const div = document.createElement('div');
-                div.className = "bg-cardbg border border-gray-100 rounded-3xl p-5 shadow-soft flex flex-col active:bg-gray-50 transition-colors";
-                div.onclick = () => { selectedClient = client; cartItems.clear(); setupCotizadorHeader(); switchTab('cotizador'); };
+                const isOffline = localNewClients.find(c => c.id === id); const badgeOffline = isOffline ? `<span class="bg-gray-100 text-primary px-1.5 py-0.5 rounded text-[8px] ml-2 font-black border border-gray-200">NUEVO</span>` : '';
+                const div = document.createElement('div'); div.className = "bg-white border border-gray-100 rounded-3xl p-5 shadow-sm flex flex-col transition-colors";
+                
                 div.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-lg font-black tracking-widest">${client.id}</div>
+                    <div onclick="toggleClientMenu('${client.id}')" class="cursor-pointer active:opacity-70 transition-opacity">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="text-[10px] bg-gray-50 text-gray-500 px-2 py-0.5 rounded-lg font-bold border border-gray-200">${client.id} ${badgeOffline}</div>
+                            <svg id="chevron-${client.id}" class="w-5 h-5 text-gray-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="text-sm font-black text-primary uppercase mb-1.5 leading-tight">${client.razonSocial}</div>
+                        <div class="text-[10px] text-gray-500 font-semibold uppercase flex flex-col gap-1">
+                            <span class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>${client.ciudad} - ${client.direccion}</span>
+                            <span class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>${client.celular}</span>
+                        </div>
                     </div>
-                    <div class="text-base font-black text-darktext uppercase mb-1.5 leading-tight">${client.razonSocial}</div>
-                    <div class="text-[10px] text-gray-500 font-bold uppercase flex flex-col gap-0.5">
-                        <span class="flex items-center gap-1"><svg class="w-3 h-3 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${client.ciudad} - ${client.direccion}</span>
-                        <span class="flex items-center gap-1"><svg class="w-3 h-3 text-primary-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>${client.celular}</span>
+                    <div id="menu-${client.id}" class="hidden mt-4 pt-4 border-t border-gray-50 flex flex-col gap-3">
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-3">Control de Visita</h4>
+                            <div id="visit-panel-${client.id}">
+                                <button onclick="startVisit('${client.id}')" class="w-full bg-success text-white py-3.5 rounded-xl text-xs font-black uppercase active:scale-[0.98] shadow-sm flex items-center justify-center gap-2">Iniciar Visita</button>
+                            </div>
+                        </div>
+                        <button onclick="startOrder('${client.id}')" class="w-full bg-primary text-white py-3.5 rounded-xl text-xs font-black uppercase active:scale-[0.98] shadow-sm flex items-center justify-center gap-2">Realizar Pedido</button>
                     </div>
                 `;
-                clientList.appendChild(div); count++;
-                if(count > 50 && search === "") break; 
+                list.appendChild(div); count++; if(count > 50 && search === "") break; 
             }
         }
     }
+    document.getElementById('clientSearch').addEventListener('input', renderClientList);
 
-    function setupCotizadorHeader() {
-        document.getElementById('cot-client-name').innerText = selectedClient.razonSocial;
+    function toggleClientMenu(id) {
+        selectedClient = globalClients.get(id);
+        const menu = document.getElementById(`menu-${id}`);
+        const chevron = document.getElementById(`chevron-${id}`);
+        const isHidden = menu.classList.contains('hidden');
+        
+        document.querySelectorAll('[id^="menu-"]').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('[id^="chevron-"]').forEach(el => el.classList.remove('rotate-180'));
+        
+        if (isHidden) {
+            menu.classList.remove('hidden');
+            chevron.classList.add('rotate-180');
+            if (activeVisitClientId === id) renderActiveVisitUI(id);
+        }
+    }
+
+    function startVisit(id) {
+        if(activeVisitClientId && activeVisitClientId !== id) { showAlert("Ya tienes una visita activa con otro cliente. Finalízala primero."); return; }
+        activeVisitClientId = id; visitSeconds = 0; clearInterval(visitTimerInterval);
+        
+        visitTimerInterval = setInterval(() => {
+            visitSeconds++;
+            const timerEl = document.getElementById(`timer-${id}`);
+            if(timerEl) timerEl.innerText = `${String(Math.floor(visitSeconds / 60)).padStart(2, '0')}:${String(visitSeconds % 60).padStart(2, '0')}`;
+        }, 1000);
+        renderActiveVisitUI(id);
+    }
+
+    function renderActiveVisitUI(id) {
+        const panel = document.getElementById(`visit-panel-${id}`);
+        if(panel) {
+            panel.innerHTML = `<div class="text-primary font-black text-2xl tracking-widest mb-1" id="timer-${id}">00:00</div><p class="text-[9px] text-gray-400 font-bold uppercase mb-3">Tiempo Transcurrido</p><button onclick="endVisit('${id}')" class="w-full bg-danger text-white py-3.5 rounded-xl text-xs font-black uppercase active:scale-[0.98] shadow-sm">Finalizar Visita</button>`;
+        }
+    }
+
+    function endVisit(id) {
+        clearInterval(visitTimerInterval);
+        const timeSpent = document.getElementById(`timer-${id}`) ? document.getElementById(`timer-${id}`).innerText : "00:00";
+        showAlert(`Visita finalizada. Tiempo: ${timeSpent}`);
+        activeVisitClientId = null;
+        const panel = document.getElementById(`visit-panel-${id}`);
+        if(panel) panel.innerHTML = `<button onclick="startVisit('${id}')" class="w-full bg-success text-white py-3.5 rounded-xl text-xs font-black uppercase active:scale-[0.98] shadow-sm flex items-center justify-center gap-2">Iniciar Visita</button>`;
+    }
+
+    function startOrder(id) {
+        selectedClient = globalClients.get(id);
+        cartItems.clear(); saveCartToLocal(); 
+        document.getElementById('cot-client-name').innerText = selectedClient.razonSocial; 
+        switchTab('cotizador');
+    }
+
+    function generateNewClientId() { document.getElementById('nc-id').value = 'CLI-' + Math.floor(1000 + Math.random() * 9000); ['nc-name','nc-address','nc-phone','nc-rfc','nc-city'].forEach(id => document.getElementById(id).value = ''); document.getElementById('traffic-light-container').classList.add('hidden'); }
+    function saveNewClient() {
+        const id = document.getElementById('nc-id').value.trim(); const name = document.getElementById('nc-name').value.trim(); const address = document.getElementById('nc-address').value.trim(); const phone = document.getElementById('nc-phone').value.trim();
+        if (!name || !address || !phone) { showAlert("Faltan datos obligatorios."); return; }
+        const obj = { id: id, razonSocial: name.toUpperCase(), direccion: address.toUpperCase(), celular: phone.toUpperCase(), ciudad: document.getElementById('nc-city').value.toUpperCase() || 'S/N', rfc: document.getElementById('nc-rfc').value.toUpperCase() || 'XAXX010101000' };
+        globalClients.set(id, obj); localNewClients.push(obj); saveNewClientsToLocal(); showAlert("Registrado."); generateNewClientId(); pushToSheets("NUEVO_CLIENTE", obj);
+    }
+    function exportNewClientsToExcel() {
+        if(localNewClients.length === 0) { showAlert("No hay clientes nuevos."); return; }
+        XLSX.writeFile(XLSX.utils.book_append_sheet(XLSX.utils.book_new(), XLSX.utils.json_to_sheet(localNewClients.map(c => ({"ID": c.id, "Razón Social": c.razonSocial, "Dirección": c.direccion, "Tel": c.celular, "Ciudad": c.ciudad, "RFC": c.rfc}))), "Nuevos"), `Nuevos_Clientes_${formatLocalDt(new Date()).replace(/\//g, '-')}.xlsx`);
+    }
+
+    function checkClientTrafficLight() {
+        const cont = document.getElementById('traffic-light-container'); if (!cont.classList.contains('hidden')) { cont.classList.add('hidden'); return; }
+        cont.innerHTML = `<h3 class="text-xs font-black text-danger uppercase tracking-wide border-b border-gray-100 pb-2 mb-1 pl-1">Clientes Sin Venta</h3>`;
+        const clientsWithSales = new Set(sessionSales.map(s => s.clientId)); let count = 0;
+        for (let [id, client] of globalClients.entries()) {
+            if (!clientsWithSales.has(id)) {
+                const div = document.createElement('div'); div.className = "bg-white border-l-4 border-danger rounded-r-2xl p-4 shadow-sm flex justify-between items-center";
+                div.innerHTML = `<div><div class="text-[10px] text-gray-400 font-bold mb-0.5">${client.id}</div><div class="text-xs font-black text-primary uppercase leading-tight">${client.razonSocial}</div></div><div class="bg-dangerlight text-danger px-2 py-1 rounded text-[8px] font-black uppercase">Sin Venta</div>`;
+                cont.appendChild(div); count++;
+            }
+        }
+        if (count === 0) cont.innerHTML += `<div class="p-4 text-center text-[10px] font-bold text-gray-400 uppercase">Todos tienen ventas.</div>`;
+        cont.classList.remove('hidden');
+    }
+
+    function switchInvTab(tab) {
+        document.getElementById('btn-tab-stock').className = tab === 'stock' ? "flex-1 py-2 rounded-lg bg-white shadow-sm text-xs font-bold text-primary" : "flex-1 py-2 rounded-lg text-gray-500 text-xs font-bold";
+        document.getElementById('btn-tab-kardex').className = tab === 'kardex' ? "flex-1 py-2 rounded-lg bg-white shadow-sm text-xs font-bold text-primary" : "flex-1 py-2 rounded-lg text-gray-500 text-xs font-bold";
+        document.getElementById('inv-view-stock').classList.toggle('hidden', tab !== 'stock'); document.getElementById('inv-view-kardex').classList.toggle('hidden', tab !== 'kardex');
+        if(tab === 'stock') handleInvSearch(); else renderKardexLog();
+    }
+
+    function registerKardexMovement(sku, qty, type, motive, refFolio = 'S/N') {
+        const d = new Date(); let currentStock = localStock[sku] || 0;
+        if(type === 'ENTRADA') localStock[sku] = currentStock + qty; else if (type === 'SALIDA') localStock[sku] = Math.max(0, currentStock - qty);
+        kardexLog.push({ date: formatLocalDt(d), time: d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'}), sku: sku, qty: qty, type: type, motive: motive, folio: refFolio });
+        saveStockToLocal(); saveKardexToLocal();
+        pushToSheets("MOVIMIENTO_KARDEX", { date: formatLocalDt(d), time: d.toLocaleTimeString('es-MX'), sku: sku, type: type, qty: qty, motive: motive, folio: refFolio });
+    }
+
+    function saveManualKardex() {
+        const sku = document.getElementById('kardex-sku').value.toUpperCase().trim(); const qty = parseInt(document.getElementById('kardex-qty').value); const motive = document.getElementById('kardex-motive').value;
+        if(!sku || isNaN(qty) || qty <= 0 || !motive) { showAlert("Completa campos."); return; }
+        if(!globalProducts.has(sku)) { showAlert("No existe en catálogo."); return; }
+        registerKardexMovement(sku, qty, 'ENTRADA', motive); ['kardex-sku','kardex-qty','kardex-motive'].forEach(id => document.getElementById(id).value = ''); showAlert("Ingresado."); handleInvSearch();
+    }
+    
+    function handleInvSearch() {
+        const query = document.getElementById('inv-search-input').value.toLowerCase().trim(); const cont = document.getElementById('inv-list-container'); cont.innerHTML = ''; let count = 0;
+        for (let [sku, prod] of globalProducts.entries()) {
+            const currentStock = localStock[sku] || 0;
+            if ((query !== '' && (sku.toLowerCase().includes(query) || prod.descripcion.toLowerCase().includes(query))) || (query === '' && currentStock > 0)) {
+                const div = document.createElement('div'); div.className = "bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between";
+                div.innerHTML = `<div class="flex-grow min-w-0 pr-4"><div class="text-sm font-black text-primary mb-1.5">${sku}</div><div class="text-[10px] text-gray-500 uppercase font-bold line-clamp-2">${prod.descripcion}</div></div><div class="bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100 flex flex-col items-center min-w-[70px]"><span class="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Disp.</span><span class="text-lg font-black text-primary">${currentStock}</span></div>`;
+                cont.appendChild(div); count++; if (count > 30) break; 
+            }
+        }
+    }
+    function renderKardexLog() {
+        const cont = document.getElementById('kardex-list-container'); cont.innerHTML = '';
+        if(kardexLog.length === 0) { cont.innerHTML = `<div class="bg-white p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase">Sin movimientos</div>`; return; }
+        [...kardexLog].reverse().forEach(log => {
+            const isE = log.type === 'ENTRADA'; const color = isE ? 'text-success bg-successlight border-success/20' : 'text-danger bg-dangerlight border-danger/20';
+            const div = document.createElement('div'); div.className = "bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex justify-between items-center";
+            div.innerHTML = `<div><div class="text-sm font-black text-primary mb-1">${log.sku}</div><div class="text-[10px] text-gray-500 font-bold uppercase mb-1">${log.motive} ${log.folio !== 'S/N' ? `(${log.folio})` : ''}</div><div class="text-[9px] text-gray-400 font-semibold">${log.date} ${log.time}</div></div><div><span class="px-2 py-1 rounded-lg text-xs font-black border tracking-widest ${color}">${isE?'+':'-'}${log.qty}</span></div>`;
+            cont.appendChild(div);
+        });
     }
 
     function handleProductSearch() {
-        const query = document.getElementById('prod-search-input').value.toLowerCase().trim();
-        const resBox = document.getElementById('prod-search-results'); resBox.innerHTML = '';
+        const query = document.getElementById('prod-search-input').value.toLowerCase().trim(); const resBox = document.getElementById('prod-search-results'); resBox.innerHTML = '';
         if (query.length < 2) { resBox.classList.add('hidden'); return; }
-        
         let count = 0;
         for (let [sku, prod] of globalProducts.entries()) {
             if (sku.toLowerCase().includes(query) || prod.descripcion.toLowerCase().includes(query)) {
                 if(!cartItems.has(sku)) {
-                    const currentStock = localStock[sku] || 0;
-                    const stockColor = currentStock > 0 ? 'text-success bg-successlight border-success/20' : 'text-gray-400 bg-gray-50 border-gray-200';
-                    const stockBadge = `<span class="px-1.5 py-0.5 rounded-md text-[9px] font-black border tracking-widest ${stockColor}">${currentStock} En Ruta</span>`;
-
-                    const img = prod.imgProducto ? `<img src="${prod.imgProducto}" class="w-12 h-12 object-contain rounded-xl border border-gray-100 bg-white">` : `<div class="w-12 h-12 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center text-[9px] text-gray-300">S/I</div>`;
-                    const div = document.createElement('div');
-                    div.className = "p-4 flex items-center gap-3 active:bg-gray-50 hover:bg-gray-50 transition-colors";
-                    div.innerHTML = `
-                        ${img}
-                        <div class="flex-grow min-w-0">
-                            <div class="text-sm font-black text-primary flex items-center gap-2 mb-1">${sku} ${stockBadge}</div>
-                            <div class="text-[10px] text-gray-500 uppercase font-bold line-clamp-1">${prod.descripcion}</div>
-                        </div>
-                        <button onclick="addProduct('${sku}')" class="bg-gradient-to-r from-success to-emerald-500 text-white p-2.5 rounded-xl flex items-center justify-center shadow-lg shadow-success/30 active:scale-95">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        </button>
-                    `;
+                    const currentStock = localStock[sku] || 0; const stockBadge = `<span class="px-1.5 py-0.5 rounded-md text-[9px] font-black border ${currentStock > 0 ? 'text-success bg-successlight border-success/20' : 'text-gray-400 bg-gray-50 border-gray-200'}">${currentStock} Disp.</span>`;
+                    const div = document.createElement('div'); div.className = "p-4 flex items-center justify-between active:bg-gray-50 border-b border-gray-50";
+                    div.innerHTML = `<div class="min-w-0 pr-2"><div class="text-sm font-black text-primary flex items-center gap-2 mb-1">${sku} ${stockBadge}</div><div class="text-[10px] text-gray-500 uppercase font-bold line-clamp-1">${prod.descripcion}</div></div><button onclick="addProduct('${sku}')" class="bg-primary text-white p-2.5 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>`;
                     resBox.appendChild(div); count++; if (count > 15) break;
                 }
             }
@@ -900,438 +660,157 @@
         resBox.classList.toggle('hidden', count === 0);
     }
 
-    function addProduct(sku) {
-        const prod = globalProducts.get(sku); if(!prod) return;
-        cartItems.set(sku, { productRef: prod, qty: 1, listPrice: prod.precioLista, discount: 0 });
-        document.getElementById('prod-search-input').value = '';
-        document.getElementById('prod-search-results').classList.add('hidden');
-        renderCartMobile(); updateCartBadge();
-    }
-
-    function updateCartItem(sku, field, value) {
-        if(!cartItems.has(sku)) return;
-        let val = parseFloat(value); if(isNaN(val) || val < 0) val = 0;
-        let item = cartItems.get(sku);
-        if(field === 'qty') item.qty = val === 0 ? 1 : val;
-        else if(field === 'price') item.listPrice = val;
-        else if(field === 'discount') item.discount = val > 100 ? 100 : val;
-        renderCartMobile();
-    }
-
-    function removeCartItem(sku) { cartItems.delete(sku); renderCartMobile(); updateCartBadge(); }
-    
-    function openConfirmCartModal() {
-        if(cartItems.size === 0) return;
-        document.getElementById('modal-confirm-cart').classList.remove('hidden');
-    }
-    function closeConfirmCartModal() {
-        document.getElementById('modal-confirm-cart').classList.add('hidden');
-    }
-    function confirmClearCart() { 
-        cartItems.clear(); 
-        renderCartMobile(); 
-        updateCartBadge(); 
-        closeConfirmCartModal();
-    }
-
-    function updateCartBadge() {
-        const b = document.getElementById('cart-badge');
-        b.innerText = cartItems.size;
-        b.classList.toggle('hidden', cartItems.size === 0);
-    }
+    function addProduct(sku) { const prod = globalProducts.get(sku); if(!prod) return; cartItems.set(sku, { productRef: prod, qty: 1, listPrice: prod.precioLista, discount: 0 }); document.getElementById('prod-search-input').value = ''; document.getElementById('prod-search-results').classList.add('hidden'); saveCartToLocal(); renderCartMobile(); }
+    function updateCartItem(sku, field, value) { let val = parseFloat(value); if(isNaN(val) || val < 0) val = 0; let item = cartItems.get(sku); if(field === 'qty') item.qty = val === 0 ? 1 : val; else if(field === 'price') item.listPrice = val; else if(field === 'discount') item.discount = val > 100 ? 100 : val; saveCartToLocal(); renderCartMobile(); }
+    function removeCartItem(sku) { cartItems.delete(sku); saveCartToLocal(); renderCartMobile(); }
+    function confirmClearCart() { cartItems.clear(); saveCartToLocal(); renderCartMobile(); document.getElementById('modal-confirm-cart').classList.add('hidden'); }
 
     function renderCartMobile() {
-        const cont = document.getElementById('cart-list-container'); cont.innerHTML = '';
-        let subtotal = 0;
-        
-        if(cartItems.size === 0) {
-            cont.innerHTML = `<div class="bg-cardbg p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase shadow-soft">El carrito está vacío</div>`;
-        } else {
+        const cont = document.getElementById('cart-list-container'); cont.innerHTML = ''; let subtotal = 0;
+        if(cartItems.size === 0) cont.innerHTML = `<div class="bg-white p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase shadow-sm">Vacío</div>`;
+        else {
             Array.from(cartItems.entries()).reverse().forEach(([sku, item]) => {
-                const prod = item.productRef;
-                const img = prod.imgProducto ? `<img src="${prod.imgProducto}" class="w-14 h-14 object-contain rounded-2xl border border-gray-100 bg-white">` : `<div class="w-14 h-14 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center text-[10px] text-gray-300 font-bold">S/I</div>`;
-                const totalRow = item.qty * item.listPrice * (1 - (item.discount / 100));
-                subtotal += totalRow;
-
-                const div = document.createElement('div');
-                div.className = "bg-cardbg p-4 rounded-3xl border border-gray-100 shadow-soft flex flex-col gap-3 relative";
-                div.innerHTML = `
-                    <button onclick="removeCartItem('${sku}')" class="absolute top-3 right-3 text-gray-300 hover:text-danger p-1 bg-white rounded-full">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                    <div class="flex items-center gap-4 pr-8 border-b border-gray-50 pb-3">
-                        ${img}
-                        <div class="min-w-0">
-                            <div class="text-sm font-black text-primary leading-none mb-1.5">${sku}</div>
-                            <div class="text-[10px] text-gray-500 uppercase font-bold line-clamp-2 leading-snug">${prod.descripcion}</div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-3">
-                        <div>
-                            <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1 pl-1">Cant</span>
-                            <input type="number" min="1" value="${item.qty}" onchange="updateCartItem('${sku}', 'qty', this.value)" class="w-full bg-gray-50 border border-gray-100 rounded-xl p-2 text-center text-sm font-black outline-none focus:border-primary transition-colors text-primary">
-                        </div>
-                        <div>
-                            <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1 pl-1">Precio</span>
-                            <input type="number" min="0" step="0.01" value="${item.listPrice}" onchange="updateCartItem('${sku}', 'price', this.value)" class="w-full bg-gray-50 border border-gray-100 rounded-xl p-2 text-center text-sm font-black outline-none focus:border-primary transition-colors text-primary">
-                        </div>
-                        <div>
-                            <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1 pl-1">Desc %</span>
-                            <input type="number" min="0" max="100" value="${item.discount}" onchange="updateCartItem('${sku}', 'discount', this.value)" class="w-full bg-dangerlight/50 border border-dangerlight text-danger rounded-xl p-2 text-center text-sm font-black outline-none focus:border-danger transition-colors">
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-end mt-1 pt-3 border-t border-gray-50">
-                        <span class="text-[10px] font-black text-success uppercase tracking-widest">Importe</span>
-                        <span class="text-lg font-black text-primary-dark">${moneyFmtFull.format(totalRow)}</span>
-                    </div>
-                `;
+                const tr = item.qty * item.listPrice * (1 - (item.discount / 100)); subtotal += tr;
+                const div = document.createElement('div'); div.className = "bg-white p-4 rounded-3xl border border-gray-100 shadow-sm relative";
+                div.innerHTML = `<button onclick="removeCartItem('${sku}')" class="absolute top-3 right-3 text-gray-300 hover:text-danger"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button><div class="pr-8 mb-3"><div class="text-sm font-black text-primary">${sku}</div><div class="text-[10px] text-gray-500 uppercase font-bold">${item.productRef.descripcion}</div></div><div class="grid grid-cols-3 gap-2"><input type="number" min="1" value="${item.qty}" onchange="updateCartItem('${sku}', 'qty', this.value)" class="bg-gray-50 border border-gray-200 rounded-xl p-2 text-center text-xs font-black text-primary"><input type="number" min="0" step="0.01" value="${item.listPrice}" onchange="updateCartItem('${sku}', 'price', this.value)" class="bg-gray-50 border border-gray-200 rounded-xl p-2 text-center text-xs font-black text-primary"><input type="number" min="0" max="100" value="${item.discount}" onchange="updateCartItem('${sku}', 'discount', this.value)" class="bg-dangerlight border border-dangerlight rounded-xl p-2 text-center text-xs font-black text-danger"></div><div class="text-right mt-2"><span class="text-sm font-black text-primary">${moneyFmtFull.format(tr)}</span></div>`;
                 cont.appendChild(div);
             });
         }
-
-        const iva = subtotal * 0.16; const totalFinal = subtotal + iva;
-        document.getElementById('cot-subtotal').innerText = moneyFmtFull.format(subtotal);
-        document.getElementById('cot-iva').innerText = moneyFmtFull.format(iva);
-        document.getElementById('cot-grand-total').innerText = moneyFmtFull.format(totalFinal);
+        const iva = subtotal * 0.16; document.getElementById('cot-subtotal').innerText = moneyFmtFull.format(subtotal); document.getElementById('cot-iva').innerText = moneyFmtFull.format(iva); document.getElementById('cot-grand-total').innerText = moneyFmtFull.format(subtotal + iva);
+        const b = document.getElementById('cart-badge'); b.innerText = cartItems.size; b.classList.toggle('hidden', cartItems.size === 0);
     }
 
     function getTempSaleObject() {
-        const d = new Date(); 
-        const timeStr = d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
-        const dateStr = formatLocalDt(d);
-        
-        const folio = `AEZ${String(folioGlobalCounter).padStart(4, '0')}`;
-        
-        let subtotal = 0; let totalItems = 0;
-        let itemsSnapshot = []; 
-
-        Array.from(cartItems.entries()).reverse().forEach(([sku, item]) => {
-            const prod = item.productRef;
-            const rowT = item.qty * item.listPrice * (1 - (item.discount / 100));
-            subtotal += rowT; totalItems += item.qty;
-            
-            itemsSnapshot.push({
-                sku: sku,
-                descripcion: prod.descripcion,
-                qty: item.qty,
-                listPrice: item.listPrice,
-                discount: item.discount,
-                imgProducto: prod.imgProducto
-            });
-        });
-        
-        const iva = subtotal * 0.16; 
-        const totalF = subtotal + iva;
-        
-        return { 
-            folio: folio,
-            date: dateStr,
-            time: timeStr, 
-            clientName: selectedClient.razonSocial,
-            clientId: selectedClient.id,
-            clientRfc: selectedClient.rfc,
-            clientDir: selectedClient.direccion,
-            clientCity: selectedClient.ciudad,
-            clientPhone: selectedClient.celular,
-            itemsCount: totalItems, 
-            subtotal: subtotal,
-            iva: iva,
-            total: totalF,
-            status: 'PENDIENTE',
-            paymentMethod: null,
-            items: itemsSnapshot
-        };
+        const d = new Date(); let sub = 0; let count = 0; let items = [];
+        Array.from(cartItems.entries()).reverse().forEach(([sku, item]) => { sub += item.qty * item.listPrice * (1 - (item.discount / 100)); count += item.qty; items.push({ sku: sku, descripcion: item.productRef.descripcion, qty: item.qty, listPrice: item.listPrice, discount: item.discount }); });
+        return { folio: `AEZ${String(folioGlobalCounter).padStart(4, '0')}`, date: formatLocalDt(d), time: d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'}), clientName: selectedClient.razonSocial, clientId: selectedClient.id, clientRfc: selectedClient.rfc, clientDir: selectedClient.direccion, clientCity: selectedClient.ciudad, clientPhone: selectedClient.celular, itemsCount: count, subtotal: sub, iva: sub*0.16, total: sub*1.16, status: 'PENDIENTE', paymentMethod: null, items: items };
     }
 
-    function generateHtmlForPrint(sale) {
+    function generateHtmlForPrint(sale, isQuote = false) {
         let cardsHtml = '';
-        
-        sale.items.forEach(item => {
-            const rowT = item.qty * item.listPrice * (1 - (item.discount / 100));
-            const desc = item.discount > 0 ? `<span style="color:#EF4444; font-size:10px; font-weight:bold;">(-${item.discount}%)</span>` : '';
-            
-            cardsHtml += `
-                <div style="background: white; border: 1px solid #E2E8F0; padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #10B981; page-break-inside: avoid;">
-                    <div style="flex: 1; padding-right: 10px;">
-                        <div style="font-size: 13px; font-weight: 900; color: #0A192F;">${item.sku}</div>
-                        <div style="font-size: 10px; font-weight: 600; color: #64748B; text-transform: uppercase; margin-top: 2px;">${item.descripcion}</div>
-                    </div>
-                    <div style="text-align: right; border-left: 1px solid #E2E8F0; padding-left: 15px; min-width: 90px;">
-                        <div style="font-size: 10px; color: #94A3B8; font-weight:bold;">CANT: <span style="color:#0A192F; font-size:12px;">${item.qty}</span></div>
-                        <div style="font-size: 10px; color: #94A3B8; margin-top:2px;">${moneyFmtFull.format(item.listPrice)} ${desc}</div>
-                        <div style="font-size: 14px; font-weight: 900; color: #10B981; margin-top: 4px;">${moneyFmtFull.format(rowT)}</div>
-                    </div>
-                </div>`;
-        });
-
-        return `
-            <div style="max-width: 800px; margin: 0 auto; font-family: 'Inter', sans-serif; color: #0F172A; text-align: left; padding: 10px;">
-                <div style="background: linear-gradient(135deg, #0A192F, #1E3A8A); color: white; padding: 25px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); position: relative; overflow: hidden;">
-                    <div style="position: absolute; right: -20px; top: -40px; opacity: 0.1;">
-                        <svg width="200" height="200" viewBox="0 0 24 24" fill="currentColor"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                    </div>
-                    <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: 1px;">AUTO ELÉCTRICA ZENDEJAS</h1>
-                    <p style="margin: 5px 0 0; color: #94A3B8; font-size: 13px;">Remisión de Venta | Ruta Móvil</p>
-                    
-                    <div style="display: flex; justify-content: space-between; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px;">
-                        <div style="font-size: 12px; color: #E2E8F0;">Folio: <b style="font-size:18px; color:white;">${sale.folio}</b></div>
-                        <div style="font-size: 12px; color: #E2E8F0; text-align:right;">Fecha: <b>${sale.date}</b><br>Hora: <b>${sale.time}</b></div>
-                    </div>
-                </div>
-
-                <div style="background: white; border: 1px solid #E2E8F0; padding: 20px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                    <div style="font-size: 10px; font-weight: 900; color: #10B981; letter-spacing: 1px; margin-bottom: 5px;">DATOS DEL CLIENTE</div>
-                    <div style="font-size: 18px; font-weight: 900; color: #0A192F; text-transform: uppercase;">${sale.clientName}</div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; font-size: 12px; color: #64748B;">
-                        <div>
-                            <b>ID:</b> ${sale.clientId}<br>
-                            <b>RFC:</b> ${sale.clientRfc}
-                        </div>
-                        <div style="text-align:right;">
-                            <b>TEL:</b> ${sale.clientPhone}<br>
-                            <b>DIR:</b> ${sale.clientDir}, ${sale.clientCity}
-                        </div>
-                    </div>
-                </div>
-
-                <div style="font-size: 11px; font-weight: 900; color: #0A192F; letter-spacing: 1px; margin-bottom: 10px;">ARTÍCULOS (${sale.itemsCount})</div>
-                <div style="display: flex; flex-direction: column;">
-                    ${cardsHtml}
-                </div>
-
-                <div style="background: #0A192F; color: white; padding: 20px; border-radius: 16px; margin-top: 25px; margin-left: auto; width: 300px; box-shadow: 0 10px 15px -3px rgba(10, 25, 47, 0.3);">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #94A3B8;"><span>SUBTOTAL:</span><span style="color:white;">${moneyFmtFull.format(sale.subtotal)}</span></div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; color: #94A3B8;"><span>IVA (16%):</span><span style="color:white;">${moneyFmtFull.format(sale.iva)}</span></div>
-                    <div style="display: flex; justify-content: space-between; border-top: 1px dashed rgba(255,255,255,0.3); padding-top: 12px; font-size: 20px; font-weight: 900; color: #10B981;">
-                        <span>TOTAL:</span><span style="color: white;">${moneyFmtFull.format(sale.total)}</span>
-                    </div>
-                </div>
-
-                <div style="text-align:center; font-size:10px; color:#94A3B8; margin-top:40px; font-weight:bold;">ESTE DOCUMENTO ES UNA REMISIÓN DE VENTA GENERADA EN RUTA.</div>
-            </div>
-        `;
+        (sale.items||[]).forEach(item => { const rowT = item.qty * item.listPrice * (1 - (item.discount / 100)); const desc = item.discount > 0 ? `<span style="color:#EF4444; font-size:10px; font-weight:bold;">(-${item.discount}%)</span>` : ''; cardsHtml += `<div style="border-bottom: 1px solid #E2E8F0; padding: 10px 0; display: flex; justify-content: space-between;"><div style="flex: 1; padding-right: 10px;"><div style="font-size: 13px; font-weight: bold; color: #0A192F;">${item.sku}</div><div style="font-size: 11px; color: #64748B;">${item.descripcion}</div></div><div style="text-align: right; min-width: 80px;"><div style="font-size: 11px; color: #64748B; margin-bottom:2px;">Cant: ${item.qty} ${desc}</div><div style="font-size: 13px; font-weight: bold; color: #0A192F;">${moneyFmtFull.format(rowT)}</div></div></div>`; });
+        const docType = isQuote ? "COTIZACIÓN" : "REMISIÓN DE VENTA";
+        return `<div style="font-family: sans-serif;"><div style="text-align: center; border-bottom: 2px solid #0A192F; padding-bottom: 10px; margin-bottom: 15px;"><h1 style="margin: 0; font-size: 20px; font-weight:900; color: #0A192F;">AUTO ELÉCTRICA ZENDEJAS</h1><p style="margin: 5px 0 0; font-size: 12px; font-weight: bold; color: #64748B;">${docType}</p></div><div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 20px; color:#0F172A;"><div><b>Cliente:</b> ${sale.clientName}<br><b>ID:</b> ${sale.clientId}<br><b>Tel:</b> ${sale.clientPhone || 'N/A'}</div><div style="text-align: right;"><b>Folio:</b> ${sale.folio}<br><b>Fecha:</b> ${sale.date}<br><b>Hora:</b> ${sale.time}</div></div><div style="margin-bottom: 15px; border-top: 1px solid #E2E8F0;">${cardsHtml}</div><div style="text-align: right; font-size: 13px;"><div style="margin-bottom: 5px; color: #64748B;">Subtotal: ${moneyFmtFull.format(sale.subtotal)}</div><div style="margin-bottom: 5px; color: #64748B;">IVA (16%): ${moneyFmtFull.format(sale.iva)}</div><div style="font-size: 18px; font-weight: 900; color: #0A192F; margin-top: 10px;">TOTAL: ${moneyFmtFull.format(sale.total)}</div></div>${isQuote ? '<div style="text-align:center; margin-top:30px; font-size:10px; color:#EF4444; font-weight:bold;">ESTE DOCUMENTO ES UNA COTIZACIÓN Y NO ASEGURA INVENTARIO NI PRECIOS FINALES.</div>' : ''}</div>`;
     }
+
+    function triggerPrint(saleObj, isQuote) { document.getElementById('print-area').innerHTML = `<div style="max-width: 800px; margin: 0 auto; padding: 10px;">${generateHtmlForPrint(saleObj, isQuote)}</div>`; setTimeout(() => { window.print(); }, 500); }
 
     function openPreviewModal() {
-        if(cartItems.size === 0) { showAlert("El carrito está vacío."); return; }
-        
-        mockSaleForPreview = getTempSaleObject();
-        const htmlContent = generateHtmlForPrint(mockSaleForPreview);
-        
-        document.getElementById('preview-content').innerHTML = htmlContent;
+        if(cartItems.size === 0) return; mockSaleForPreview = getTempSaleObject();
+        document.getElementById('preview-title').innerText = "Vista Previa Ticket";
+        document.getElementById('preview-actions-presale').classList.remove('hidden'); document.getElementById('preview-actions-postsale').classList.add('hidden');
+        document.getElementById('preview-content').innerHTML = `<div style="padding: 15px; text-align: left;">${generateHtmlForPrint(mockSaleForPreview, false)}</div>`; 
         document.getElementById('modal-preview').classList.remove('hidden');
     }
-
-    function closePreviewModal() {
-        document.getElementById('modal-preview').classList.add('hidden');
-        mockSaleForPreview = null;
-    }
-
-    function commitAndPrintSale() {
-        if(!mockSaleForPreview) return;
-        
-        // Guardamos la venta generada
-        sessionSales.push(mockSaleForPreview);
-        folioGlobalCounter++;
-        
-        // Descontamos el inventario local
-        mockSaleForPreview.items.forEach(item => {
-            let currentStock = localStock[item.sku] || 0;
-            localStock[item.sku] = Math.max(0, currentStock - item.qty);
-        });
-        
-        saveSalesToLocal();
-        saveStockToLocal();
-
-        cartItems.clear(); 
-        renderCartMobile();
-        updateCartBadge();
-        closePreviewModal();
-        
-        updateDashboard(); 
-        renderReportsUI();
-        
-        showAlert("Generando Archivo PDF...", 1500);
-        const printArea = document.getElementById('print-area');
-        printArea.innerHTML = generateHtmlForPrint(mockSaleForPreview);
-        setTimeout(() => window.print(), 500); 
-    }
+    
+    function closePreviewModal(clearData = true) { document.getElementById('modal-preview').classList.add('hidden'); if(clearData) { mockSaleForPreview = null; ticketViewerSale = null; } }
 
     function reprintSale(folio) {
-        const sale = sessionSales.find(s => s.folio === folio);
-        if(sale) {
-            const printArea = document.getElementById('print-area');
-            printArea.innerHTML = generateHtmlForPrint(sale);
-            setTimeout(() => window.print(), 500); 
-        } else {
-            showAlert("Documento no encontrado.");
-        }
+        try {
+            const sale = sessionSales.find(s => s.folio === folio); if(!sale) { showAlert("No encontrado."); return; }
+            ticketViewerSale = sale; const isQuote = sale.status === 'COTIZACION' || sale.status === 'PENDIENTE';
+            document.getElementById('preview-title').innerText = `Folio: ${sale.folio}`;
+            document.getElementById('preview-actions-presale').classList.add('hidden'); document.getElementById('preview-actions-postsale').classList.remove('hidden');
+            document.getElementById('preview-content').innerHTML = `<div style="padding: 15px; text-align: left;">${generateHtmlForPrint(sale, isQuote)}</div>`; 
+            document.getElementById('modal-preview').classList.remove('hidden');
+        } catch(e) { showAlert("Error al leer documento."); }
     }
 
-    function openPaymentModal(folio) {
-        saleToPay = folio;
-        document.getElementById('pay-folio-text').innerText = `Folio: ${folio}`;
-        document.getElementById('payment-method').value = '';
-        document.getElementById('modal-payment').classList.remove('hidden');
+    function triggerPrintFromViewer() { if(ticketViewerSale) triggerPrint(ticketViewerSale, ticketViewerSale.status === 'COTIZACION' || ticketViewerSale.status === 'PENDIENTE'); }
+    function sendWhatsAppFromViewer() {
+        if(!ticketViewerSale) return; const phone = (ticketViewerSale.clientPhone || "").toString().replace(/\D/g,'');
+        if(!phone || phone.length < 10) { showAlert("Cliente sin celular registrado."); return; }
+        const docName = (ticketViewerSale.status === 'COTIZACION' || ticketViewerSale.status === 'PENDIENTE') ? 'Cotización' : 'Nota de Venta';
+        let text = `*AUTO ELÉCTRICA ZENDEJAS*\n\nHola *${ticketViewerSale.clientName}*, le compartimos su ${docName}:\n\n*Folio:* ${ticketViewerSale.folio}\n*Fecha:* ${ticketViewerSale.date}\n*Total:* ${moneyFmtFull.format(ticketViewerSale.total)}\n\n¡Gracias por su preferencia!`;
+        window.open(`https://wa.me/52${phone}?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    function closePaymentModal() {
-        saleToPay = null;
-        document.getElementById('modal-payment').classList.add('hidden');
+    function commitSale(tipo) {
+        if(!mockSaleForPreview) return;
+        if(tipo === 'COTIZACION') {
+            const saleToProcess = { ...mockSaleForPreview }; saleToProcess.status = 'COTIZACION';
+            sessionSales.push(saleToProcess); folioGlobalCounter++; saveSalesToLocal(); cartItems.clear(); saveCartToLocal(); closePreviewModal(true); reprintSale(saleToProcess.folio);
+        } else { closePreviewModal(false); openPaymentModal('NEW'); }
     }
+
+    function openPaymentModal(folio) { saleToPay = folio; document.getElementById('pay-folio-text').innerText = folio === 'NEW' ? mockSaleForPreview.folio : folio; document.getElementById('payment-method').value = ''; document.getElementById('modal-payment').classList.remove('hidden'); }
+    function closePaymentModal() { saleToPay = null; document.getElementById('modal-payment').classList.add('hidden'); }
 
     function confirmPayment() {
-        const method = document.getElementById('payment-method').value;
-        if(!method) { showAlert("Selecciona un método de pago."); return; }
+        if(!saleToPay) return; 
+        const m = document.getElementById('payment-method').value; if(!m) { showAlert("Selecciona un método de pago."); return; }
+        const folioGuardado = saleToPay; saleToPay = null; document.getElementById('modal-payment').classList.add('hidden');
         
-        let sale = sessionSales.find(s => s.folio === saleToPay);
-        if(sale) {
-            sale.status = 'PAGADA';
-            sale.paymentMethod = method;
-        }
-        
-        saveSalesToLocal(); 
-        closePaymentModal();
-        showAlert(`Remisión ${saleToPay} cobrada exitosamente.`, 2000);
-        renderReportsUI();
-        updateDashboard(); 
-    }
-
-    // Funciones de Filtros
-    function setFilterStatus(status) {
-        currentFilterStatus = status;
-        document.getElementById('btn-filt-all').className = `flex-1 py-2 rounded-lg text-[10px] font-black uppercase shadow-sm transition-colors ${status === 'ALL' ? 'bg-primary text-white' : 'bg-gray-50 text-gray-500 border border-gray-200'}`;
-        document.getElementById('btn-filt-pend').className = `flex-1 py-2 rounded-lg text-[10px] font-black uppercase shadow-sm transition-colors ${status === 'PENDIENTE' ? 'bg-warning text-white' : 'bg-gray-50 text-gray-500 border border-gray-200'}`;
-        document.getElementById('btn-filt-pag').className = `flex-1 py-2 rounded-lg text-[10px] font-black uppercase shadow-sm transition-colors ${status === 'PAGADA' ? 'bg-success text-white' : 'bg-gray-50 text-gray-500 border border-gray-200'}`;
-        renderReportsUI();
-    }
-
-    function clearFilters() {
-        document.getElementById('filter-client').value = '';
-        document.getElementById('filter-date').value = '';
-        setFilterStatus('ALL');
-    }
-
-    function convertToDDMMYYYY(yyyyMMdd) {
-        if(!yyyyMMdd) return '';
-        const [y, m, d] = yyyMMdd.split('-');
-        return `${d}/${m}/${y}`;
-    }
-
-    function renderReportsUI() {
-        // Obtenemos los valores de los filtros
-        const dateFilterVal = document.getElementById('filter-date').value;
-        const clientFilterVal = document.getElementById('filter-client').value.toLowerCase().trim();
-        const dateFilter = convertToDDMMYYYY(dateFilterVal);
-
-        // 1. Calcular el total cobrado HOY estrictamente (Ignora los filtros de la lista)
-        let sumTotalPagadoHoy = 0;
-        let numVentasCerradasHoy = 0;
-        const strHoy = formatLocalDt(new Date());
-
-        sessionSales.forEach(sale => {
-            if(sale.date === strHoy && sale.status === 'PAGADA') {
-                sumTotalPagadoHoy += sale.total;
-                numVentasCerradasHoy++;
-            }
-        });
-        document.getElementById('rep-total-money').innerText = moneyFmtFull.format(sumTotalPagadoHoy);
-        document.getElementById('rep-total-count').innerText = `${numVentasCerradasHoy} Cobros Hoy`;
-
-        // 2. Filtrar y Renderizar la Lista de Historial
-        const cont = document.getElementById('rep-list-container'); 
-        cont.innerHTML = '';
-        
-        let filteredSales = sessionSales.filter(sale => {
-            let matchDate = dateFilter ? sale.date === dateFilter : true;
-            let matchClient = clientFilterVal ? sale.clientName.toLowerCase().includes(clientFilterVal) || sale.clientId.toLowerCase().includes(clientFilterVal) : true;
-            let matchStatus = currentFilterStatus === 'ALL' ? true : sale.status === currentFilterStatus;
-            return matchDate && matchClient && matchStatus;
-        });
-
-        if(filteredSales.length === 0) {
-            cont.innerHTML = `<div class="bg-cardbg p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase shadow-soft">No hay remisiones para esta búsqueda.</div>`;
+        let saleObj;
+        if (folioGuardado === 'NEW') {
+            saleObj = { ...mockSaleForPreview }; saleObj.status = 'PAGADA'; saleObj.paymentMethod = m;
+            (saleObj.items || []).forEach(item => registerKardexMovement(item.sku, item.qty, 'SALIDA', 'VENTA', saleObj.folio));
+            sessionSales.push(saleObj); folioGlobalCounter++; cartItems.clear(); saveCartToLocal();
         } else {
-            [...filteredSales].reverse().forEach(sale => {
-                
-                let badgeHtml = '';
-                let actionHtml = '';
+            saleObj = sessionSales.find(s => s.folio === folioGuardado);
+            if(saleObj) {
+                if(saleObj.status !== 'PAGADA') (saleObj.items || []).forEach(item => registerKardexMovement(item.sku, item.qty, 'SALIDA', 'VENTA CONVERTIDA', saleObj.folio));
+                saleObj.status = 'PAGADA'; saleObj.paymentMethod = m;
+            }
+        }
+        saveSalesToLocal(); showAlert("Cobro exitoso."); reprintSale(saleObj.folio);
+        pushToSheets("NUEVA_VENTA", { folio: saleObj.folio, date: saleObj.date, time: saleObj.time, clientId: saleObj.clientId, clientName: saleObj.clientName, total: saleObj.total, status: saleObj.status, paymentMethod: saleObj.paymentMethod });
+    }
 
-                if(sale.status === 'PENDIENTE') {
-                    badgeHtml = `<span class="bg-warning/10 text-warning px-3 py-1 rounded-xl text-[9px] font-black tracking-widest border border-warning/20">PENDIENTE</span>`;
-                    actionHtml = `
-                        <button onclick="openPaymentModal('${sale.folio}')" class="bg-gradient-to-r from-success to-emerald-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-success/30 flex items-center gap-1.5 active:scale-95">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Cobrar
-                        </button>
-                    `;
-                } else {
-                    badgeHtml = `<span class="bg-successlight text-success px-3 py-1 rounded-xl text-[9px] font-black tracking-widest border border-success/20">PAGADA</span>`;
-                    actionHtml = `<div class="text-[9px] font-bold text-gray-400 uppercase text-right leading-tight bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100">Pagado con<br><span class="text-success font-black">${sale.paymentMethod}</span></div>`;
-                }
-
-                const btnPdf = `
-                    <button onclick="reprintSale('${sale.folio}')" class="bg-white border border-gray-200 text-primary px-4 py-2 rounded-xl text-[10px] font-black uppercase shadow-soft flex items-center gap-1.5 mt-3 w-full justify-center active:bg-gray-50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                        Ver PDF Remisión
-                    </button>
-                `;
-
-                const div = document.createElement('div');
-                div.className = "bg-cardbg p-5 rounded-3xl border border-gray-100 shadow-soft flex flex-col gap-2";
-                div.innerHTML = `
-                    <div class="flex justify-between items-start border-b border-gray-50 pb-3 mb-1">
-                        <div>
-                            <div class="text-[11px] font-black text-primary mb-1 tracking-wider bg-primary/5 inline-block px-2 py-0.5 rounded">${sale.folio}</div>
-                            <div class="text-[10px] font-bold text-gray-400">${sale.date} a las ${sale.time}</div>
-                        </div>
-                        ${badgeHtml}
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <div class="min-w-0 pr-2">
-                            <div class="text-sm font-black text-darktext uppercase line-clamp-1">${sale.clientName}</div>
-                            <div class="text-[10px] font-bold text-gray-500 mt-1 flex items-center gap-1">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                                ${sale.itemsCount} Artículos
-                            </div>
-                        </div>
-                        <div class="text-right flex flex-col items-end gap-2">
-                            <div class="text-lg font-black text-darktext">${moneyFmtFull.format(sale.total)}</div>
-                            ${actionHtml}
-                        </div>
-                    </div>
-                    ${btnPdf}
-                `;
-                cont.appendChild(div);
-            });
+    function deleteSale(folio) {
+        if(!confirm(`¿ELIMINAR permanentemente el folio ${folio}?`)) return;
+        const idx = sessionSales.findIndex(s => s.folio === folio);
+        if(idx > -1) {
+            const sale = sessionSales[idx];
+            if(sale.status === 'PAGADA') {
+                showAlert("Los pedidos cerrados no se pueden eliminar."); return;
+            }
+            sessionSales.splice(idx, 1); saveSalesToLocal(); renderCotizacionesList(); showAlert("Cotización eliminada.");
         }
     }
 
-    function exportExcel() {
-        if(cartItems.size === 0) { showAlert("El carrito está vacío."); return; }
-        
-        const folio = `AEZ${String(folioGlobalCounter)}`; 
-        
-        let exData = []; let sub = 0;
-        Array.from(cartItems.entries()).reverse().forEach(([sku, item]) => {
-            const tr = item.qty * item.listPrice * (1 - (item.discount / 100)); sub += tr;
-            exData.push({"Código": sku, "Descripción": item.productRef.descripcion.toUpperCase(), "Cantidad": item.qty, "Precio": parseFloat(item.listPrice.toFixed(2)), "Desc %": parseFloat(item.discount.toFixed(2)), "Importe": parseFloat(tr.toFixed(2))});
+    function renderPedidosList() {
+        const q = document.getElementById('search-pedidos').value.toLowerCase(); const d = convertToDDMMYYYY(document.getElementById('date-pedidos').value);
+        const cont = document.getElementById('pedidos-list-container'); cont.innerHTML = '';
+        const fil = sessionSales.filter(s => s.status === 'PAGADA' && (q ? s.clientName.toLowerCase().includes(q) || s.folio.toLowerCase().includes(q) : true) && (d ? s.date === d : true));
+        if(fil.length === 0) { cont.innerHTML = `<div class="bg-white p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase shadow-sm">Sin pedidos pagados</div>`; return; }
+        [...fil].reverse().forEach(s => {
+            const div = document.createElement('div'); div.className = "bg-white p-5 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden";
+            div.innerHTML = `<div class="absolute top-0 left-0 w-1 h-full bg-success"></div><div class="flex justify-between"><div><div class="text-[10px] text-gray-400 font-bold">${s.date}</div><div class="text-sm font-black text-primary">${s.clientName}</div><div class="text-[10px] text-gray-500 font-bold mt-1">${s.folio} | ${s.paymentMethod}</div></div><div class="text-right"><div class="text-xs bg-successlight text-success px-2 py-0.5 rounded font-black mb-1 inline-block">PAGADA</div><div class="text-base font-black text-primary">${moneyFmtFull.format(s.total)}</div></div></div><div class="flex gap-2 mt-3"><button onclick="reprintSale('${s.folio}')" class="w-full bg-gray-50 border border-gray-200 text-primary py-2.5 rounded-xl text-[10px] font-black uppercase active:scale-[0.98] flex items-center justify-center gap-2">Ver Ticket</button></div>`;
+            cont.appendChild(div);
         });
-        const iva = sub * 0.16; const tot = sub + iva;
-        exData.push({}); exData.push({"Descripción": "SUBTOTAL:", "Importe": parseFloat(sub.toFixed(2))}); exData.push({"Descripción": "IVA (16%):", "Importe": parseFloat(iva.toFixed(2))}); exData.push({"Descripción": "TOTAL FINAL:", "Importe": parseFloat(tot.toFixed(2))});
-        const ws = XLSX.utils.json_to_sheet(exData); ws['!cols'] = [{wch: 15}, {wch: 50}, {wch: 10}, {wch: 15}, {wch: 15}, {wch: 15}];
-        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Remisión");
-        XLSX.writeFile(wb, `Remision_${folio}.xlsx`);
     }
 
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
-                navigator.serviceWorker.register('./sw.js')
-                .then(() => console.log('Service Worker Registrado correctamente.'))
-                .catch(err => console.error('Error al registrar Service Worker:', err));
+    function renderCotizacionesList() {
+        const cont = document.getElementById('cotizaciones-list-container'); cont.innerHTML = '';
+        const fil = sessionSales.filter(s => s.status !== 'PAGADA');
+        if(fil.length === 0) { cont.innerHTML = `<div class="bg-white p-8 rounded-3xl border border-gray-100 text-center text-gray-400 font-bold text-xs uppercase shadow-sm">Sin cotizaciones activas</div>`; return; }
+        [...fil].reverse().forEach(s => {
+            const div = document.createElement('div'); div.className = "bg-white p-5 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden";
+            div.innerHTML = `
+                <div class="absolute top-0 left-0 w-1 h-full bg-warning"></div>
+                <div class="flex justify-between"><div><div class="text-[10px] text-gray-400 font-bold">${s.date}</div><div class="text-sm font-black text-primary">${s.clientName}</div><div class="text-[10px] text-gray-500 font-bold mt-1">${s.folio}</div></div><div class="text-right"><div class="text-xs bg-warning/20 text-warning px-2 py-0.5 rounded font-black mb-1 inline-block">EN PAUSA</div><div class="text-base font-black text-primary">${moneyFmtFull.format(s.total)}</div></div></div>
+                <div class="flex gap-2 mt-3"><button onclick="deleteSale('${s.folio}')" class="flex items-center justify-center bg-dangerlight text-danger px-3 rounded-xl active:scale-[0.98] gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg><span class="text-[9px] font-bold uppercase">Borrar</span></button><button onclick="reprintSale('${s.folio}')" class="flex-1 bg-gray-50 border border-gray-200 text-primary py-2.5 rounded-xl text-[10px] font-bold uppercase active:scale-[0.98]">Ver Ticket</button><button onclick="openPaymentModal('${s.folio}')" class="flex-1 bg-primary text-white py-2.5 rounded-xl text-[10px] font-black uppercase active:scale-[0.98]">Cobrar</button></div>`;
+            cont.appendChild(div);
+        });
+    }
+
+    function exportGlobalData() {
+        const d1 = document.getElementById('exp-start-date').value; const d2 = document.getElementById('exp-end-date').value;
+        if (!d1 || !d2) { showAlert("Selecciona fechas."); return; }
+        const t1 = new Date(d1+"T00:00:00").getTime(); const t2 = new Date(d2+"T23:59:59").getTime();
+        const pts = (str) => { const p=str.split('/'); return p.length===3 ? new Date(`${p[2]}-${p[1]}-${p[0]}T12:00:00`).getTime() : 0; };
+        let dV=[], dC=[], dK=[];
+        sessionSales.forEach(s => {
+            const ts = pts(s.date); if(ts>=t1 && ts<=t2) {
+                if(s.status==='PAGADA') (s.items||[]).forEach(i=>dV.push({"Folio":s.folio, "Fecha":s.date, "ID":s.clientId, "Cliente":s.clientName, "SKU":i.sku, "Cant":i.qty, "Total":parseFloat((i.qty*i.listPrice*(1-(i.discount/100))).toFixed(2))}));
+                else dC.push({"Folio":s.folio, "Fecha":s.date, "Cliente":s.clientName, "Total":parseFloat(s.total.toFixed(2))});
             }
         });
+        kardexLog.forEach(k => { const ts = pts(k.date); if(ts>=t1 && ts<=t2) dK.push({"Fecha":k.date, "SKU":k.sku, "Tipo":k.type, "Cant":k.qty, "Motivo":k.motive, "Folio":k.folio}); });
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dV.length>0?dV:[{"Aviso":"Sin datos"}]), "Ventas"); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dC.length>0?dC:[{"Aviso":"Sin datos"}]), "Cotizaciones"); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dK.length>0?dK:[{"Aviso":"Sin datos"}]), "Kardex");
+        XLSX.writeFile(wb, `Reporte_AEZ_${d1}_al_${d2}.xlsx`);
     }
 </script>
 </body>
