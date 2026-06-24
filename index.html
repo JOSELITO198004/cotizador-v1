@@ -28,17 +28,8 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: { 
-                        primary: { DEFAULT: '#0A2558', light: '#1E40AF' }, 
-                        danger: '#E02424', dangerlight: '#FDE8E8', 
-                        warning: '#FACA15', warninglight: '#FEF08A',
-                        success: '#057A55', successlight: '#DEF7EC', 
-                        darktext: '#111827' 
-                    },
-                    boxShadow: { 
-                        'vibrant': '0 4px 14px 0 rgba(10, 37, 88, 0.15)',
-                        'btn': '0 4px 0 0 rgba(0, 0, 0, 0.15)'
-                    }
+                    colors: { primary: { DEFAULT: '#0A2558', light: '#1E40AF' }, danger: '#E02424', dangerlight: '#FDE8E8', warning: '#FACA15', success: '#057A55', successlight: '#DEF7EC', darktext: '#111827' },
+                    boxShadow: { 'sm': '0 1px 3px 0 rgba(0, 0, 0, 0.05)', 'vibrant': '0 4px 14px 0 rgba(10, 37, 88, 0.15)', 'btn': '0 4px 0 0 rgba(0, 0, 0, 0.15)' }
                 }
             }
         }
@@ -47,33 +38,32 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; color: #111827; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; min-height: 100vh; overflow-y: auto; }
         ::-webkit-scrollbar { display: none; }
-        
-        /* Fondo Metálico Vibrante */
-        .bg-metallic {
-            background: linear-gradient(135deg, #0A2558 0%, #1E40AF 50%, #0A2558 100%);
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
-        }
-
+        .bg-metallic { background: linear-gradient(135deg, #0A2558 0%, #1E40AF 50%, #0A2558 100%); box-shadow: inset 0 2px 4px rgba(255,255,255,0.1); }
         .nav-item.active { color: #0A2558; font-weight: 900; }
         .nav-item.active svg { stroke-width: 2.5; transform: scale(1.1); transition: 0.2s ease; }
         #main-content { padding-bottom: 120px !important; }
         .progress-ring__circle { transition: stroke-dashoffset 0.8s ease-in-out; transform: rotate(-90deg); transform-origin: 50% 50%; }
         .modal-enter { animation: fade-in-up 0.3s ease-out forwards; }
         @keyframes fade-in-up { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        
         @media print { @page { margin: 5mm; } body { background-color: white !important; } header, nav, main, #alert-box, .print-hidden, [id^="modal-"] { display: none !important; } #print-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; } }
     </style>
 </head>
 <body> 
 
-<!-- ENCABEZADO METÁLICO -->
 <header class="bg-metallic text-white shadow-vibrant sticky top-0 z-40 print-hidden border-b-2 border-blue-400">
     <div class="px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-white text-primary rounded-xl flex items-center justify-center font-black text-xs shadow-md border-b-2 border-gray-200">AEZ</div>
-            <div>
+            <div onclick="openProfileModal()" class="cursor-pointer">
                 <h1 class="text-sm font-black uppercase leading-none tracking-wide text-white">Auto Eléctrica Zendejas</h1>
-                <p class="text-[9px] font-bold uppercase mt-1 text-blue-200" id="header-status">Sistema de Campo</p>
+                <div class="flex items-center gap-2 mt-1">
+                    <p class="text-[9px] font-bold uppercase text-blue-200 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <span id="header-asesor-name">Configurar Perfil</span>
+                    </p>
+                    <span class="text-blue-400 text-[8px] opacity-50">|</span>
+                    <p class="text-[8px] font-bold uppercase text-blue-300 tracking-wider" id="header-status">Sistema de Campo</p>
+                </div>
             </div>
         </div>
         <button onclick="clearCacheAndReload()" class="p-2.5 bg-white/10 hover:bg-white/20 rounded-xl transition-colors shadow-inner">
@@ -88,7 +78,20 @@
         <p id="alert-msg" class="text-xs font-black uppercase tracking-wide"></p>
     </div>
 
-    <!-- JERARQUÍA 1: SINCRONIZACIÓN -->
+    <div id="modal-profile" class="hidden fixed inset-0 z-[120] bg-primary/90 backdrop-blur-sm flex items-center justify-center p-4 modal-enter">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden border-b-4 border-blue-500">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-blue-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-100">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </div>
+                <h2 class="text-lg font-black text-primary uppercase tracking-tight mb-2">Identificación de Asesor</h2>
+                <p class="text-xs text-gray-500 mb-6 font-bold">Por favor, ingresa tu nombre para registrar tus ventas y movimientos.</p>
+                <input type="text" id="profile-name-input" placeholder="Ej. Juan Pérez" class="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-4 py-4 text-center text-sm outline-none focus:border-blue-500 transition-all font-black text-primary uppercase mb-4 shadow-inner">
+                <button onclick="saveProfile()" class="w-full py-4 bg-metallic text-white rounded-xl text-xs font-black uppercase shadow-btn border-b-4 border-blue-800 active:scale-[0.98] transition-all">Guardar y Continuar</button>
+            </div>
+        </div>
+    </div>
+
     <div id="step-1" class="w-full bg-white rounded-3xl shadow-vibrant border-2 border-blue-100 p-6 flex flex-col items-center text-center mt-2">
         <input type="file" id="dataFile" accept=".xlsx, .xls" class="hidden">
         <div id="loader-spinner" class="hidden mb-6 flex flex-col items-center py-10">
@@ -108,7 +111,6 @@
         </div>
     </div>
 
-    <!-- JERARQUÍA 2: MENÚ PRINCIPAL -->
     <div id="step-main-menu" class="w-full hidden mt-2">
         <div class="bg-metallic rounded-3xl p-6 shadow-vibrant text-white mb-6 flex items-center justify-between border-b-4 border-blue-800">
             <div>
@@ -127,7 +129,6 @@
         </div>
     </div>
 
-    <!-- JERARQUÍA 3: CARTERA DE CLIENTES -->
     <div id="step-clientes" class="w-full hidden mt-2">
         <div class="bg-white rounded-3xl p-5 shadow-vibrant border border-blue-50 mb-5">
             <div class="flex justify-between items-center mb-4">
@@ -160,29 +161,27 @@
         <div id="client-list" class="flex flex-col gap-3 pb-4"></div>
     </div>
 
-    <!-- JERARQUÍA 3: NUEVO CLIENTE -->
     <div id="step-nuevo-cliente" class="w-full hidden mt-2">
         <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Gestión de Clientes</h2>
         <div class="bg-white p-6 rounded-3xl border-2 border-gray-100 shadow-sm mb-5">
             <h3 class="text-xs font-black text-primary uppercase tracking-wide mb-4 flex items-center gap-2 border-b border-gray-100 pb-3"><svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>Alta de Nuevo Cliente</h3>
             <div class="flex flex-col gap-3">
-                <label class="text-[10px] font-bold text-gray-500 uppercase -mb-2 ml-1">ID Generado Automáticamente</label>
+                <label class="text-[10px] font-bold text-gray-500 uppercase -mb-2 ml-1">ID Automático</label>
                 <input type="text" id="nc-id" readonly class="w-full bg-gray-50 border border-transparent rounded-2xl px-4 py-3 text-sm font-bold text-gray-400 outline-none cursor-not-allowed mb-2">
-                <input type="text" id="nc-name" placeholder="Razón Social *" class="w-full bg-white border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all font-bold">
-                <input type="text" id="nc-address" placeholder="Domicilio Completo *" class="w-full bg-white border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all font-bold">
-                <input type="tel" id="nc-phone" placeholder="Teléfono / WhatsApp *" class="w-full bg-white border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all font-bold">
-                <div class="flex gap-3"><input type="text" id="nc-rfc" placeholder="RFC (Opc.)" class="w-1/2 bg-white border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all font-bold"><input type="text" id="nc-city" placeholder="Ciudad (Opc.)" class="w-1/2 bg-white border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all font-bold"></div>
-                <button onclick="saveNewClient()" class="w-full bg-metallic text-white font-black text-xs uppercase py-4 rounded-xl mt-3 active:scale-[0.98] shadow-btn border-b-4 border-blue-800 transition-all">Guardar Cliente Local</button>
+                <input type="text" id="nc-name" placeholder="Razón Social *" class="w-full bg-white border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm outline-none focus:border-blue-500 font-bold">
+                <input type="text" id="nc-address" placeholder="Domicilio Completo *" class="w-full bg-white border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm outline-none focus:border-blue-500 font-bold">
+                <input type="tel" id="nc-phone" placeholder="Teléfono / WhatsApp *" class="w-full bg-white border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm outline-none focus:border-blue-500 font-bold">
+                <div class="flex gap-3"><input type="text" id="nc-rfc" placeholder="RFC (Opc.)" class="w-1/2 bg-white border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm outline-none focus:border-blue-500 font-bold"><input type="text" id="nc-city" placeholder="Ciudad (Opc.)" class="w-1/2 bg-white border-2 border-gray-100 rounded-2xl px-4 py-3 text-sm outline-none focus:border-blue-500 font-bold"></div>
+                <button onclick="saveNewClient()" class="w-full bg-metallic text-white font-black text-xs uppercase py-4 rounded-xl mt-3 active:scale-[0.98] shadow-btn border-b-4 border-blue-800">Guardar Cliente Local</button>
             </div>
         </div>
         <div class="grid grid-cols-2 gap-3 mb-5">
-            <button onclick="exportNewClientsToExcel()" class="bg-white border-2 border-gray-100 p-4 rounded-3xl shadow-sm hover:border-green-500 flex flex-col items-center justify-center text-center active:bg-gray-50 transition-all"><svg class="w-6 h-6 text-success mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span class="text-[10px] font-black uppercase text-primary">Descargar<br>Nuevos</span></button>
-            <button onclick="checkClientTrafficLight()" class="bg-white border-2 border-gray-100 p-4 rounded-3xl shadow-sm hover:border-red-500 flex flex-col items-center justify-center text-center active:bg-gray-50 transition-all"><svg class="w-6 h-6 text-danger mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg><span class="text-[10px] font-black uppercase text-primary">Semáforo<br>Sin Venta</span></button>
+            <button onclick="exportNewClientsToExcel()" class="bg-white border-2 border-gray-100 p-4 rounded-3xl shadow-sm hover:border-green-500 flex flex-col items-center justify-center text-center active:bg-gray-50"><svg class="w-6 h-6 text-success mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span class="text-[10px] font-black uppercase text-primary">Descargar Nuevos</span></button>
+            <button onclick="checkClientTrafficLight()" class="bg-white border-2 border-gray-100 p-4 rounded-3xl shadow-sm hover:border-red-500 flex flex-col items-center justify-center text-center active:bg-gray-50"><svg class="w-6 h-6 text-danger mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg><span class="text-[10px] font-black uppercase text-primary">Semáforo Fuga</span></button>
         </div>
         <div id="traffic-light-container" class="hidden flex flex-col gap-3 pb-4"></div>
     </div>
 
-    <!-- JERARQUÍA 3: MIS PEDIDOS (Inmutables) -->
     <div id="step-pedidos" class="w-full hidden mt-2">
         <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Ventas Cerradas</h2>
         <div class="bg-white p-5 rounded-3xl border-2 border-gray-100 shadow-sm mb-4">
@@ -194,14 +193,12 @@
         <div id="pedidos-list-container" class="flex flex-col gap-3 pb-4"></div>
     </div>
 
-    <!-- JERARQUÍA 3: MIS COTIZACIONES (Limpieza Automática) -->
     <div id="step-cotizaciones" class="w-full hidden mt-2">
         <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-2">Cotizaciones Activas</h2>
         <p class="text-[10px] font-bold text-gray-600 uppercase mb-4 tracking-wide bg-yellow-50 p-3 rounded-xl border border-yellow-200">Se muestran las recientes. Se depuran automáticamente tras 7 días.</p>
         <div id="cotizaciones-list-container" class="flex flex-col gap-3 pb-4"></div>
     </div>
 
-    <!-- JERARQUÍA 3: INFORMES Y GRÁFICAS -->
     <div id="step-informes" class="w-full hidden mt-2">
         <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Reportes e Inteligencia</h2>
         <div class="bg-metallic p-6 rounded-3xl shadow-vibrant text-white mb-5 border-b-4 border-blue-800">
@@ -219,7 +216,6 @@
         </div>
     </div>
 
-    <!-- JERARQUÍA 3: INVENTARIOS -->
     <div id="step-inventario" class="w-full hidden mt-2">
         <h2 class="text-xl font-black text-primary tracking-tight uppercase mb-4">Inventario y Kardex</h2>
         <div class="flex bg-gray-100 p-1.5 rounded-2xl mb-5 shadow-inner">
@@ -250,11 +246,9 @@
             </div>
             <div id="inv-list-container" class="flex flex-col gap-3 pb-4"></div>
         </div>
-
         <div id="inv-view-kardex" class="hidden"><div id="kardex-list-container" class="flex flex-col gap-3 pb-4"></div></div>
     </div>
 
-    <!-- COTIZADOR (CARRITO) -->
     <div id="step-cotizador" class="w-full hidden">
         <div class="bg-metallic text-white rounded-3xl shadow-vibrant p-6 mb-5 border-b-4 border-blue-800">
             <button onclick="switchTab('clientes')" class="flex items-center gap-1 text-blue-200 hover:text-white text-[10px] font-black uppercase tracking-wider mb-4 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>Volver a Cartera</button>
@@ -282,7 +276,6 @@
         </div>
     </div>
 
-    <!-- ESCÁNER MODAL -->
     <div id="modal-scanner" class="hidden fixed inset-0 z-[110] bg-primary/90 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col border-b-4 border-blue-500">
             <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
@@ -293,7 +286,6 @@
         </div>
     </div>
 
-    <!-- VISOR DE TICKET UNIVERSAL Y ELECCIÓN DE FLUJO -->
     <div id="modal-preview" class="hidden fixed inset-0 z-[85] bg-primary/90 backdrop-blur-sm flex items-center justify-center p-2 modal-enter">
         <div class="bg-gray-100 rounded-3xl shadow-2xl w-full h-[95vh] max-w-md flex flex-col overflow-hidden">
             <div class="p-4 border-b border-gray-200 bg-white flex justify-between items-center z-10 shadow-sm">
@@ -317,7 +309,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE PAGOS -->
     <div id="modal-payment" class="hidden fixed inset-0 z-[80] bg-primary/90 backdrop-blur-sm flex items-center justify-center p-4 modal-enter">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden mt-[-10%] border-b-4 border-success">
             <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
@@ -354,7 +345,7 @@
 <div id="print-area" class="hidden"></div>
 
 <script>
-    const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbxwXsxTIOjAUgzCiB9clZ-Fi6NtZ4-ALCeO0ORzPrhuw8o37-wsy-Rxnr8K-buH6Wd2/exec";
+    const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbwher-qWX_hM2cLrXsTw6fFHnQAAQySBboh6XydbckxJ3uVae2bB9LGkdOYUOk2jZ1_/exec";
 
     let globalProducts = new Map(); let globalClients = new Map(); let selectedClient = null; let cartItems = new Map(); let saleToPay = null; let mockSaleForPreview = null; let ticketViewerSale = null; let html5QrcodeScanner = null; let targetInputForScanner = ''; let skuChartInstance = null;
     let activeVisitClientId = null; let visitTimerInterval = null; let visitSeconds = 0;
@@ -365,11 +356,13 @@
     let localNewClients = JSON.parse(localStorage.getItem('empresanueva_new_clients')) || [];
     let kardexLog = JSON.parse(localStorage.getItem('empresanueva_kardex')) || [];
 
+    // PERFIL ASESOR
+    let asesorName = localStorage.getItem('empresanueva_asesor') || '';
+
     function saveSalesToLocal() { localStorage.setItem('empresanueva_sales', JSON.stringify(sessionSales)); localStorage.setItem('empresanueva_folio', folioGlobalCounter); }
     function saveStockToLocal() { localStorage.setItem('empresanueva_stock', JSON.stringify(localStock)); }
     function saveNewClientsToLocal() { localStorage.setItem('empresanueva_new_clients', JSON.stringify(localNewClients)); }
     function saveKardexToLocal() { localStorage.setItem('empresanueva_kardex', JSON.stringify(kardexLog)); }
-    
     function saveCartToLocal() { localStorage.setItem('empresanueva_cart', JSON.stringify(Array.from(cartItems.entries()))); }
     function loadCartFromLocal() { const saved = localStorage.getItem('empresanueva_cart'); if(saved) { cartItems = new Map(JSON.parse(saved)); if(cartItems.size > 0) renderCartMobile(); } }
 
@@ -382,12 +375,43 @@
     const formatLocalDt = (d) => { let day = ("0" + d.getDate()).slice(-2); let month = ("0" + (d.getMonth() + 1)).slice(-2); return `${day}/${month}/${d.getFullYear()}`; };
     function convertToDDMMYYYY(yyyyMMdd) { if(!yyyyMMdd) return ''; const [y, m, d] = yyyMMdd.split('-'); return `${d}/${m}/${y}`; }
 
-    window.onload = function() { loadCartFromLocal(); }
+    window.onload = function() { 
+        loadCartFromLocal(); 
+        checkProfile();
+    }
+
+    function checkProfile() {
+        if(!asesorName) {
+            document.getElementById('modal-profile').classList.remove('hidden');
+        } else {
+            document.getElementById('header-asesor-name').innerText = asesorName;
+        }
+    }
+
+    function openProfileModal() {
+        document.getElementById('profile-name-input').value = asesorName;
+        document.getElementById('modal-profile').classList.remove('hidden');
+    }
+
+    function saveProfile() {
+        const nameInput = document.getElementById('profile-name-input').value.trim();
+        if(!nameInput || nameInput.length < 3) {
+            showAlert("Ingresa un nombre válido.");
+            return;
+        }
+        asesorName = nameInput.toUpperCase();
+        localStorage.setItem('empresanueva_asesor', asesorName);
+        document.getElementById('header-asesor-name').innerText = asesorName;
+        document.getElementById('modal-profile').classList.add('hidden');
+        showAlert(`Bienvenido, ${asesorName}`);
+    }
 
     function hideAllSteps() { ['step-1', 'step-main-menu', 'step-clientes', 'step-nuevo-cliente', 'step-pedidos', 'step-cotizaciones', 'step-informes', 'step-inventario', 'step-cotizador'].forEach(id => { document.getElementById(id).classList.add('hidden'); }); document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); }
 
     function switchTab(tab) {
-        if(globalProducts.size === 0) return; 
+        if(globalProducts.size === 0 && tab !== 'inicio') return; 
+        if(!asesorName && tab !== 'inicio') { checkProfile(); return; }
+
         hideAllSteps(); document.getElementById('bottom-nav').classList.remove('hidden'); document.getElementById(`tab-${tab}`)?.classList.add('active');
         if(tab === 'inicio') { document.getElementById('step-main-menu').classList.remove('hidden'); updateDashboard(); }
         else if (tab === 'clientes') { document.getElementById('step-clientes').classList.remove('hidden'); renderClientList(); updateDashboard(); }
@@ -458,7 +482,12 @@
     }
     function closeScanner() { document.getElementById('modal-scanner').classList.add('hidden'); if(html5QrcodeScanner) { html5QrcodeScanner.clear(); html5QrcodeScanner = null; } }
 
-    async function pushToSheets(actionType, payloadObj) { if(!GOOGLE_SHEETS_API_URL || GOOGLE_SHEETS_API_URL.includes("AKI_VA_TU_URL")) return; payloadObj.action = actionType; try { await fetch(GOOGLE_SHEETS_API_URL, { method: 'POST', body: JSON.stringify(payloadObj), headers: { 'Content-Type': 'text/plain;charset=utf-8' }}); } catch(error) { console.error("Error nube", error); } }
+    async function pushToSheets(actionType, payloadObj) { 
+        if(!GOOGLE_SHEETS_API_URL || GOOGLE_SHEETS_API_URL.includes("AKI_VA_TU_URL")) return; 
+        payloadObj.action = actionType; 
+        payloadObj.asesor = asesorName; 
+        try { await fetch(GOOGLE_SHEETS_API_URL, { method: 'POST', body: JSON.stringify(payloadObj), headers: { 'Content-Type': 'text/plain;charset=utf-8' }}); } catch(error) { console.error("Error nube", error); } 
+    }
 
     async function loadFromCloud() {
         if(!GOOGLE_SHEETS_API_URL || GOOGLE_SHEETS_API_URL.includes("AKI_VA_TU_URL")) { showAlert("Configura la URL de Sheets."); return; }
@@ -582,7 +611,6 @@
         cont.classList.remove('hidden');
     }
 
-    // INVENTARIO
     function switchInvTab(tab) {
         document.getElementById('btn-tab-stock').className = tab === 'stock' ? "flex-1 py-2 rounded-xl bg-white shadow-sm text-xs font-black text-primary" : "flex-1 py-2 rounded-xl text-gray-500 text-xs font-black";
         document.getElementById('btn-tab-kardex').className = tab === 'kardex' ? "flex-1 py-2 rounded-xl bg-white shadow-sm text-xs font-black text-primary" : "flex-1 py-2 rounded-xl text-gray-500 text-xs font-black";
@@ -628,7 +656,6 @@
         });
     }
 
-    // COTIZADOR Y TRANSACCIONES
     function handleProductSearch() {
         const query = document.getElementById('prod-search-input').value.toLowerCase().trim(); const resBox = document.getElementById('prod-search-results'); resBox.innerHTML = '';
         if (query.length < 2) { resBox.classList.add('hidden'); return; }
@@ -674,7 +701,6 @@
         return { folio: `AEZ${String(folioGlobalCounter).padStart(4, '0')}`, date: formatLocalDt(d), time: d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'}), clientName: selectedClient.razonSocial, clientId: selectedClient.id, clientRfc: selectedClient.rfc, clientDir: selectedClient.direccion, clientCity: selectedClient.ciudad, clientPhone: selectedClient.celular, itemsCount: count, subtotal: sub, iva: sub*0.16, total: sub*1.16, status: 'PENDIENTE', paymentMethod: null, items: items };
     }
 
-    // GENERADOR DE TICKET HTML EN TABLA
     function generateHtmlForPrint(sale, isQuote = false) {
         let rows = '';
         (sale.items||[]).forEach(item => { 
