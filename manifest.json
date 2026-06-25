@@ -1,5 +1,5 @@
 
-"name": "AEZ Sistema de Campo",
+"name": "AEZ-CAMPO-PRO-A-2026.06.24",
   "short_name": "AEZ Campo",
   "description": "Sistema de campo para ventas, cotizaciones, clientes, inventario y sincronización offline",
   "start_url": "./index.html",
@@ -20,11 +20,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    },
-{
-  "productos": [],
-  "clientes": [],
-  "usuarios": []
-}
+    }
   ]
 }
