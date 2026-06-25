@@ -1,5 +1,8 @@
 const CACHE_NAME = 'aez-campo-pro-a-2026-06-24-v1';
-const CORE_ASSETS = ['./aez-paquete-c.js',
+const CORE_ASSETS = [
+  './aez-paquete-b.js',
+  './aez-paquete-c.js',
+  './aez-paquete-d.js',
   './',
   './index.html'
 ];
