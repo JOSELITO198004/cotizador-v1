@@ -45,7 +45,6 @@
         .progress-ring__circle { transition: stroke-dashoffset 0.8s ease-in-out; transform: rotate(-90deg); transform-origin: 50% 50%; }
         .modal-enter { animation: fade-in-up 0.3s ease-out forwards; }
         @keyframes fade-in-up { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        @media print { @page { margin: 5mm; } body { background-color: white !important; } header, nav, main, #alert-box, .print-hidden, [id^="modal-"] { display: none !important; } #print-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; } }
     </style>
 </head>
 <body> 
@@ -62,7 +61,6 @@
                         <span id="header-asesor-name">Configurar Perfil</span>
                     </p>
                     <span class="text-blue-400 text-[8px] opacity-50">|</span>
-                    <!-- MEJORA: INDICADOR DE ESTADO OFFLINE/ONLINE -->
                     <p class="text-[8px] font-bold uppercase text-blue-300 tracking-wider flex items-center gap-1" id="sync-status">
                         <span class="w-1.5 h-1.5 rounded-full bg-blue-300"></span> Cargando...
                     </p>
@@ -83,7 +81,6 @@
         <p id="alert-msg" class="text-xs font-black uppercase tracking-wide"></p>
     </div>
 
-    <!-- MODAL DE PERFIL (Obligatorio) -->
     <div id="modal-profile" class="hidden fixed inset-0 z-[120] bg-primary/90 backdrop-blur-sm flex items-center justify-center p-4 modal-enter">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden border-b-4 border-blue-500">
             <div class="p-6 text-center">
@@ -126,16 +123,15 @@
         </div>
         <h2 class="text-sm font-black text-primary tracking-tight uppercase mb-3 pl-2 border-l-4 border-primary">Módulos de Operación</h2>
         <div class="grid grid-cols-2 gap-4">
-            <button onclick="switchTab('clientes')" class="bg-white border-2 border-gray-100 rounded-3xl p-5 shadow-sm hover:border-blue-500 flex flex-col items-center text-center active:scale-95 transition-all"><div class="w-14 h-14 bg-blue-50 text-primary rounded-2xl flex items-center justify-center mb-3 border border-blue-100"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></div><h3 class="text-xs font-black text-primary uppercase tracking-wide">1. Cartera Clientes</h3></button>
-            <button onclick="switchTab('nuevo_cliente')" class="bg-white border-2 border-gray-100 rounded-3xl p-5 shadow-sm hover:border-green-500 flex flex-col items-center text-center active:scale-95 transition-all"><div class="w-14 h-14 bg-green-50 text-success rounded-2xl flex items-center justify-center mb-3 border border-green-100"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg></div><h3 class="text-xs font-black text-primary uppercase tracking-wide">2. Nuevo Cliente</h3></button>
-            <button onclick="switchTab('pedidos')" class="bg-white border-2 border-gray-100 rounded-3xl p-5 shadow-sm hover:border-blue-500 flex flex-col items-center text-center active:scale-95 transition-all"><div class="w-14 h-14 bg-blue-50 text-primary rounded-2xl flex items-center justify-center mb-3 border border-blue-100"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg></div><h3 class="text-xs font-black text-primary uppercase tracking-wide">3. Mis Pedidos</h3></button>
-            <button onclick="switchTab('cotizaciones')" class="bg-white border-2 border-gray-100 rounded-3xl p-5 shadow-sm hover:border-yellow-500 flex flex-col items-center text-center active:scale-95 transition-all"><div class="w-14 h-14 bg-yellow-50 text-warning rounded-2xl flex items-center justify-center mb-3 border border-yellow-100"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div><h3 class="text-xs font-black text-primary uppercase tracking-wide">4. Cotizaciones</h3></button>
-            <button onclick="switchTab('informes')" class="bg-white border-2 border-gray-100 rounded-3xl p-5 shadow-sm hover:border-red-500 flex flex-col items-center text-center active:scale-95 transition-all"><div class="w-14 h-14 bg-red-50 text-danger rounded-2xl flex items-center justify-center mb-3 border border-red-100"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg></div><h3 class="text-xs font-black text-primary uppercase tracking-wide">5. Informes</h3></button>
-            <button onclick="switchTab('inventario')" class="bg-white border-2 border-gray-100 rounded-3xl p-5 shadow-sm hover:border-gray-500 flex flex-col items-center text-center active:scale-95 transition-all"><div class="w-14 h-14 bg-gray-100 text-gray-700 rounded-2xl flex items-center justify-center mb-3 border border-gray-200"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></div><h3 class="text-xs font-black text-primary uppercase tracking-wide">6. Inventarios</h3></button>
+            <button onclick="switchTab('clientes')" class="bg-white border-2 border-gray-100 rounded-3xl p-5 shadow-sm hover:border-blue-500 flex flex-col items-center text-center active:scale-95 transition-all"><div class="w-14 h-14 bg-blue-50 text-primary rounded-2xl flex items-center justify-center mb-3 border border-blue-100"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></div><h3 class="text-xs font-black text-primary uppercase tracking-wide">Cartera Clientes</h3></button>
+            <button onclick="switchTab('nuevo_cliente')" class="bg-white border-2 border-gray-100 rounded-3xl p-5 shadow-sm hover:border-green-500 flex flex-col items-center text-center active:scale-95 transition-all"><div class="w-14 h-14 bg-green-50 text-success rounded-2xl flex items-center justify-center mb-3 border border-green-100"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg></div><h3 class="text-xs font-black text-primary uppercase tracking-wide">Nuevo Cliente</h3></button>
+            <button onclick="switchTab('pedidos')" class="bg-white border-2 border-gray-100 rounded-3xl p-5 shadow-sm hover:border-blue-500 flex flex-col items-center text-center active:scale-95 transition-all"><div class="w-14 h-14 bg-blue-50 text-primary rounded-2xl flex items-center justify-center mb-3 border border-blue-100"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg></div><h3 class="text-xs font-black text-primary uppercase tracking-wide">Mis Pedidos</h3></button>
+            <button onclick="switchTab('cotizaciones')" class="bg-white border-2 border-gray-100 rounded-3xl p-5 shadow-sm hover:border-yellow-500 flex flex-col items-center text-center active:scale-95 transition-all"><div class="w-14 h-14 bg-yellow-50 text-warning rounded-2xl flex items-center justify-center mb-3 border border-yellow-100"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div><h3 class="text-xs font-black text-primary uppercase tracking-wide">Cotizaciones</h3></button>
+            <button onclick="switchTab('informes')" class="bg-white border-2 border-gray-100 rounded-3xl p-5 shadow-sm hover:border-red-500 flex flex-col items-center text-center active:scale-95 transition-all"><div class="w-14 h-14 bg-red-50 text-danger rounded-2xl flex items-center justify-center mb-3 border border-red-100"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg></div><h3 class="text-xs font-black text-primary uppercase tracking-wide">Informes</h3></button>
+            <button onclick="switchTab('inventario')" class="bg-white border-2 border-gray-100 rounded-3xl p-5 shadow-sm hover:border-gray-500 flex flex-col items-center text-center active:scale-95 transition-all"><div class="w-14 h-14 bg-gray-100 text-gray-700 rounded-2xl flex items-center justify-center mb-3 border border-gray-200"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></div><h3 class="text-xs font-black text-primary uppercase tracking-wide">Inventarios</h3></button>
         </div>
     </div>
 
-    <!-- JERARQUÍAS COMPLETAS RESTANTES -->
     <div id="step-clientes" class="w-full hidden mt-2">
         <div class="bg-white rounded-3xl p-5 shadow-vibrant border border-blue-50 mb-5">
             <div class="flex justify-between items-center mb-4">
@@ -261,7 +257,6 @@
         <div id="inv-view-kardex" class="hidden"><div id="kardex-list-container" class="flex flex-col gap-3 pb-4"></div></div>
     </div>
 
-    <!-- COTIZADOR (CARRITO) -->
     <div id="step-cotizador" class="w-full hidden">
         <div class="bg-metallic text-white rounded-3xl shadow-vibrant p-6 mb-5 border-b-4 border-blue-800">
             <button onclick="switchTab('clientes')" class="flex items-center gap-1 text-blue-200 hover:text-white text-[10px] font-black uppercase tracking-wider mb-4 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>Volver a Cartera</button>
@@ -289,7 +284,6 @@
         </div>
     </div>
 
-    <!-- ESCÁNER MODAL -->
     <div id="modal-scanner" class="hidden fixed inset-0 z-[110] bg-primary/90 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col border-b-4 border-blue-500">
             <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
@@ -300,7 +294,6 @@
         </div>
     </div>
 
-    <!-- VISOR DE TICKET UNIVERSAL Y ELECCIÓN DE FLUJO -->
     <div id="modal-preview" class="hidden fixed inset-0 z-[85] bg-primary/90 backdrop-blur-sm flex items-center justify-center p-2 modal-enter">
         <div class="bg-gray-100 rounded-3xl shadow-2xl w-full h-[95vh] max-w-md flex flex-col overflow-hidden">
             <div class="p-4 border-b border-gray-200 bg-white flex justify-between items-center z-10 shadow-sm">
@@ -324,7 +317,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE PAGOS CON BLOQUEO ANTI-DEDO -->
     <div id="modal-payment" class="hidden fixed inset-0 z-[80] bg-primary/90 backdrop-blur-sm flex items-center justify-center p-4 modal-enter">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden mt-[-10%] border-b-4 border-success">
             <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
@@ -368,8 +360,6 @@
         </button>
     </div>
 </nav>
-
-<div id="print-area" class="hidden"></div>
 
 <script>
     const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbyNkW8j4o3oawMyvyTwIOcRjdbRF4dplVUx43-2T7WXEogEbVSU5MhO1qwv2gsxupf2Tw/exec";
@@ -859,7 +849,45 @@
         return `<div style="font-family: 'Inter', sans-serif; background: #FFFFFF; padding: 15px; border-radius: 12px; max-width: 800px; margin: 0 auto;"><div style="text-align: center; border-bottom: 3px solid #0A2558; padding-bottom: 15px; margin-bottom: 15px;"><h1 style="margin: 0; font-size: 22px; font-weight: 900; color: #0A2558; text-transform: uppercase;">Auto Eléctrica Zendejas</h1><p style="margin: 4px 0 0; font-size: 12px; font-weight: 800; color: #057A55; letter-spacing: 1px;">${docType}</p></div><div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 20px; background: #F8FAFC; padding: 10px; border-radius: 8px; border: 1px solid #E5E7EB;"><div style="color: #111827;"><b style="color: #0A2558;">Cliente:</b> ${sale.clientName}<br><b style="color: #0A2558;">ID:</b> ${sale.clientId}<br><b style="color: #0A2558;">Tel:</b> ${sale.clientPhone || 'N/A'}</div><div style="text-align: right; color: #111827;"><b style="color: #D90429; font-size: 13px;">Folio: ${sale.folio}</b><br><b>Fecha:</b> ${sale.date}<br><b>Hora:</b> ${sale.time}</div></div><table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;"><thead><tr style="background: #0A2558; color: #FFFFFF; text-transform: uppercase; font-size: 9px; text-align: left;"><th style="padding: 6px 4px; text-align: center; border-top-left-radius: 6px;">IMG</th><th style="padding: 6px 4px;">Código</th><th style="padding: 6px 4px;">Descripción</th><th style="padding: 6px 4px; text-align: center;">Desc.</th><th style="padding: 6px 4px; text-align: right; border-top-right-radius: 6px;">Importe</th></tr></thead><tbody>${rows}</tbody></table><div style="display: flex; justify-content: flex-end;"><div style="width: 200px; background: #F8FAFC; padding: 10px; border-radius: 8px; border: 1px solid #E5E7EB; text-align: right; font-size: 12px; color: #4B5563;"><div style="margin-bottom: 6px;">Subtotal: <b style="color: #111827;">${moneyFmtFull.format(sale.subtotal)}</b></div><div style="margin-bottom: 6px;">IVA (16%): <b style="color: #111827;">${moneyFmtFull.format(sale.iva)}</b></div><div style="font-size: 18px; font-weight: 900; color: #057A55; margin-top: 10px; border-top: 1px dashed #D1D5DB; padding-top: 10px;">TOTAL: ${moneyFmtFull.format(sale.total)}</div></div></div>${isQuote ? '<div style="text-align: center; margin-top: 25px; padding: 10px; background: #FDE8E8; color: #D90429; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase;">ESTE DOCUMENTO ES UNA COTIZACIÓN Y NO ASEGURA INVENTARIO NI PRECIOS FINALES.</div>' : ''}</div>`;
     }
 
-    function triggerPrint(saleObj, isQuote) { document.getElementById('print-area').innerHTML = generateHtmlForPrint(saleObj, isQuote); setTimeout(() => { window.print(); }, 500); }
+    function triggerPrint(saleObj, isQuote) {
+        const ticketHtml = generateHtmlForPrint(saleObj, isQuote);
+        let printFrame = document.getElementById('iframe-impresion');
+        if (!printFrame) {
+            printFrame = document.createElement('iframe');
+            printFrame.id = 'iframe-impresion';
+            printFrame.style.position = 'fixed';
+            printFrame.style.right = '0';
+            printFrame.style.bottom = '0';
+            printFrame.style.width = '0';
+            printFrame.style.height = '0';
+            printFrame.style.border = '0';
+            document.body.appendChild(printFrame);
+        }
+        const frameDoc = printFrame.contentWindow.document;
+        frameDoc.open();
+        frameDoc.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Impresión de Ticket</title>
+                <style>
+                    @media print {
+                        @page { margin: 5mm; }
+                        body { margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    }
+                </style>
+            </head>
+            <body>
+                ${ticketHtml}
+            </body>
+            </html>
+        `);
+        frameDoc.close();
+        setTimeout(() => {
+            printFrame.contentWindow.focus();
+            printFrame.contentWindow.print();
+        }, 500);
+    }
 
     function openPreviewModal() {
         if(cartItems.size === 0) return;
